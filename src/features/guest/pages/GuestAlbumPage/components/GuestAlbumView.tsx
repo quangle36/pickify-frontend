@@ -1,0 +1,253 @@
+import { FC, useState, useEffect } from 'react';
+import { Album, Photo } from '@/types';
+import {
+  Heart,
+  Search,
+  ArrowLeft,
+  AlertCircle,
+  Columns,
+  Grid,
+} from 'lucide-react';
+import { store } from '@/lib/mockStore';
+import { LightboxModal } from '@/components/shared/LightboxModal';
+import { GuestPhotoCard } from './GuestPhotoCard';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+interface GuestAlbumViewProps {
+  album: Album;
+  onExitGuestView: () => void;
+}
+
+export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
+  album,
+  onExitGuestView,
+}) => {
+  const [photos, setPhotos] = useState<Photo[]>(store.getPhotos(album.id));
+  const [filterOnlyHearts, setFilterOnlyHearts] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [gridCols, setGridCols] = useState<2 | 3>(2); // Mobile first: 2 or 3 cols
+  const [failedSaves, setFailedSaves] = useState<Record<string, boolean>>({}); // photoId -> boolean
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Sync photos from store on updates
+  useEffect(() => {
+    const handleUpdate = () => {
+      setPhotos(store.getPhotos(album.id));
+    };
+    const unsubscribe = store.subscribe(handleUpdate);
+    return () => unsubscribe();
+  }, [album.id]);
+
+  const selectedCount = photos.filter((p) => p.isSelected).length;
+
+  // Optimistic Heart Toggle
+  const handleToggleHeart = (photo: Photo) => {
+    const nextVal = !photo.isSelected;
+    // Optimistically update locally
+    const success = store.toggleHeart(album.id, photo.id, nextVal);
+
+    if (!success) {
+      // Báo lỗi Chưa Lưu theo đúng plan.md
+      setFailedSaves((prev) => ({ ...prev, [photo.id]: true }));
+    } else {
+      setFailedSaves((prev) => {
+        const copy = { ...prev };
+        delete copy[photo.id];
+        return copy;
+      });
+    }
+  };
+
+  const handleRetrySave = (photo: Photo) => {
+    const success = store.toggleHeart(album.id, photo.id, !photo.isSelected);
+    if (success) {
+      setFailedSaves((prev) => {
+        const copy = { ...prev };
+        delete copy[photo.id];
+        return copy;
+      });
+    }
+  };
+
+  const filteredPhotos = photos.filter((p) => {
+    if (searchTerm && !p.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
+    }
+    if (filterOnlyHearts) return p.isSelected;
+    return true;
+  });
+
+  return (
+    <div className="min-h-screen bg-stone-900 text-stone-100 flex flex-col font-sans pb-24">
+      {/* Sticky Mobile-First Header */}
+      <header className="sticky top-0 z-30 bg-stone-900/90 backdrop-blur-md border-b border-stone-800 px-4 py-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={onExitGuestView}
+              className="text-stone-400 hover:text-white hover:bg-stone-800 rounded-xl"
+              title="Thoát chế độ xem của khách"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-base font-extrabold text-white truncate">
+                {album.title}
+              </h1>
+              <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Đồng bộ trực tiếp</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Realtime Hearts Count Pill */}
+          <Button
+            size="sm"
+            onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
+            variant={filterOnlyHearts ? 'default' : 'secondary'}
+            className={`rounded-2xl text-xs font-bold gap-1.5 shrink-0 ${
+              filterOnlyHearts
+                ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/30'
+                : 'bg-stone-800 text-stone-300 hover:text-white border-stone-700 hover:bg-stone-700'
+            }`}
+          >
+            <Heart
+              className={`w-4 h-4 ${
+                filterOnlyHearts ? 'fill-white text-white' : 'fill-rose-500 text-rose-500'
+              }`}
+            />
+            <span>
+              {selectedCount}/{photos.length}
+            </span>
+          </Button>
+        </div>
+      </header>
+
+      {/* Network Error Alert Notice if any */}
+      {Object.keys(failedSaves).length > 0 && (
+        <div className="max-w-4xl mx-auto w-full px-4 pt-3">
+          <Alert className="bg-amber-950/80 border-amber-600/60 rounded-2xl text-xs text-amber-200 flex items-center justify-between gap-2 p-3">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+              <AlertDescription className="text-xs text-amber-200">
+                Kết nối mạng gián đoạn. Có ảnh chưa lưu vào máy chủ.
+              </AlertDescription>
+            </div>
+            <span className="text-[11px] font-bold underline cursor-pointer">Bấm vào ảnh để thử lại</span>
+          </Alert>
+        </div>
+      )}
+
+      {/* Filters and Controls */}
+      <div className="max-w-4xl mx-auto w-full px-4 py-3 flex items-center justify-between gap-3">
+        {/* Search */}
+        <div className="relative flex-1">
+          <Input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Tìm mã ảnh (VD: 0012)..."
+            className="pl-8 pr-3 h-9 rounded-xl bg-stone-800 border-stone-700 text-stone-100 placeholder:text-stone-500 text-xs font-mono focus:border-brand-500"
+          />
+          <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+
+        {/* Filter & Grid Cols */}
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant={filterOnlyHearts ? 'default' : 'outline'}
+            onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
+            className={`rounded-xl text-xs font-semibold gap-1.5 h-9 ${
+              filterOnlyHearts
+                ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                : 'bg-stone-800 text-stone-400 hover:text-white border-stone-700 hover:bg-stone-700'
+            }`}
+          >
+            <span>Đã tim</span>
+          </Button>
+
+          <Button
+            size="icon-sm"
+            variant="outline"
+            onClick={() => setGridCols(gridCols === 2 ? 3 : 2)}
+            className="h-9 w-9 rounded-xl bg-stone-800 border-stone-700 text-stone-400 hover:text-white hover:bg-stone-700"
+            title="Đổi số cột hiển thị"
+          >
+            {gridCols === 2 ? <Grid className="w-4 h-4" /> : <Columns className="w-4 h-4" />}
+          </Button>
+        </div>
+      </div>
+
+      {/* Photo Grid */}
+      <main className="max-w-4xl mx-auto w-full px-3 sm:px-4 flex-1">
+        {filteredPhotos.length > 0 ? (
+          <div
+            className={`grid gap-2 sm:gap-3 ${
+              gridCols === 2 ? 'grid-cols-2' : 'grid-cols-3'
+            }`}
+          >
+            {filteredPhotos.map((photo, index) => (
+              <GuestPhotoCard
+                key={photo.id}
+                photo={photo}
+                isFailed={!!failedSaves[photo.id]}
+                onClick={() => {
+                  setLightboxIndex(index);
+                  setLightboxOpen(true);
+                }}
+                onToggleHeart={handleToggleHeart}
+                onRetrySave={handleRetrySave}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center text-stone-500 space-y-3">
+            <Heart className="w-12 h-12 mx-auto stroke-1 text-stone-600" />
+            <p className="text-sm">Không tìm thấy ảnh nào.</p>
+          </div>
+        )}
+      </main>
+
+      {/* Floating Bottom Bar on Mobile */}
+      <div className="fixed bottom-3 inset-x-0 z-20 flex justify-center px-4 pointer-events-none">
+        <div className="bg-stone-800/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-stone-700/80 flex items-center gap-4 backdrop-blur-md pointer-events-auto">
+          <div className="flex items-center gap-2 text-xs">
+            <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
+            <span>
+              Đã chọn <strong>{selectedCount}</strong> / {photos.length} ảnh
+            </span>
+          </div>
+          <div className="h-4 w-px bg-stone-700" />
+          <Button
+            variant="link"
+            size="sm"
+            onClick={onExitGuestView}
+            className="text-xs text-stone-400 hover:text-white font-medium p-0 h-auto"
+          >
+            Đóng
+          </Button>
+        </div>
+      </div>
+
+      {/* Lightbox for Guest View */}
+      <LightboxModal
+        photos={filteredPhotos}
+        currentIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        onNavigate={(idx) => setLightboxIndex(idx)}
+        onToggleSelection={(photoId, currentSelected) => {
+          store.toggleHeart(album.id, photoId, !currentSelected);
+        }}
+      />
+    </div>
+  );
+};
+export default GuestAlbumView;
