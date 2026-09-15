@@ -1,6 +1,8 @@
 import { FC, useState, FormEvent } from 'react';
+import { errorMessage } from "@/lib/api";
+import { useApiData } from "@/lib/apiQueries";
 import { Album } from '@/types';
-import { Lock, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,35 +18,17 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
   album,
   onVerified,
 }) => {
+  const store = useApiData();
   const [inputPasscode, setInputPasscode] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [attempts, setAttempts] = useState(0);
-
-  const handleSubmit = (e: FormEvent) => {
+  const [pending, setPending] = useState(false);
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    if (!inputPasscode.trim()) {
-      setError('Vui lòng nhập mật khẩu được cấp.');
-      return;
-    }
-
-    if (inputPasscode.trim() === album.passcode) {
-      onVerified();
-    } else {
-      const nextAttempts = attempts + 1;
-      setAttempts(nextAttempts);
-      if (nextAttempts >= 5) {
-        setError('Bạn đã nhập sai 5 lần. Tạm khóa thử lại theo chính sách bảo mật (plan.md).');
-      } else {
-        setError(`Mật khẩu không chính xác. Bạn còn ${5 - nextAttempts} lần thử.`);
-      }
-    }
-  };
-
-  const handleQuickFill = () => {
-    setInputPasscode(album.passcode);
-    setError(null);
+    if (pending) return;
+    setPending(true); setError(null);
+    try { await store.verifyGuestPasscode(album.shareId, inputPasscode); onVerified(); }
+    catch (error) { setError(errorMessage(error)); }
+    finally { setPending(false); }
   };
 
   return (
@@ -72,7 +56,7 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
             {album.title}
           </h2>
           <p className="text-xs text-stone-500 mt-2 leading-relaxed">
-            Vui lòng nhập mã mật khẩu 4 chữ số do nhiếp ảnh gia cung cấp để mở xem ảnh và thả tim.
+            Vui lòng nhập mật khẩu do nhiếp ảnh gia cung cấp để mở xem ảnh và thả tim.
           </p>
         </div>
 
@@ -89,13 +73,11 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
           <div>
             <Input
               type="password"
-              inputMode="numeric"
-              pattern="[0-9]*"
               value={inputPasscode}
               onChange={(e) => setInputPasscode(e.target.value)}
               placeholder="Nhập mật khẩu (VD: 1234)"
-              maxLength={8}
-              disabled={attempts >= 5}
+              maxLength={128}
+              disabled={pending}
               autoFocus
               className="h-16 text-center text-2xl tracking-widest font-mono font-black py-4 px-4 rounded-2xl border-2 border-stone-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 placeholder:text-stone-300 placeholder:tracking-normal placeholder:font-sans placeholder:text-base"
             />
@@ -103,7 +85,7 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
 
           <Button
             type="submit"
-            disabled={attempts >= 5}
+            disabled={pending}
             variant="brand"
             size="lg"
             className="w-full h-12 py-4 rounded-2xl font-bold text-sm shadow-xl shadow-brand-600/25 gap-2"
@@ -113,19 +95,6 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
           </Button>
         </form>
 
-        {/* Quick Demo Hint */}
-        <div className="pt-2 border-t border-stone-100">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleQuickFill}
-            className="text-xs font-semibold text-brand-600 hover:text-brand-700 gap-1.5"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Điền nhanh mật khẩu mẫu ({album.passcode})</span>
-          </Button>
-        </div>
       </Card>
     </div>
   );

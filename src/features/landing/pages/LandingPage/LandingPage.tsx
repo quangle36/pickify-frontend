@@ -11,19 +11,20 @@ import { LandingFooter } from './components/LandingFooter';
 
 interface LandingPageProps {
   onGoToDashboard: () => void;
+  onLogin: () => void;
+  userName?: string;
   onOpenGuestDemo: () => void;
 }
 
 const LandingPage: FC<LandingPageProps> = ({
   onGoToDashboard,
   onOpenGuestDemo,
+  onLogin,
+  userName,
 }) => {
   return (
     <div className="flex-1 flex flex-col">
-      <LandingNavbar
-        onGoToDashboard={onGoToDashboard}
-        onOpenGuestDemo={onOpenGuestDemo}
-      />
+      <LandingNavbar onGoToDashboard={onGoToDashboard} onLogin={onLogin} userName={userName} />
       <main className="flex-1">
         <HeroSection
           onStartDashboard={onGoToDashboard}

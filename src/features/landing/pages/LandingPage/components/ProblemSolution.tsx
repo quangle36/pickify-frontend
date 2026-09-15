@@ -1,21 +1,34 @@
-import { FC } from 'react';
-import { XCircle, CheckCircle2, AlertOctagon, Sparkles, Flame } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { FC } from "react";
+import {
+  XCircle,
+  CheckCircle2,
+  AlertOctagon,
+  Sparkles,
+  Flame,
+} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export const ProblemSolution: FC = () => {
   return (
-    <section id="problem-solution" className="py-16 sm:py-24 bg-stone-100/70 border-y border-stone-200/80">
+    <section
+      id="problem-solution"
+      className="py-16 sm:py-24 bg-stone-100/70 border-y border-stone-200/80"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <Badge variant="brand" className="mb-2 uppercase tracking-widest font-bold">
+          <Badge
+            variant="brand"
+            className="mb-2 uppercase tracking-widest font-bold"
+          >
             Tại sao lại cần Pickify?
           </Badge>
           <h3 className="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight">
             Nỗi ám ảnh mang tên: "Khách gửi mã ảnh qua Zalo"
           </h3>
           <p className="mt-4 text-stone-600 text-sm sm:text-base">
-            Nếu bạn là thợ chụp cưới, tiệc, phóng sự hay sự kiện, bạn chắc chắn đã từng phát ngấy với cảnh này:
+            Nếu bạn là thợ chụp cưới, tiệc, phóng sự hay sự kiện, bạn chắc chắn
+            đã từng phát ngấy với cảnh này:
           </p>
         </div>
 
@@ -33,42 +46,65 @@ export const ProblemSolution: FC = () => {
                   <AlertOctagon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-lg text-stone-900">Gửi link Drive thô & chờ Zalo</h4>
-                  <p className="text-xs text-stone-500">Mất 30–60 phút mò mẫm mỗi album</p>
+                  <h4 className="font-extrabold text-lg text-stone-900">
+                    Gửi link Drive thô & chờ Zalo
+                  </h4>
+                  <p className="text-xs text-stone-500">
+                    Mất 30–60 phút mò mẫm mỗi album
+                  </p>
                 </div>
               </div>
 
               {/* Chat bubble simulation */}
               <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/80 text-xs font-mono space-y-2 mb-6">
-                <p className="text-stone-400 font-sans font-semibold text-[11px] uppercase tracking-wider">Tin nhắn của khách:</p>
+                <p className="text-stone-400 font-sans font-semibold text-[11px] uppercase tracking-wider">
+                  Tin nhắn của khách:
+                </p>
                 <div className="p-3 bg-white rounded-xl border border-stone-200 text-stone-700 shadow-2xs leading-relaxed">
-                  "Dạ em chọn các ảnh này ạ: IMG_0142, IMG_0145, IMG_0188 (chụp với mẹ), IMG_0219 (ảnh cười tươi nha anh), DSC_0411, 0412... với cả chú rể có chọn thêm 5 cái nữa mà em quên chưa lưu..."
+                  "Dạ em chọn các ảnh này ạ: IMG_0142, IMG_0145, IMG_0188 (chụp
+                  với mẹ), IMG_0219 (ảnh cười tươi nha anh), DSC_0411, 0412...
+                  với cả chú rể có chọn thêm 5 cái nữa mà em quên chưa lưu..."
                 </div>
               </div>
 
               <ul className="space-y-3.5 text-sm text-stone-700">
                 <li className="flex items-start gap-2.5">
                   <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                  <span>Google Drive load trên điện thoại rất nặng, hay giật lag và dễ nhầm thứ tự ảnh.</span>
+                  <span>
+                    Google Drive load trên điện thoại rất nặng, hay giật lag và
+                    dễ nhầm thứ tự ảnh.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                  <span>Khách gõ nhầm mã file, phải chụp màn hình khoanh tròn gửi qua lại rối rắm.</span>
+                  <span>
+                    Khách gõ nhầm mã file, phải chụp màn hình khoanh tròn gửi
+                    qua lại rối rắm.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                  <span>Cô dâu chú rể chọn 2 máy khác nhau, không có danh sách tim chung dẫn đến xung đột.</span>
+                  <span>
+                    Cô dâu chú rể chọn 2 máy khác nhau, không có danh sách tim
+                    chung dẫn đến xung đột.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                  <span>Photographer phải ngồi copy-paste từng tên file vào ô tìm kiếm Lightroom rất mệt mỏi.</span>
+                  <span>
+                    Photographer phải ngồi copy-paste từng tên file vào ô tìm
+                    kiếm Lightroom rất mệt mỏi.
+                  </span>
                 </li>
               </ul>
             </div>
 
             <div className="mt-6 pt-4 border-t border-red-100 text-xs font-semibold text-red-600 flex items-center gap-1.5">
               <Flame className="w-4 h-4" />
-              <span>Tiêu tốn trung bình 2–3 giờ làm việc mỗi tuần chỉ để gỡ rối mã ảnh.</span>
+              <span>
+                Tiêu tốn trung bình 2–3 giờ làm việc mỗi tuần chỉ để gỡ rối mã
+                ảnh.
+              </span>
             </div>
           </Card>
 
@@ -84,8 +120,12 @@ export const ProblemSolution: FC = () => {
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-lg text-stone-900">1 Link Chọn Ảnh Thông Minh</h4>
-                  <p className="text-xs text-brand-700 font-semibold">Khách chạm tim ❤️ — Xuất CSV trong 3 giây</p>
+                  <h4 className="font-extrabold text-lg text-stone-900">
+                    1 Link Chọn Ảnh Thông Minh
+                  </h4>
+                  <p className="text-xs text-brand-700 font-semibold">
+                    Khách chạm tim ❤️ — Xuất CSV trong 3 giây
+                  </p>
                 </div>
               </div>
 
@@ -100,7 +140,9 @@ export const ProblemSolution: FC = () => {
                 <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="font-mono text-stone-800 text-xs">TuanTrang_ChonAnh_2026.csv</span>
+                    <span className="font-mono text-stone-800 text-xs">
+                      TuanTrang_ChonAnh_2026.csv
+                    </span>
                   </div>
                   <Badge variant="success" className="font-bold text-[11px]">
                     Sẵn sàng cho Lightroom
@@ -111,26 +153,41 @@ export const ProblemSolution: FC = () => {
               <ul className="space-y-3.5 text-sm text-stone-800 font-medium">
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
-                  <span>Khách mở điện thoại không cần đăng nhập tài khoản Google hay tạo mật khẩu phức tạp.</span>
+                  <span>
+                    Khách mở điện thoại không cần đăng nhập tài khoản Google hay
+                    tạo mật khẩu phức tạp.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
-                  <span>Giao diện mượt mà: chạm tim ảnh to, lướt nhanh, xem toàn màn hình (lightbox) sắc nét.</span>
+                  <span>
+                    Giao diện mượt mà: chạm tim ảnh to, lướt nhanh, xem toàn màn
+                    hình (lightbox) sắc nét.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
-                  <span>Một danh sách tim chung thời gian thực (SSE), cô dâu và chú rể thả tim đồng thời không bao giờ lệch.</span>
+                  <span>
+                    Một danh sách tim chung được lưu bền vững, sẵn sàng để
+                    photographer lọc và xuất CSV.
+                  </span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
-                  <span>Xuất file CSV chuẩn UTF-8 BOM, nhập thẳng vào Lightroom Library Filter chỉ 1 click.</span>
+                  <span>
+                    Xuất file CSV chuẩn UTF-8 BOM, nhập thẳng vào Lightroom
+                    Library Filter chỉ 1 click.
+                  </span>
                 </li>
               </ul>
             </div>
 
             <div className="mt-6 pt-4 border-t border-brand-100 text-xs font-bold text-brand-700 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Chuyên nghiệp hóa hình ảnh studio và tiết kiệm 95% thời gian xử lý file.</span>
+              <span>
+                Chuyên nghiệp hóa hình ảnh studio và tiết kiệm 95% thời gian xử
+                lý file.
+              </span>
             </div>
           </Card>
         </div>

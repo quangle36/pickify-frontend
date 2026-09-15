@@ -1,12 +1,13 @@
-import { FC, MouseEvent } from 'react';
-import { Photo } from '@/types';
-import { Heart, RefreshCw } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { FC, MouseEvent } from "react";
+import { Photo } from "@/types";
+import { Heart, RefreshCw } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface GuestPhotoCardProps {
   photo: Photo;
   isFailed: boolean;
+  isPending: boolean;
   onClick: () => void;
   onToggleHeart: (photo: Photo) => void;
   onRetrySave: (photo: Photo) => void;
@@ -15,6 +16,7 @@ interface GuestPhotoCardProps {
 export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
   photo,
   isFailed,
+  isPending,
   onClick,
   onToggleHeart,
   onRetrySave,
@@ -31,35 +33,58 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
 
   return (
     <Card
-      onClick={onClick}
-      className="group relative rounded-2xl overflow-hidden aspect-4/3 bg-stone-800 cursor-pointer border border-stone-800 hover:border-brand-500 transition-all select-none"
+      onClick={photo.status === "ready" ? onClick : undefined}
+      className={`group relative aspect-[4/3] overflow-hidden rounded-2xl border border-stone-800 bg-stone-800 transition-all select-none ${photo.status === "ready" ? "cursor-pointer hover:border-brand-500" : "cursor-default"}`}
     >
-      <img
-        src={photo.thumbnailUrl}
-        alt={photo.name}
-        className="w-full h-full object-cover"
-        loading="lazy"
-      />
+      {photo.status === "processing" && (
+        <div
+          role="status"
+          aria-label={`Đang xử lý ${photo.name}`}
+          className="absolute inset-0 origin-center animate-skeleton-breathe bg-linear-to-br from-stone-800 via-stone-700 to-stone-800 motion-reduce:animate-none"
+        />
+      )}
+      {photo.status === "ready" && (
+        <img
+          src={photo.displayUrl}
+          alt={photo.name}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+        />
+      )}
 
       {/* Dark gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
 
       {/* Heart Button Overlay (Tap target >= 44px) */}
-      <div className="absolute top-1.5 right-1.5 z-10">
-        <button
-          type="button"
-          onClick={handleHeartClick}
-          className={`min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center backdrop-blur-md transition-transform active:scale-85 ${
-            photo.isSelected
-              ? 'bg-rose-500 text-white animate-heart-pop shadow-lg shadow-rose-500/40'
-              : 'bg-black/45 text-white/80 hover:bg-black/60'
-          }`}
-          aria-label={photo.isSelected ? 'Bỏ tim' : 'Thả tim'}
-        >
-          <Heart className={`w-5 h-5 ${photo.isSelected ? 'fill-white' : ''}`} />
-        </button>
-      </div>
+      {photo.status === "ready" && (
+        <div className="absolute top-1.5 right-1.5 z-10">
+          <button
+            type="button"
+            onClick={handleHeartClick}
+            disabled={isPending}
+            aria-pressed={photo.isSelected}
+            className={`min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center backdrop-blur-md transition-transform active:scale-85 ${
+              photo.isSelected
+                ? "bg-rose-500 text-white animate-heart-pop shadow-lg shadow-rose-500/40"
+                : "bg-black/45 text-white/80 hover:bg-black/60"
+            }`}
+            aria-label={photo.isSelected ? "Bỏ tim" : "Thả tim"}
+          >
+            <Heart
+              className={`w-5 h-5 ${photo.isSelected ? "fill-white" : ""}`}
+            />
+          </button>
+        </div>
+      )}
 
+      {isPending && (
+        <span
+          role="status"
+          className="absolute top-2 left-2 bg-stone-900 text-white p-1 text-xs"
+        >
+          Đang lưu…
+        </span>
+      )}
       {/* Unsaved warning badge per plan.md */}
       {isFailed && (
         <div
@@ -75,7 +100,10 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
       <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between text-[11px] font-mono text-stone-300 pointer-events-none">
         <span className="truncate">{photo.name}</span>
         {photo.isSelected && (
-          <Badge variant="destructive" className="text-[10px] font-sans font-black text-rose-400 bg-rose-950/80 px-1.5 py-0 rounded shrink-0 border-rose-800/50">
+          <Badge
+            variant="destructive"
+            className="text-[10px] font-sans font-black text-rose-400 bg-rose-950/80 px-1.5 py-0 rounded shrink-0 border-rose-800/50"
+          >
             ĐÃ CHỌN
           </Badge>
         )}

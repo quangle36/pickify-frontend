@@ -1,5 +1,6 @@
-import { FC, useState, useEffect } from 'react';
-import { Album, Photo } from '@/types';
+import { LoadMore } from "@/components/shared/LoadMore";
+import { FC, useState, useEffect } from "react";
+import { Album, Photo } from "@/types";
 import {
   Heart,
   Search,
@@ -7,13 +8,13 @@ import {
   AlertCircle,
   Columns,
   Grid,
-} from 'lucide-react';
-import { store } from '@/lib/mockStore';
-import { LightboxModal } from '@/components/shared/LightboxModal';
-import { GuestPhotoCard } from './GuestPhotoCard';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+} from "lucide-react";
+import { useApiData } from "@/lib/apiQueries";
+import { LightboxModal } from "@/components/shared/LightboxModal";
+import { GuestPhotoCard } from "./GuestPhotoCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface GuestAlbumViewProps {
   album: Album;
@@ -24,56 +25,45 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   album,
   onExitGuestView,
 }) => {
-  const [photos, setPhotos] = useState<Photo[]>(store.getPhotos(album.id));
+  const store = useApiData();
+  const photos = store.getPhotos(album.id);
   const [filterOnlyHearts, setFilterOnlyHearts] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [gridCols, setGridCols] = useState<2 | 3>(2); // Mobile first: 2 or 3 cols
   const [failedSaves, setFailedSaves] = useState<Record<string, boolean>>({}); // photoId -> boolean
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  // Sync photos from store on updates
   useEffect(() => {
-    const handleUpdate = () => {
-      setPhotos(store.getPhotos(album.id));
-    };
-    const unsubscribe = store.subscribe(handleUpdate);
-    return () => unsubscribe();
-  }, [album.id]);
+    const timer = setTimeout(() => {
+      void store
+        .filterPhotos(album.id, filterOnlyHearts, searchTerm)
+        .catch((e) => store.report(e));
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [album.id, filterOnlyHearts, searchTerm]);
 
-  const selectedCount = photos.filter((p) => p.isSelected).length;
+  const selectedCount = album.selectedPhotosCount;
 
-  // Optimistic Heart Toggle
-  const handleToggleHeart = (photo: Photo) => {
-    const nextVal = !photo.isSelected;
-    // Optimistically update locally
-    const success = store.toggleHeart(album.id, photo.id, nextVal);
-
-    if (!success) {
-      // Báo lỗi Chưa Lưu theo đúng plan.md
-      setFailedSaves((prev) => ({ ...prev, [photo.id]: true }));
-    } else {
-      setFailedSaves((prev) => {
-        const copy = { ...prev };
-        delete copy[photo.id];
-        return copy;
-      });
-    }
+  const handleToggleHeart = async (photo: Photo) => {
+    if (store.isPending(photo.id)) return;
+    const success = await store.toggleHeart(
+      album.id,
+      photo.id,
+      !photo.isSelected,
+    );
+    setFailedSaves((previous) => ({ ...previous, [photo.id]: !success }));
   };
-
-  const handleRetrySave = (photo: Photo) => {
-    const success = store.toggleHeart(album.id, photo.id, !photo.isSelected);
-    if (success) {
-      setFailedSaves((prev) => {
-        const copy = { ...prev };
-        delete copy[photo.id];
-        return copy;
-      });
-    }
+  const handleRetrySave = async (photo: Photo) => {
+    const success = await store.retryHeart(album.id, photo.id);
+    setFailedSaves((previous) => ({ ...previous, [photo.id]: !success }));
   };
 
   const filteredPhotos = photos.filter((p) => {
-    if (searchTerm && !p.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+    if (
+      searchTerm &&
+      !p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
       return false;
     }
     if (filterOnlyHearts) return p.isSelected;
@@ -100,37 +90,39 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
                 {album.title}
               </h1>
               <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Đồng bộ trực tiếp</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>Lựa chọn được lưu tự động</span>
               </div>
             </div>
           </div>
 
-          {/* Realtime Hearts Count Pill */}
+          {/* Hearts Count Pill */}
           <Button
             size="sm"
             onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
-            variant={filterOnlyHearts ? 'default' : 'secondary'}
+            variant={filterOnlyHearts ? "default" : "secondary"}
             className={`rounded-2xl text-xs font-bold gap-1.5 shrink-0 ${
               filterOnlyHearts
-                ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/30'
-                : 'bg-stone-800 text-stone-300 hover:text-white border-stone-700 hover:bg-stone-700'
+                ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/30"
+                : "bg-stone-800 text-stone-300 hover:text-white border-stone-700 hover:bg-stone-700"
             }`}
           >
             <Heart
               className={`w-4 h-4 ${
-                filterOnlyHearts ? 'fill-white text-white' : 'fill-rose-500 text-rose-500'
+                filterOnlyHearts
+                  ? "fill-white text-white"
+                  : "fill-rose-500 text-rose-500"
               }`}
             />
             <span>
-              {selectedCount}/{photos.length}
+              {selectedCount}/{album.totalPhotos}
             </span>
           </Button>
         </div>
       </header>
 
       {/* Network Error Alert Notice if any */}
-      {Object.keys(failedSaves).length > 0 && (
+      {Object.values(failedSaves).some(Boolean) && (
         <div className="max-w-4xl mx-auto w-full px-4 pt-3">
           <Alert className="bg-amber-950/80 border-amber-600/60 rounded-2xl text-xs text-amber-200 flex items-center justify-between gap-2 p-3">
             <div className="flex items-center gap-2">
@@ -139,7 +131,9 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
                 Kết nối mạng gián đoạn. Có ảnh chưa lưu vào máy chủ.
               </AlertDescription>
             </div>
-            <span className="text-[11px] font-bold underline cursor-pointer">Bấm vào ảnh để thử lại</span>
+            <span className="text-[11px] font-bold underline cursor-pointer">
+              Bấm vào ảnh để thử lại
+            </span>
           </Alert>
         </div>
       )}
@@ -162,12 +156,12 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
         <div className="flex items-center gap-2">
           <Button
             size="sm"
-            variant={filterOnlyHearts ? 'default' : 'outline'}
+            variant={filterOnlyHearts ? "default" : "outline"}
             onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
             className={`rounded-xl text-xs font-semibold gap-1.5 h-9 ${
               filterOnlyHearts
-                ? 'bg-rose-600 hover:bg-rose-700 text-white'
-                : 'bg-stone-800 text-stone-400 hover:text-white border-stone-700 hover:bg-stone-700'
+                ? "bg-rose-600 hover:bg-rose-700 text-white"
+                : "bg-stone-800 text-stone-400 hover:text-white border-stone-700 hover:bg-stone-700"
             }`}
           >
             <span>Đã tim</span>
@@ -180,7 +174,11 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
             className="h-9 w-9 rounded-xl bg-stone-800 border-stone-700 text-stone-400 hover:text-white hover:bg-stone-700"
             title="Đổi số cột hiển thị"
           >
-            {gridCols === 2 ? <Grid className="w-4 h-4" /> : <Columns className="w-4 h-4" />}
+            {gridCols === 2 ? (
+              <Grid className="w-4 h-4" />
+            ) : (
+              <Columns className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </div>
@@ -190,14 +188,15 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
         {filteredPhotos.length > 0 ? (
           <div
             className={`grid gap-2 sm:gap-3 ${
-              gridCols === 2 ? 'grid-cols-2' : 'grid-cols-3'
+              gridCols === 2 ? "grid-cols-2" : "grid-cols-3"
             }`}
           >
             {filteredPhotos.map((photo, index) => (
               <GuestPhotoCard
                 key={photo.id}
                 photo={photo}
-                isFailed={!!failedSaves[photo.id]}
+                isFailed={store.isFailed(photo.id)}
+                isPending={store.isPending(photo.id)}
                 onClick={() => {
                   setLightboxIndex(index);
                   setLightboxOpen(true);
@@ -213,6 +212,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
             <p className="text-sm">Không tìm thấy ảnh nào.</p>
           </div>
         )}
+        <LoadMore albumId={album.id} />
       </main>
 
       {/* Floating Bottom Bar on Mobile */}
@@ -221,7 +221,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
           <div className="flex items-center gap-2 text-xs">
             <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
             <span>
-              Đã chọn <strong>{selectedCount}</strong> / {photos.length} ảnh
+              Đã chọn <strong>{selectedCount}</strong> / {album.totalPhotos} ảnh
             </span>
           </div>
           <div className="h-4 w-px bg-stone-700" />

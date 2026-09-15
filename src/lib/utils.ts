@@ -27,8 +27,9 @@ export function formatBytes(bytes: number, decimals = 1): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-export function getDaysRemaining(expiresAt: string): number {
+export function getDaysRemaining(expiresAt: string | null): number {
   try {
+    if (!expiresAt) return 30;
     const now = new Date().getTime();
     const expiry = new Date(expiresAt).getTime();
     const diff = expiry - now;

@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { Album } from '@/types';
-import { store } from '@/lib/mockStore';
 import { GuestPasscodeModal } from './components/GuestPasscodeModal';
 import { GuestAlbumView } from './components/GuestAlbumView';
 
@@ -22,7 +21,6 @@ const GuestAlbumPage: FC<GuestAlbumPageProps> = ({
       <GuestPasscodeModal
         album={album}
         onVerified={() => {
-          store.verifyGuestPasscode(album.shareId, album.passcode);
           onVerified();
         }}
       />

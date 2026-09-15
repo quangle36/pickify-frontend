@@ -42,15 +42,15 @@ Giao diện tiếng Việt, ưu tiên điện thoại, hỗ trợ bàn phím tro
 
 ### Stack
 
-| Thành phần | Lựa chọn |
-|---|---|
-| Frontend | React, Vite, TypeScript, Tailwind, shadcn/ui |
-| Backend | Node.js, TypeScript, Fastify |
-| Database | PostgreSQL managed, Prisma |
-| Hàng đợi | BullMQ và Redis managed hỗ trợ BullMQ |
-| Worker | Tiến trình Node.js riêng, dùng Sharp xử lý JPEG |
-| Media | Object storage riêng tư tương thích S3, CDN hỗ trợ URL ký |
-| Đồng bộ tim | SSE; gửi thao tác qua HTTP |
+| Thành phần  | Lựa chọn                                                  |
+| ----------- | --------------------------------------------------------- |
+| Frontend    | React, Vite, TypeScript, Tailwind, shadcn/ui              |
+| Backend     | Node.js, TypeScript, Fastify                              |
+| Database    | PostgreSQL managed, Prisma                                |
+| Hàng đợi    | BullMQ và Redis managed hỗ trợ BullMQ                     |
+| Worker      | Tiến trình Node.js riêng, dùng Sharp xử lý JPEG           |
+| Media       | Object storage riêng tư tương thích S3, CDN hỗ trợ URL ký |
+| Đồng bộ tim | SSE; gửi thao tác qua HTTP                                |
 
 Một monorepo chứa web, API, worker và kiểu dữ liệu dùng chung. API và worker triển khai độc lập; tác vụ nhập không chạy bên trong request tạo album.
 
@@ -86,7 +86,7 @@ Ràng buộc duy nhất `(albumId, driveFileId)` ngăn ảnh trùng khi chạy l
 4. Worker tải từng JPEG, tạo thumbnail và preview, tải lên storage rồi xóa file tạm.
 5. Đánh dấu sẵn sàng chỉ khi mọi JPEG trong danh sách đều có preview thành công.
 
-Mặc định thumbnail rộng tối đa 480 px, preview cạnh dài tối đa 2.560 px; không phóng lớn ảnh nhỏ. Tự xoay theo EXIF và loại metadata vị trí khỏi bản phục vụ khách.
+Mặc định thumbnail rộng tối đa 960 px để hiển thị rõ trên màn hình Retina, preview cạnh dài tối đa 2.560 px; không phóng lớn ảnh nhỏ. Tự xoay theo EXIF và loại metadata vị trí khỏi bản phục vụ khách.
 
 - Giới hạn 50 MB/JPEG; folder vượt 1.500 JPEG hoặc chứa JPEG không hợp lệ phải báo rõ, không bỏ qua âm thầm.
 - Bỏ qua định dạng khác và báo số lượng; chưa nhập thư mục con hoặc shortcut.

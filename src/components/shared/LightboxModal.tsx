@@ -1,9 +1,10 @@
-import { FC, useEffect, useCallback } from 'react';
-import { Photo } from '@/types';
-import { X, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
-import { formatBytes } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { FC, useEffect, useCallback } from "react";
+import { useApiData } from "@/lib/apiQueries";
+import { Photo } from "@/types";
+import { X, ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import { formatBytes } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface LightboxModalProps {
   photos: Photo[];
@@ -22,29 +23,45 @@ export const LightboxModal: FC<LightboxModalProps> = ({
   onNavigate,
   onToggleSelection,
 }) => {
+  const store = useApiData();
   const currentPhoto = photos[currentIndex];
-
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!isOpen || !currentPhoto) return;
 
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === "ArrowLeft") {
         if (currentIndex > 0) onNavigate(currentIndex - 1);
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === "ArrowRight") {
         if (currentIndex < photos.length - 1) onNavigate(currentIndex + 1);
-      } else if (e.key === ' ' || e.key === 'l' || e.key === 'L' || e.key === 'h' || e.key === 'H') {
+      } else if (
+        e.key === " " ||
+        e.key === "l" ||
+        e.key === "L" ||
+        e.key === "h" ||
+        e.key === "H"
+      ) {
         e.preventDefault();
+        if (store.isPending(currentPhoto.id)) return;
         onToggleSelection(currentPhoto.id, currentPhoto.isSelected);
       }
     },
-    [isOpen, currentPhoto, currentIndex, photos.length, onClose, onNavigate, onToggleSelection]
+    [
+      isOpen,
+      currentPhoto,
+      currentIndex,
+      photos.length,
+      onClose,
+      onNavigate,
+      onToggleSelection,
+      store,
+    ],
   );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
   if (!isOpen || !currentPhoto) return null;
@@ -57,7 +74,10 @@ export const LightboxModal: FC<LightboxModalProps> = ({
           <span className="font-mono text-xs sm:text-sm font-bold tracking-wider">
             {currentPhoto.name}
           </span>
-          <Badge variant="outline" className="text-stone-400 border-stone-700 bg-stone-900/50">
+          <Badge
+            variant="outline"
+            className="text-stone-400 border-stone-700 bg-stone-900/50"
+          >
             {currentIndex + 1} / {photos.length}
           </Badge>
         </div>
@@ -66,16 +86,29 @@ export const LightboxModal: FC<LightboxModalProps> = ({
           {/* Heart toggle inside lightbox */}
           <Button
             size="sm"
-            onClick={() => onToggleSelection(currentPhoto.id, currentPhoto.isSelected)}
-            variant={currentPhoto.isSelected ? 'default' : 'secondary'}
+            disabled={store.isPending(currentPhoto.id)}
+            onClick={() =>
+              onToggleSelection(currentPhoto.id, currentPhoto.isSelected)
+            }
+            variant={currentPhoto.isSelected ? "default" : "secondary"}
             className={`gap-2 rounded-full font-bold transition-all ${
               currentPhoto.isSelected
-                ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/40 animate-heart-pop'
-                : 'bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 border-stone-700'
+                ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/40 animate-heart-pop"
+                : "bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 border-stone-700"
             }`}
           >
-            <Heart className={`w-4 h-4 ${currentPhoto.isSelected ? 'fill-white' : ''}`} />
-            <span>{currentPhoto.isSelected ? 'Đã thả tim' : 'Thả tim'}</span>
+            <Heart
+              className={`w-4 h-4 ${currentPhoto.isSelected ? "fill-white" : ""}`}
+            />
+            <span>
+              {store.isPending(currentPhoto.id)
+                ? "Đang lưu…"
+                : store.isFailed(currentPhoto.id)
+                  ? "Chưa lưu — thử lại"
+                  : currentPhoto.isSelected
+                    ? "Đã thả tim"
+                    : "Thả tim"}
+            </span>
           </Button>
 
           <Button
@@ -93,7 +126,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
       {/* Main Image Stage */}
       <div className="relative flex-1 flex items-center justify-center p-2 sm:p-6 overflow-hidden">
         <img
-          src={currentPhoto.previewUrl}
+          src={currentPhoto.displayUrl}
           alt={currentPhoto.name}
           className="max-h-full max-w-full object-contain rounded-lg shadow-2xl transition-all"
         />
@@ -128,20 +161,31 @@ export const LightboxModal: FC<LightboxModalProps> = ({
       {/* Bottom Footer Info & Keyboard Hints */}
       <div className="p-4 bg-gradient-to-t from-black/80 to-transparent flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">
         <div className="flex items-center gap-3">
-          <span>Kích thước: {currentPhoto.dimensions.width} × {currentPhoto.dimensions.height} px</span>
+          <span>
+            Kích thước: {currentPhoto.dimensions.width} ×{" "}
+            {currentPhoto.dimensions.height} px
+          </span>
           <span>•</span>
           <span>Dung lượng: {formatBytes(currentPhoto.sizeBytes)}</span>
         </div>
 
         <div className="hidden md:flex items-center gap-2 text-[11px] text-stone-400">
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">←</kbd>
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">→</kbd>
+          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+            ←
+          </kbd>
+          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+            →
+          </kbd>
           <span>Chuyển ảnh</span>
           <span className="mx-1">•</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">Space</kbd>
+          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+            Space
+          </kbd>
           <span>Thả tim</span>
           <span className="mx-1">•</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">Esc</kbd>
+          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+            Esc
+          </kbd>
           <span>Đóng</span>
         </div>
       </div>

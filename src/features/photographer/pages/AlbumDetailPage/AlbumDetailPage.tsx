@@ -1,5 +1,6 @@
-import { useState, FC } from 'react';
-import { Album, Photo } from '@/types';
+import { useState, useEffect, FC } from "react";
+import { Link } from "@tanstack/react-router";
+import { Album, Photo } from "@/types";
 import {
   ArrowLeft,
   Heart,
@@ -10,20 +11,19 @@ import {
   Search,
   Eye,
   Clock,
-} from 'lucide-react';
-import { getDaysRemaining } from '@/lib/utils';
-import { exportSelectedPhotosToCsv } from '@/lib/exportCsv';
-import { store } from '@/lib/mockStore';
-import { PhotoCard } from './components/PhotoCard';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+} from "lucide-react";
+import { getDaysRemaining } from "@/lib/utils";
+import { exportSelectedPhotosToCsv } from "@/lib/exportCsv";
+import { useApiData } from "@/lib/apiQueries";
+import { PhotoCard } from "./components/PhotoCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AlbumDetailPageProps {
   album: Album;
   photos: Photo[];
-  onBack: () => void;
   onOpenGuestView: (shareId: string) => void;
   onOpenLightbox: (photos: Photo[], index: number) => void;
 }
@@ -31,20 +31,31 @@ interface AlbumDetailPageProps {
 const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   album,
   photos,
-  onBack,
   onOpenGuestView,
   onOpenLightbox,
 }) => {
-  const [filterMode, setFilterMode] = useState<'all' | 'selected' | 'error'>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const store = useApiData();
+  const [filterMode, setFilterMode] = useState<"all" | "selected" | "error">(
+    "all",
+  );
+  const [searchTerm, setSearchTerm] = useState("");
   const [gridColumns, setGridColumns] = useState<3 | 4 | 6>(4);
   const [copiedLink, setCopiedLink] = useState(false);
   const [editingPasscode, setEditingPasscode] = useState(false);
-  const [newPasscode, setNewPasscode] = useState(album.passcode);
+  const [newPasscode, setNewPasscode] = useState("");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void store
+        .filterPhotos(album.id, filterMode === "selected", searchTerm)
+        .catch((e) => store.report(e));
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [album.id, filterMode, searchTerm]);
+
   const daysLeft = getDaysRemaining(album.expiresAt);
-  const selectedCount = photos.filter((p) => p.isSelected).length;
+  const selectedCount = album.selectedPhotosCount;
 
   const handleCopyLink = () => {
     const guestUrl = `${window.location.origin}/album/${album.shareId}`;
@@ -57,20 +68,36 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
     exportSelectedPhotosToCsv(album, photos);
   };
 
-  const handleSavePasscode = () => {
+  const handleSavePasscode = async () => {
     if (!newPasscode || newPasscode.length < 4) {
-      alert('Mật khẩu phải có ít nhất 4 ký tự.');
+      alert("Mật khẩu phải có ít nhất 4 ký tự.");
       return;
     }
-    store.updateAlbumPasscode(album.id, newPasscode);
+    try {
+      await store.updateAlbumPasscode(album.id, newPasscode);
+    } catch (error) {
+      store.report(error);
+      return;
+    }
     setEditingPasscode(false);
-    showNotice('Đã đổi mật khẩu và thu hồi toàn bộ phiên đăng nhập cũ của khách hàng.');
+    showNotice(
+      "Đã đổi mật khẩu và thu hồi toàn bộ phiên đăng nhập cũ của khách hàng.",
+    );
   };
 
-  const handleRevokeSessions = () => {
-    if (window.confirm('Thu hồi toàn bộ phiên khách đang mở? Khách sẽ phải nhập lại mật khẩu để tiếp tục.')) {
-      store.revokeGuestSessions(album.id);
-      showNotice('Đã thu hồi tất cả phiên của khách.');
+  const handleRevokeSessions = async () => {
+    if (
+      window.confirm(
+        "Thu hồi toàn bộ phiên khách đang mở? Khách sẽ phải nhập lại mật khẩu để tiếp tục.",
+      )
+    ) {
+      try {
+        await store.revokeGuestSessions(album.id);
+      } catch (error) {
+        store.report(error);
+        return;
+      }
+      showNotice("Đã thu hồi tất cả phiên của khách.");
     }
   };
 
@@ -81,16 +108,19 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
 
   // Filtered photos
   const filteredPhotos = photos.filter((p) => {
-    if (searchTerm && !p.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+    if (
+      searchTerm &&
+      !p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
       return false;
     }
-    if (filterMode === 'selected') return p.isSelected;
-    if (filterMode === 'error') return p.status === 'error';
+    if (filterMode === "selected") return p.isSelected;
+    if (filterMode === "error") return p.status === "error";
     return true;
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fade-in">
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6 animate-fade-in">
       {/* Toast Notice */}
       {toastMsg && (
         <div className="fixed top-4 inset-x-0 z-50 flex justify-center pointer-events-none animate-fade-in">
@@ -104,13 +134,15 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       {/* Top Breadcrumb & Actions Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200">
         <Button
+          asChild
           variant="ghost"
           size="sm"
-          onClick={onBack}
           className="gap-2 text-xs font-bold text-stone-600 hover:text-stone-900 self-start"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Quay lại Danh sách Album</span>
+          <Link to="/dashboard">
+            <ArrowLeft className="w-4 h-4" />
+            <span>Quay lại Danh sách Album</span>
+          </Link>
         </Button>
 
         <div className="flex items-center flex-wrap gap-2">
@@ -130,8 +162,12 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             onClick={handleCopyLink}
             className="rounded-xl text-xs gap-1.5 shadow-2xs"
           >
-            {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiedLink ? 'Đã chép link!' : 'Chép link chia sẻ'}</span>
+            {copiedLink ? (
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
+            ) : (
+              <Copy className="w-3.5 h-3.5" />
+            )}
+            <span>{copiedLink ? "Đã chép link!" : "Chép link chia sẻ"}</span>
           </Button>
 
           <Button
@@ -188,7 +224,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
                     variant="link"
                     size="sm"
                     onClick={() => {
-                      setNewPasscode(album.passcode);
+                      setNewPasscode("");
                       setEditingPasscode(false);
                     }}
                     className="text-[11px] text-stone-400 hover:underline p-0 h-auto"
@@ -198,7 +234,9 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-stone-900">{album.passcode}</span>
+                  <span className="font-mono font-bold text-stone-900">
+                    {"••••"}
+                  </span>
                   <Button
                     variant="link"
                     size="sm"
@@ -230,9 +268,14 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             <Heart className="w-6 h-6 fill-white" />
           </div>
           <div>
-            <span className="text-xs font-bold text-brand-800 uppercase tracking-wider">Khách đã chọn</span>
+            <span className="text-xs font-bold text-brand-800 uppercase tracking-wider">
+              Khách đã chọn
+            </span>
             <div className="text-2xl font-black text-brand-700 font-mono">
-              {selectedCount} <span className="text-sm font-medium text-brand-600/70">/ {photos.length} ảnh</span>
+              {selectedCount}{" "}
+              <span className="text-sm font-medium text-brand-600/70">
+                / {photos.length} ảnh
+              </span>
             </div>
           </div>
         </Card>
@@ -247,10 +290,16 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
           className="w-full sm:w-auto"
         >
           <TabsList className="bg-stone-200/70 p-1 rounded-2xl">
-            <TabsTrigger value="all" className="rounded-xl px-3.5 py-2 font-bold">
+            <TabsTrigger
+              value="all"
+              className="rounded-xl px-3.5 py-2 font-bold"
+            >
               Tất cả ảnh ({photos.length})
             </TabsTrigger>
-            <TabsTrigger value="selected" className="rounded-xl px-3.5 py-2 font-bold gap-1.5">
+            <TabsTrigger
+              value="selected"
+              className="rounded-xl px-3.5 py-2 font-bold gap-1.5"
+            >
               <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
               <span>Khách đã tim ({selectedCount})</span>
             </TabsTrigger>
@@ -274,21 +323,21 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             <button
               type="button"
               onClick={() => setGridColumns(3)}
-              className={`px-2.5 py-1.5 rounded-xl ${gridColumns === 3 ? 'bg-white text-stone-900 shadow-xs' : ''}`}
+              className={`px-2.5 py-1.5 rounded-xl ${gridColumns === 3 ? "bg-white text-stone-900 shadow-xs" : ""}`}
             >
               3 Cột
             </button>
             <button
               type="button"
               onClick={() => setGridColumns(4)}
-              className={`px-2.5 py-1.5 rounded-xl ${gridColumns === 4 ? 'bg-white text-stone-900 shadow-xs' : ''}`}
+              className={`px-2.5 py-1.5 rounded-xl ${gridColumns === 4 ? "bg-white text-stone-900 shadow-xs" : ""}`}
             >
               4 Cột
             </button>
             <button
               type="button"
               onClick={() => setGridColumns(6)}
-              className={`px-2.5 py-1.5 rounded-xl ${gridColumns === 6 ? 'bg-white text-stone-900 shadow-xs' : ''}`}
+              className={`px-2.5 py-1.5 rounded-xl ${gridColumns === 6 ? "bg-white text-stone-900 shadow-xs" : ""}`}
             >
               6 Cột
             </button>
@@ -301,16 +350,18 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
         <div
           className={`grid gap-3 sm:gap-4 ${
             gridColumns === 3
-              ? 'grid-cols-2 sm:grid-cols-3'
+              ? "grid-cols-2 sm:grid-cols-3"
               : gridColumns === 4
-              ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
-              : 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-6'
+                ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+                : "grid-cols-2 sm:grid-cols-4 lg:grid-cols-6"
           }`}
         >
           {filteredPhotos.map((photo, index) => (
             <PhotoCard
               key={photo.id}
               photo={photo}
+              pending={store.isPending(photo.id)}
+              failed={store.isFailed(photo.id)}
               onClick={() => onOpenLightbox(filteredPhotos, index)}
               onToggleHeart={(photoId, currentSelected) => {
                 store.toggleHeart(album.id, photoId, !currentSelected);
@@ -321,8 +372,12 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       ) : (
         <Card className="rounded-3xl p-12 text-center border-stone-200 shadow-2xs space-y-3 bg-white">
           <Heart className="w-10 h-10 text-stone-300 mx-auto" />
-          <h3 className="text-base font-bold text-stone-900">Không có ảnh nào phù hợp</h3>
-          <p className="text-xs text-stone-500">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.</p>
+          <h3 className="text-base font-bold text-stone-900">
+            Không có ảnh nào phù hợp
+          </h3>
+          <p className="text-xs text-stone-500">
+            Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.
+          </p>
         </Card>
       )}
     </div>

@@ -1,8 +1,16 @@
-import { FC } from 'react';
-import { ArrowRight, Heart, Sparkles, ShieldCheck, Zap, Smartphone, FileSpreadsheet } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { FC } from "react";
+import {
+  ArrowRight,
+  Heart,
+  Sparkles,
+  ShieldCheck,
+  Zap,
+  Smartphone,
+  FileSpreadsheet,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 interface HeroSectionProps {
   onStartDashboard: () => void;
@@ -25,16 +33,21 @@ export const HeroSection: FC<HeroSectionProps> = ({
         {/* Top pill badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-stone-200 shadow-xs text-xs font-semibold text-stone-800 mb-6 sm:mb-8 animate-fade-in hover:border-brand-300 transition-colors">
           <span className="flex h-2 w-2 rounded-full bg-brand-500 animate-ping" />
-          <Badge variant="brand" className="font-bold border-0 bg-transparent px-0 py-0">
+          <Badge
+            variant="brand"
+            className="font-bold border-0 bg-transparent px-0 py-0"
+          >
             Dành riêng cho Photographer & Studio
           </Badge>
           <span className="text-stone-300">|</span>
-          <span className="text-stone-600">Tiết kiệm 80% thời gian lọc ảnh</span>
+          <span className="text-stone-600">
+            Tiết kiệm 80% thời gian lọc ảnh
+          </span>
         </div>
 
         {/* Main Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-stone-900 tracking-tight max-w-5xl mx-auto leading-[1.15] sm:leading-[1.12]">
-          Khách Hàng Chọn Ảnh Từ Google Drive{' '}
+          Khách Hàng Chọn Ảnh Từ Google Drive{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-rose-500 to-amber-500">
             Trong 1 Nốt Nhạc
           </span>
@@ -42,10 +55,13 @@ export const HeroSection: FC<HeroSectionProps> = ({
 
         {/* Subtitle */}
         <p className="mt-6 text-base sm:text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed font-normal">
-          Tạm biệt những ngày khách phải căng mắt tìm file rồi nhắn mã{' '}
-          <code className="px-1.5 py-0.5 rounded bg-stone-100 text-stone-800 font-mono text-sm">DSC_0412.JPG</code> qua Zalo.
-          Chỉ cần dán link folder Google Drive, khách mở link bảo mật trên smartphone, chạm tim ❤️ để chọn ảnh.
-          Đồng bộ tức thì và xuất CSV chuẩn Lightroom trong 3 giây.
+          Tạm biệt những ngày khách phải căng mắt tìm file rồi nhắn mã{" "}
+          <code className="px-1.5 py-0.5 rounded bg-stone-100 text-stone-800 font-mono text-sm">
+            DSC_0412.JPG
+          </code>{" "}
+          qua Zalo. Chỉ cần dán link folder Google Drive, khách mở link bảo mật
+          trên smartphone, chạm tim ❤️ để chọn ảnh. Mỗi lượt tim được lưu ngay
+          và danh sách có thể xuất CSV chuẩn Lightroom trong 3 giây.
         </p>
 
         {/* CTAs */}
@@ -78,8 +94,12 @@ export const HeroSection: FC<HeroSectionProps> = ({
               <Zap className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-stone-900">1.500 ảnh/album</p>
-              <p className="text-[11px] text-stone-500">Quét & preview mượt mà</p>
+              <p className="text-xs font-bold text-stone-900">
+                1.500 ảnh/album
+              </p>
+              <p className="text-[11px] text-stone-500">
+                Quét & preview mượt mà
+              </p>
             </div>
           </Card>
 
@@ -88,8 +108,12 @@ export const HeroSection: FC<HeroSectionProps> = ({
               <Smartphone className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-stone-900">Mobile-First UI</p>
-              <p className="text-[11px] text-stone-500">Khách không cần đăng nhập</p>
+              <p className="text-xs font-bold text-stone-900">
+                Mobile-First UI
+              </p>
+              <p className="text-[11px] text-stone-500">
+                Khách không cần đăng nhập
+              </p>
             </div>
           </Card>
 
@@ -98,8 +122,12 @@ export const HeroSection: FC<HeroSectionProps> = ({
               <FileSpreadsheet className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-stone-900">Xuất CSV 1-Click</p>
-              <p className="text-[11px] text-stone-500">UTF-8 BOM chuẩn tiếng Việt</p>
+              <p className="text-xs font-bold text-stone-900">
+                Xuất CSV 1-Click
+              </p>
+              <p className="text-[11px] text-stone-500">
+                UTF-8 BOM chuẩn tiếng Việt
+              </p>
             </div>
           </Card>
 
@@ -108,8 +136,10 @@ export const HeroSection: FC<HeroSectionProps> = ({
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-stone-900">An toàn & Bảo mật</p>
-              <p className="text-[11px] text-stone-500">Quyền drive.readonly</p>
+              <p className="text-xs font-bold text-stone-900">
+                An toàn & Bảo mật
+              </p>
+              <p className="text-[11px] text-stone-500">Link Drive public</p>
             </div>
           </Card>
         </div>

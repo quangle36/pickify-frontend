@@ -1,5 +1,5 @@
 import { FC, useState, FormEvent } from 'react';
-import { UploadCloud, Lock, Sparkles, AlertCircle, HelpCircle } from 'lucide-react';
+import { UploadCloud, Lock, AlertCircle, HelpCircle } from 'lucide-react';
 import { extractDriveFolderId } from '@/lib/utils';
 import {
   Dialog,
@@ -17,10 +17,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface CreateAlbumModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { name: string; folderUrl: string; passcode: string }) => {
+  onSubmit: (data: { name: string; folderUrl: string; passcode: string }) => Promise<{
     success: boolean;
     error?: string;
-  };
+  }>;
 }
 
 export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
@@ -28,20 +28,15 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const [pending, setPending] = useState(false);
   const [name, setName] = useState('');
   const [folderUrl, setFolderUrl] = useState('');
-  const [passcode, setPasscode] = useState('1234');
+  const [passcode, setPasscode] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const handleFillSample = () => {
-    setName('Kỷ yếu Lớp 12A1 — Ngoại Cảnh Tràng An');
-    setFolderUrl('https://drive.google.com/drive/folders/1KyYeu12A1_NgoaiCanhTrangAn2026_Sample');
-    setPasscode('2026');
-    setError(null);
-  };
-
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (pending) return;
     setError(null);
 
     if (!name.trim()) {
@@ -65,16 +60,18 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       return;
     }
 
-    const res = onSubmit({
+    setPending(true);
+    const res = await onSubmit({
       name: name.trim(),
       folderUrl: folderUrl.trim(),
       passcode: passcode.trim(),
     });
 
+    setPending(false);
     if (res.success) {
       setName('');
       setFolderUrl('');
-      setPasscode('1234');
+      setPasscode('');
       onClose();
     } else {
       setError(res.error || 'Có lỗi xảy ra khi tạo album');
@@ -128,16 +125,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
               <Label htmlFor="drive-url" className="text-xs font-bold text-stone-700 uppercase tracking-wider">
                 Đường dẫn thư mục Google Drive <span className="text-rose-500">*</span>
               </Label>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleFillSample}
-                className="h-auto p-0 text-[11px] font-bold text-brand-600 hover:text-brand-700 gap-1"
-              >
-                <Sparkles className="w-3 h-3 text-amber-500" />
-                <span>Điền link mẫu</span>
-              </Button>
+
             </div>
             <Input
               id="drive-url"
@@ -154,6 +142,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
           </div>
 
           {/* Guest Passcode */}
+          <p className="rounded-xl bg-blue-50 p-3 text-xs text-blue-900">Folder và ảnh bên trong phải được chia sẻ: <strong>Bất kỳ ai có đường liên kết — Người xem</strong>. Không cần kết nối tài khoản Drive.</p>
           <div className="space-y-1.5">
             <Label htmlFor="guest-passcode" className="text-xs font-bold text-stone-700 uppercase tracking-wider">
               Mật khẩu truy cập cho Khách (Passcode) <span className="text-rose-500">*</span>
@@ -194,7 +183,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
               Hủy
             </Button>
             <Button
-              type="submit"
+              type="submit" disabled={pending}
               variant="brand"
               className="rounded-xl font-bold shadow-md shadow-brand-600/25"
             >
