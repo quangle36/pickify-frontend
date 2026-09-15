@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@pickify/contracts':
-        specifier: file:../pickify-backend/packages/contracts
-        version: file:../pickify-backend/packages/contracts
       '@radix-ui/react-accordion':
         specifier: ^1.2.20
         version: 1.2.20(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -71,6 +68,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.19(tsx@4.23.13))
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
     devDependencies:
       '@types/node':
         specifier: ^22.20.2
@@ -860,9 +860,6 @@ packages:
   '@phc/format@1.0.0':
     resolution: {integrity: sha512-m7X9U6BG2+J+R1lSOdCiITLLrxm+cWlNI3HUFA92oLO77ObGNzaKdh8pMLqdZcshtkKuV84olNNXDfMc4FezBQ==}
     engines: {node: '>=10'}
-
-  '@pickify/contracts@file:../pickify-backend/packages/contracts':
-    resolution: {directory: ../pickify-backend/packages/contracts, type: directory}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -2993,10 +2990,6 @@ snapshots:
       fastq: 1.20.3
 
   '@phc/format@1.0.0': {}
-
-  '@pickify/contracts@file:../pickify-backend/packages/contracts':
-    dependencies:
-      zod: 3.25.76
 
   '@pinojs/redact@0.4.0': {}
 

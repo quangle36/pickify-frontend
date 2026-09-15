@@ -14,7 +14,7 @@ import {
   useQueryClient,
   type InfiniteData,
 } from "@tanstack/react-query";
-import { createAlbumSchema, type SelectionInput } from "@pickify/contracts";
+import { createAlbumSchema, type SelectionInput } from "./contracts";
 import type { Album, PhotographerProfile } from "@/types";
 import {
   api,
