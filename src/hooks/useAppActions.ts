@@ -40,6 +40,18 @@ export function useAppActions() {
   const selectAlbum = (id: string) => {
     void navigate({ to: "/dashboard/album/$albumId", params: { albumId: id } });
   };
+  const deleteAlbum = async (id: string) => {
+    try {
+      await store.deleteAlbum(id);
+      toast({ title: "Đã chặn truy cập và yêu cầu dọn album" });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Không thể xóa album",
+        description: `Album đã được khôi phục. ${errorMessage(error)}`,
+      });
+    }
+  };
   return {
     dashboard,
     openGuest,
@@ -59,11 +71,7 @@ export function useAppActions() {
         () => store.retryAlbum(id),
         "Đã yêu cầu nhập lại ảnh chưa hoàn tất",
       ),
-    deleteAlbum: (id: string) =>
-      action(
-        () => store.deleteAlbum(id),
-        "Đã chặn truy cập và yêu cầu dọn album",
-      ),
+    deleteAlbum,
     openCreate: () => setCreateOpen(true),
     openDrive: () => setDriveOpen(true),
     createModal: {

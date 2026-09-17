@@ -24,7 +24,7 @@ export function useAppController(route: AppRoute) {
   useAppEffects({ ...route, album, closeLightbox: lightbox.close });
 
   return {
-    loading: store.loading,
+    loading: route.currentRole === "landing" ? false : store.loading,
     error: store.error,
     profile,
     albums,

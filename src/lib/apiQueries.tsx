@@ -48,6 +48,9 @@ function useApiController() {
       location.pathname.match(/^\/album\/([a-zA-Z0-9_-]+)\/?$/)?.[1] ?? null,
   );
   const [error, setError] = useState<string | null>(null);
+  const [hiddenAlbumIds, setHiddenAlbumIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const report = (error: unknown) => setError(errorMessage(error));
   const [target, setTarget] = useState<{ id: string; status: string } | null>(
     null,
@@ -85,12 +88,14 @@ function useApiController() {
         undefined,
         signal,
       );
-      return result.albums.map((a) => ({
-        ...a,
-        errorMessage: a.errorMessage
-          ? (messages[a.errorMessage] ?? a.errorMessage)
-          : undefined,
-      }));
+      return result.albums
+        .filter((album) => !["deleting", "deleted"].includes(album.status))
+        .map((a) => ({
+          ...a,
+          errorMessage: a.errorMessage
+            ? (messages[a.errorMessage] ?? a.errorMessage)
+            : undefined,
+        }));
     },
     refetchInterval: (query) =>
       query.state.data?.some((a) => processing(a.status)) ? 5000 : false,
@@ -177,9 +182,11 @@ function useApiController() {
     ? guest.data
       ? [{ ...guest.data, ...photoAlbum }]
       : []
-    : (albumsQuery.data ?? []).map((a) =>
-        a.id === id && photoAlbum ? { ...a, ...photoAlbum } : a,
-      );
+    : (albumsQuery.data ?? [])
+        .filter((album) => !hiddenAlbumIds.has(album.id))
+        .map((a) =>
+          a.id === id && photoAlbum ? { ...a, ...photoAlbum } : a,
+        );
   const photos = [
     ...new Map(
       photosQuery.data?.pages.flatMap((p) => p.photos).map((p) => [p.id, p]) ??
@@ -216,6 +223,80 @@ function useApiController() {
     onSuccess: async () => {
       await refreshOwner();
       await client.invalidateQueries({ queryKey: ["photos", "owner"] });
+    },
+  });
+  const deleteAlbumMutation = useMutation({
+    mutationFn: (id: string) =>
+      api<{ ok: boolean }>(`/albums/${id}`, "DELETE"),
+    onMutate: async (id) => {
+      setHiddenAlbumIds((current) => new Set(current).add(id));
+      await Promise.all([
+        client.cancelQueries({ queryKey: albumsKey }),
+        client.cancelQueries({ queryKey: ownerKey }),
+      ]);
+
+      let removedAlbum: Album | undefined;
+      let removedIndex = -1;
+      client.setQueryData<Album[]>(albumsKey, (current) => {
+        if (!current) return current;
+        removedIndex = current.findIndex((album) => album.id === id);
+        if (removedIndex === -1) return current;
+        removedAlbum = current[removedIndex];
+        return current.filter((album) => album.id !== id);
+      });
+
+      const countedAsActive =
+        removedAlbum !== undefined &&
+        !["expired", "deleting", "deleted"].includes(removedAlbum.status);
+      if (countedAsActive) {
+        client.setQueryData<PhotographerProfile | null>(ownerKey, (current) =>
+          current
+            ? {
+                ...current,
+                activeAlbumsCount: Math.max(0, current.activeAlbumsCount - 1),
+              }
+            : current,
+        );
+      }
+
+      return { removedAlbum, removedIndex, countedAsActive };
+    },
+    onError: (_error, _id, context) => {
+      setHiddenAlbumIds((current) => {
+        const next = new Set(current);
+        next.delete(_id);
+        return next;
+      });
+      if (!context?.removedAlbum) return;
+      const albumToRestore = context.removedAlbum;
+      client.setQueryData<Album[]>(albumsKey, (current = []) => {
+        if (current.some((album) => album.id === albumToRestore.id))
+          return current;
+        const next = [...current];
+        next.splice(
+          Math.min(Math.max(context.removedIndex, 0), next.length),
+          0,
+          albumToRestore,
+        );
+        return next;
+      });
+      if (context.countedAsActive) {
+        client.setQueryData<PhotographerProfile | null>(ownerKey, (current) =>
+          current
+            ? {
+                ...current,
+                activeAlbumsCount: Math.min(
+                  current.maxAlbumsLimit,
+                  current.activeAlbumsCount + 1,
+                ),
+              }
+            : current,
+        );
+      }
+    },
+    onSuccess: async (_result, id) => {
+      client.removeQueries({ queryKey: ["photos", "owner", id] });
+      await client.invalidateQueries({ queryKey: ownerKey });
     },
   });
   const verification = useMutation({
@@ -401,11 +482,7 @@ function useApiController() {
         method: "POST",
       }),
     deleteAlbum: async (id: string) => {
-      await albumMutation.mutateAsync({
-        path: `/albums/${id}`,
-        method: "DELETE",
-      });
-      client.removeQueries({ queryKey: ["photos", "owner", id] });
+      await deleteAlbumMutation.mutateAsync(id);
     },
     updateAlbumPasscode: (id: string, password: string) =>
       albumMutation.mutateAsync({

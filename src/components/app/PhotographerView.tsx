@@ -35,10 +35,8 @@ export function PhotographerView({
         onCreateAlbum={actions.openCreate}
         onOpenGuestDemo={openGuestDemo}
         onOpenDriveModal={actions.openDrive}
+        onLogout={actions.logout}
       />
-      <div className="max-w-7xl mx-auto w-full px-6 pt-3 text-right">
-        <button onClick={actions.logout}>Đăng xuất</button>
-      </div>
       {isDetailView && album ? (
         <>
           <AlbumDetailPage

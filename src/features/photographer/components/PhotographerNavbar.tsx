@@ -1,15 +1,24 @@
 import { FC } from "react";
 import { Link } from "@tanstack/react-router";
 import { PhotographerProfile } from "@/types";
-import { Heart, Plus, Eye, Home, Cloud } from "lucide-react";
+import { Heart, Plus, Eye, Home, Cloud, LogOut, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface PhotographerNavbarProps {
   profile: PhotographerProfile;
   onCreateAlbum: () => void;
   onOpenGuestDemo: () => void;
   onOpenDriveModal: () => void;
+  onLogout?: () => void;
 }
 
 export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
@@ -17,6 +26,7 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
   onCreateAlbum,
   onOpenGuestDemo,
   onOpenDriveModal,
+  onLogout,
 }) => {
   const isQuotaFull = profile.activeAlbumsCount >= profile.maxAlbumsLimit;
 
@@ -108,22 +118,51 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
             </Badge>
           </Button>
 
-          {/* User Profile */}
-          <div className="flex items-center gap-2 pl-1 border-l border-stone-200">
-            <img
-              src={profile.avatarUrl}
-              alt={profile.name}
-              className="w-8 h-8 rounded-xl object-cover ring-2 ring-stone-200"
-            />
-            <div className="hidden xl:block text-left">
-              <p className="text-xs font-bold text-stone-900 leading-tight">
-                {profile.name}
-              </p>
-              <p className="text-[10px] text-stone-400 truncate max-w-[120px]">
-                {profile.email}
-              </p>
-            </div>
-          </div>
+          {/* User Profile Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center gap-2 pl-2 border-l border-stone-200 hover:opacity-90 transition-all outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 rounded-xl p-1 -m-1 text-left cursor-pointer group"
+                title="Tài khoản cá nhân"
+              >
+                <img
+                  src={profile.avatarUrl}
+                  alt={profile.name}
+                  className="w-8 h-8 rounded-xl object-cover ring-2 ring-stone-200 group-hover:ring-brand-500 transition-all"
+                />
+                <div className="hidden xl:block text-left">
+                  <p className="text-xs font-bold text-stone-900 leading-tight">
+                    {profile.name}
+                  </p>
+                  <p className="text-[10px] text-stone-400 truncate max-w-[120px]">
+                    {profile.email}
+                  </p>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-stone-400 group-hover:text-stone-600 transition-colors hidden sm:block" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 p-1.5 shadow-xl border-stone-200">
+              <DropdownMenuLabel className="font-normal px-2.5 py-2">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-xs font-bold text-stone-900 leading-none truncate">
+                    {profile.name}
+                  </p>
+                  <p className="text-[11px] text-stone-500 leading-none truncate">
+                    {profile.email}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={onLogout}
+                className="text-rose-600 focus:bg-rose-50 focus:text-rose-700 cursor-pointer font-medium"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                <span>Đăng xuất</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
