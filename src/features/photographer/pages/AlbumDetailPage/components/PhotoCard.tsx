@@ -4,6 +4,7 @@ import { Heart } from "lucide-react";
 import { formatBytes } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { preloadImage } from "@/lib/imagePreloader";
 
 interface PhotoCardProps {
   photo: Photo;
@@ -28,6 +29,16 @@ export const PhotoCard: FC<PhotoCardProps> = ({
   return (
     <Card
       onClick={photo.status === "ready" ? onClick : undefined}
+      onPointerEnter={() => {
+        if (photo.status === "ready") {
+          void preloadImage(photo.displayUrl, "high").catch(() => undefined);
+        }
+      }}
+      onTouchStart={() => {
+        if (photo.status === "ready") {
+          void preloadImage(photo.displayUrl, "high").catch(() => undefined);
+        }
+      }}
       className={`group relative aspect-[9/16] overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 transition-all select-none ${photo.status === "ready" ? "cursor-pointer hover:border-brand-500 hover:shadow-md" : "cursor-default"}`}
     >
       {photo.status === "processing" && (
@@ -43,6 +54,7 @@ export const PhotoCard: FC<PhotoCardProps> = ({
           alt={photo.name}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
+          decoding="async"
         />
       )}
 

@@ -5,6 +5,7 @@ import { X, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { formatBytes } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { preloadImage } from "@/lib/imagePreloader";
 
 interface LightboxModalProps {
   photos: Photo[];
@@ -64,10 +65,25 @@ export const LightboxModal: FC<LightboxModalProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    if (!isOpen || !currentPhoto) return;
+
+    void preloadImage(currentPhoto.displayUrl, "high").catch(() => undefined);
+
+    for (const index of [currentIndex - 1, currentIndex + 1]) {
+      const adjacentPhoto = photos[index];
+      if (adjacentPhoto) {
+        void preloadImage(adjacentPhoto.displayUrl, "low").catch(
+          () => undefined,
+        );
+      }
+    }
+  }, [currentIndex, currentPhoto, isOpen, photos]);
+
   if (!isOpen || !currentPhoto) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between select-none animate-fade-in">
+    <div className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between select-none">
       {/* Top Header Bar */}
       <div className="p-4 flex items-center justify-between text-white bg-gradient-to-b from-black/80 to-transparent z-10">
         <div className="flex items-center gap-3">
@@ -128,6 +144,9 @@ export const LightboxModal: FC<LightboxModalProps> = ({
         <img
           src={currentPhoto.displayUrl}
           alt={currentPhoto.name}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
           className="max-h-full max-w-full object-contain rounded-lg shadow-2xl transition-all"
         />
 

@@ -3,6 +3,7 @@ import { Photo } from "@/types";
 import { Heart, RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { preloadImage } from "@/lib/imagePreloader";
 
 interface GuestPhotoCardProps {
   photo: Photo;
@@ -34,6 +35,16 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
   return (
     <Card
       onClick={photo.status === "ready" ? onClick : undefined}
+      onPointerEnter={() => {
+        if (photo.status === "ready") {
+          void preloadImage(photo.displayUrl, "high").catch(() => undefined);
+        }
+      }}
+      onTouchStart={() => {
+        if (photo.status === "ready") {
+          void preloadImage(photo.displayUrl, "high").catch(() => undefined);
+        }
+      }}
       className={`group relative aspect-[4/3] overflow-hidden rounded-2xl border border-stone-800 bg-stone-800 transition-all select-none ${photo.status === "ready" ? "cursor-pointer hover:border-brand-500" : "cursor-default"}`}
     >
       {photo.status === "processing" && (
@@ -49,6 +60,7 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
           alt={photo.name}
           className="absolute inset-0 h-full w-full object-cover"
           loading="lazy"
+          decoding="async"
         />
       )}
 
