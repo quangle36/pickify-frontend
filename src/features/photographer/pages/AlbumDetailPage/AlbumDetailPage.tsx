@@ -11,6 +11,7 @@ import {
   Search,
   Eye,
   Clock,
+  RefreshCw,
 } from "lucide-react";
 import { getDaysRemaining } from "@/lib/utils";
 import { exportSelectedPhotosToCsv } from "@/lib/exportCsv";
@@ -20,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 interface AlbumDetailPageProps {
   album: Album;
@@ -106,8 +108,16 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
     setTimeout(() => setToastMsg(null), 3000);
   };
 
+  // Only photos that have been successfully uploaded to DB
+  const readyPhotos = photos.filter((p) => p.status === "ready");
+
   // Filtered photos
   const filteredPhotos = photos.filter((p) => {
+    if (filterMode === "error") {
+      if (p.status !== "error") return false;
+    } else {
+      if (p.status !== "ready") return false;
+    }
     if (
       searchTerm &&
       !p.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -115,7 +125,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       return false;
     }
     if (filterMode === "selected") return p.isSelected;
-    if (filterMode === "error") return p.status === "error";
     return true;
   });
 
@@ -195,9 +204,20 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-            {album.title}
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+              {album.title}
+            </h1>
+            {album.status === "importing" && (
+              <Badge
+                variant="info"
+                className="gap-1.5 px-3 py-1 shadow-xs bg-blue-500/95 text-white border-0"
+              >
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <span>Đang xử lý ảnh ({readyPhotos.length}/{album.totalPhotos})</span>
+              </Badge>
+            )}
+          </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
             {/* Passcode Setting */}
@@ -274,7 +294,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             <div className="text-2xl font-black text-brand-700 font-mono">
               {selectedCount}{" "}
               <span className="text-sm font-medium text-brand-600/70">
-                / {photos.length} ảnh
+                / {readyPhotos.length} ảnh
               </span>
             </div>
           </div>
@@ -294,7 +314,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
               value="all"
               className="rounded-xl px-3.5 py-2 font-bold"
             >
-              Tất cả ảnh ({photos.length})
+              Tất cả ảnh ({readyPhotos.length})
             </TabsTrigger>
             <TabsTrigger
               value="selected"
@@ -371,13 +391,27 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
         </div>
       ) : (
         <Card className="rounded-3xl p-12 text-center border-stone-200 shadow-2xs space-y-3 bg-white">
-          <Heart className="w-10 h-10 text-stone-300 mx-auto" />
-          <h3 className="text-base font-bold text-stone-900">
-            Không có ảnh nào phù hợp
-          </h3>
-          <p className="text-xs text-stone-500">
-            Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.
-          </p>
+          {album.status === "importing" ? (
+            <>
+              <RefreshCw className="w-10 h-10 text-blue-500 animate-spin mx-auto" />
+              <h3 className="text-base font-bold text-stone-900">
+                Đang xử lý ảnh từ Google Drive...
+              </h3>
+              <p className="text-xs text-stone-500">
+                Ảnh sau khi tối ưu và tải lên thành công sẽ tự động xuất hiện tại đây.
+              </p>
+            </>
+          ) : (
+            <>
+              <Heart className="w-10 h-10 text-stone-300 mx-auto" />
+              <h3 className="text-base font-bold text-stone-900">
+                Không có ảnh nào phù hợp
+              </h3>
+              <p className="text-xs text-stone-500">
+                Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.
+              </p>
+            </>
+          )}
         </Card>
       )}
     </div>

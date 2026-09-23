@@ -192,7 +192,7 @@ function useApiController() {
       photosQuery.data?.pages.flatMap((p) => p.photos).map((p) => [p.id, p]) ??
         [],
     ).values(),
-  ];
+  ].filter((p) => p.status === "ready" || p.status === "error");
   useEffect(() => {
     const error =
       owner.error ?? albumsQuery.error ?? guest.error ?? photosQuery.error;

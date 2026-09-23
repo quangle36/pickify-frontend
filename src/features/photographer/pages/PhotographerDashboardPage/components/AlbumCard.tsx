@@ -20,7 +20,6 @@ import { exportSelectedPhotosToCsv } from "@/lib/exportCsv";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 
 interface AlbumCardProps {
   album: Album;
@@ -66,10 +65,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
     }
   };
 
-  const importPercentage =
-    album.totalPhotos > 0
-      ? Math.round((album.importedPhotos / album.totalPhotos) * 100)
-      : 0;
+
 
   return (
     <Card
@@ -117,7 +113,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
             >
               <RefreshCw className="w-3.5 h-3.5 animate-spin" />
               <span>
-                Đang nhập ({album.importedPhotos}/{album.totalPhotos})
+                Đang nhập ({album.totalPhotos} ảnh)
               </span>
             </Badge>
           )}
@@ -180,16 +176,16 @@ export const AlbumCard: FC<AlbumCardProps> = ({
         {album.status === "importing" && (
           <div className="space-y-1.5 bg-blue-50/70 p-3 rounded-2xl border border-blue-100">
             <div className="flex justify-between text-xs font-semibold text-blue-900">
-              <span>Tiến độ tạo ảnh xem trước</span>
-              <span>{importPercentage}%</span>
+              <span className="flex items-center gap-1.5">
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                Đang tối ưu & lưu ảnh vào hệ thống
+              </span>
             </div>
-            <Progress
-              value={importPercentage}
-              indicatorColor="bg-blue-600"
-              className="h-2 bg-blue-200/70"
-            />
+            <div className="h-1.5 w-full bg-blue-200/70 rounded-full overflow-hidden">
+              <div className="h-full bg-blue-600 animate-pulse w-full rounded-full" />
+            </div>
             <p className="text-[11px] text-blue-700">
-              Đang tạo ảnh display 1.600px dùng chung cho lưới và lightbox...
+              Ảnh được xử lý ngầm, bấm vào album để xem các ảnh đã hoàn thành.
             </p>
           </div>
         )}
