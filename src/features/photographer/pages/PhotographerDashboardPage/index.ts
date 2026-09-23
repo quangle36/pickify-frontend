@@ -1,1 +1,4 @@
-export { default } from './PhotographerDashboardPage';
+export {
+  default,
+  PhotographerDashboardSkeleton,
+} from "./PhotographerDashboardPage";

@@ -420,9 +420,15 @@ function useApiController() {
     error,
     report,
     clearError: () => setError(null),
-    loading: guestShare
-      ? guest.isLoading || (!hasGuestData && photosQuery.isLoading)
-      : owner.isLoading || albumsQuery.isLoading,
+    pending: {
+      owner: !guestShare && owner.isPending,
+      albums:
+        !guestShare && !!owner.data?.id && albumsQuery.isPending,
+      guest:
+        !!guestShare &&
+        (guest.isPending ||
+          (guest.isSuccess && !hasGuestData && photosQuery.isPending)),
+    },
     getProfile: () => owner.data ?? emptyProfile,
     getAlbums: () => albums,
     getPhotos: (albumId: string) =>

@@ -12,7 +12,7 @@ export function AppShell({ app, children }: { app: AppController; children: Reac
           <button onClick={app.actions.reload}>Thử lại</button>
         </div>
       )}
-      {app.loading ? <p role="status" className="p-12 text-center">Đang tải…</p> : children}
+      {children}
       <Toaster />
     </div>
   );
