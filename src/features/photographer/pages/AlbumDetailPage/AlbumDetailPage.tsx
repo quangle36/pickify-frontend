@@ -1,6 +1,7 @@
 import { useState, useEffect, FC } from "react";
 import { Link } from "@tanstack/react-router";
-import { Album, Photo } from "@/types";
+import type { Photo } from "@/features/photo/types/photo.types";
+import type { Album } from "@/features/photographer/types/album.types";
 import {
   ArrowLeft,
   Heart,
@@ -14,8 +15,14 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { getDaysRemaining } from "@/lib/utils";
-import { exportSelectedPhotosToCsv } from "@/lib/exportCsv";
-import { useApiData } from "@/lib/apiQueries";
+import { exportSelectedPhotosToCsv } from "@/features/photographer/utils/exportCsv";
+import {
+  useRevokeAlbumSessions,
+  useUpdateAlbumPasscode,
+} from "@/features/photographer/queries/album.mutations";
+import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
+import { usePhotoSelection } from "@/features/photo/queries/photo.mutations";
+import { useAppStore } from "@/app/stores/app.store";
 import { PhotoCard } from "./components/PhotoCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +43,11 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   onOpenGuestView,
   onOpenLightbox,
 }) => {
-  const store = useApiData();
+  const report = useAppStore((state) => state.report);
+  const filterPhotos = usePhotoFilters(album.id);
+  const photoSelection = usePhotoSelection("owner", null);
+  const updatePasscode = useUpdateAlbumPasscode();
+  const revokeSessions = useRevokeAlbumSessions();
   const [filterMode, setFilterMode] = useState<"all" | "selected" | "error">(
     "all",
   );
@@ -49,12 +60,10 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      void store
-        .filterPhotos(album.id, filterMode === "selected", searchTerm)
-        .catch((e) => store.report(e));
+      filterPhotos(filterMode === "selected", searchTerm);
     }, 200);
     return () => clearTimeout(timer);
-  }, [album.id, filterMode, searchTerm]);
+  }, [filterMode, filterPhotos, searchTerm]);
 
   const daysLeft = getDaysRemaining(album.expiresAt);
   const selectedCount = album.selectedPhotosCount;
@@ -76,9 +85,12 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       return;
     }
     try {
-      await store.updateAlbumPasscode(album.id, newPasscode);
+      await updatePasscode.mutateAsync({
+        albumId: album.id,
+        password: newPasscode,
+      });
     } catch (error) {
-      store.report(error);
+      report(error);
       return;
     }
     setEditingPasscode(false);
@@ -94,9 +106,9 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       )
     ) {
       try {
-        await store.revokeGuestSessions(album.id);
+        await revokeSessions.mutateAsync(album.id);
       } catch (error) {
-        store.report(error);
+        report(error);
         return;
       }
       showNotice("Đã thu hồi tất cả phiên của khách.");
@@ -380,11 +392,15 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             <PhotoCard
               key={photo.id}
               photo={photo}
-              pending={store.isPending(photo.id)}
-              failed={store.isFailed(photo.id)}
+              pending={photoSelection.isPending(photo.id)}
+              failed={photoSelection.isFailed(photo.id)}
               onClick={() => onOpenLightbox(filteredPhotos, index)}
               onToggleHeart={(photoId, currentSelected) => {
-                store.toggleHeart(album.id, photoId, !currentSelected);
+                void photoSelection.toggle(
+                  album.id,
+                  photoId,
+                  !currentSelected,
+                );
               }}
             />
           ))}

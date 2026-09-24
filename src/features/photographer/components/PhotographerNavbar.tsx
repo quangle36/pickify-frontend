@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Link } from "@tanstack/react-router";
-import { PhotographerProfile } from "@/types";
+import type { PhotographerProfile } from "@/features/photographer/types/album.types";
 import { Heart, Plus, Eye, Home, Cloud, LogOut, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

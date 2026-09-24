@@ -1,5 +1,5 @@
 import { FC, useState, MouseEvent } from "react";
-import { Album } from "@/types";
+import type { Album } from "@/features/photographer/types/album.types";
 import {
   CheckCircle2,
   RefreshCw,
@@ -15,8 +15,8 @@ import {
   Eye,
 } from "lucide-react";
 import { getDaysRemaining } from "@/lib/utils";
-import { useApiData } from "@/lib/apiQueries";
-import { exportSelectedPhotosToCsv } from "@/lib/exportCsv";
+import { useCachedAlbumPhotos } from "@/features/photo/queries/photo.queries";
+import { exportSelectedPhotosToCsv } from "@/features/photographer/utils/exportCsv";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
   onRetry,
   onDelete,
 }) => {
-  const store = useApiData();
+  const cachedPhotos = useCachedAlbumPhotos(album.id);
   const [copied, setCopied] = useState(false);
   const daysLeft = getDaysRemaining(album.expiresAt);
 
@@ -50,8 +50,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
 
   const handleExport = (e: MouseEvent) => {
     e.stopPropagation();
-    const photos = store.getPhotos(album.id);
-    exportSelectedPhotosToCsv(album, photos);
+    exportSelectedPhotosToCsv(album, cachedPhotos);
   };
 
   const handleDelete = (e: MouseEvent) => {

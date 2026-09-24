@@ -1,4 +1,2 @@
-export {
-  default,
-  PhotographerDashboardSkeleton,
-} from "./PhotographerDashboardPage";
+export { default } from "./PhotographerDashboardPage";
+export { PhotographerDashboardSkeleton } from "./components/PhotographerDashboardSkeleton";

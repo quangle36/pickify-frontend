@@ -1,9 +1,9 @@
 import { FC, MouseEvent } from "react";
-import { Photo } from "@/types";
+import type { Photo } from "@/features/photo/types/photo.types";
 import { Heart, RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { preloadImage } from "@/lib/imagePreloader";
+import { preloadImage } from "@/features/photo/utils/imagePreloader";
 
 interface GuestPhotoCardProps {
   photo: Photo;

@@ -1,10 +1,14 @@
 import { FC } from 'react';
-import { Album } from '@/types';
+import type { Photo } from '@/features/photo/types/photo.types';
+import type { Album } from '@/features/photographer/types/album.types';
 import { GuestPasscodeModal } from './components/GuestPasscodeModal';
 import { GuestAlbumView } from './components/GuestAlbumView';
 
 interface GuestAlbumPageProps {
   album: Album;
+  photos: Photo[];
+  hasMorePhotos: boolean;
+  onLoadMorePhotos: () => Promise<unknown>;
   guestVerified: boolean;
   onVerified: () => void;
   onExitGuestView: () => void;
@@ -12,6 +16,9 @@ interface GuestAlbumPageProps {
 
 const GuestAlbumPage: FC<GuestAlbumPageProps> = ({
   album,
+  photos,
+  hasMorePhotos,
+  onLoadMorePhotos,
   guestVerified,
   onVerified,
   onExitGuestView,
@@ -30,6 +37,9 @@ const GuestAlbumPage: FC<GuestAlbumPageProps> = ({
   return (
     <GuestAlbumView
       album={album}
+      photos={photos}
+      hasMorePhotos={hasMorePhotos}
+      onLoadMorePhotos={onLoadMorePhotos}
       onExitGuestView={onExitGuestView}
     />
   );

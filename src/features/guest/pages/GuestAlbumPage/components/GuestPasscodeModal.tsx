@@ -1,7 +1,7 @@
 import { FC, useState, FormEvent } from 'react';
-import { errorMessage } from "@/lib/api";
-import { useApiData } from "@/lib/apiQueries";
-import { Album } from '@/types';
+import { errorMessage } from "@/api/errors";
+import { useGuestVerificationMutation } from "@/features/guest/queries/guest.mutations";
+import type { Album } from '@/features/photographer/types/album.types';
 import { Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
   album,
   onVerified,
 }) => {
-  const store = useApiData();
+  const verification = useGuestVerificationMutation(album.shareId);
   const [inputPasscode, setInputPasscode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -26,7 +26,13 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
     e.preventDefault();
     if (pending) return;
     setPending(true); setError(null);
-    try { await store.verifyGuestPasscode(album.shareId, inputPasscode); onVerified(); }
+    try {
+      await verification.mutateAsync({
+        share: album.shareId,
+        password: inputPasscode,
+      });
+      onVerified();
+    }
     catch (error) { setError(errorMessage(error)); }
     finally { setPending(false); }
   };

@@ -1,6 +1,7 @@
-import { LoadMore } from "@/components/shared/LoadMore";
+import { LoadMore } from "@/features/photo/components/LoadMore";
 import { FC, useState, useEffect } from "react";
-import { Album, Photo } from "@/types";
+import type { Photo } from "@/features/photo/types/photo.types";
+import type { Album } from "@/features/photographer/types/album.types";
 import {
   Heart,
   Search,
@@ -9,8 +10,9 @@ import {
   Columns,
   Grid,
 } from "lucide-react";
-import { useApiData } from "@/lib/apiQueries";
-import { LightboxModal } from "@/components/shared/LightboxModal";
+import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
+import { usePhotoSelection } from "@/features/photo/queries/photo.mutations";
+import { LightboxModal } from "@/features/photo/components/LightboxModal";
 import { GuestPhotoCard } from "./GuestPhotoCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,15 +20,21 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface GuestAlbumViewProps {
   album: Album;
+  photos: Photo[];
+  hasMorePhotos: boolean;
+  onLoadMorePhotos: () => Promise<unknown>;
   onExitGuestView: () => void;
 }
 
 export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   album,
+  photos,
+  hasMorePhotos,
+  onLoadMorePhotos,
   onExitGuestView,
 }) => {
-  const store = useApiData();
-  const photos = store.getPhotos(album.id);
+  const photoSelection = usePhotoSelection("guest", album.shareId);
+  const filterPhotos = usePhotoFilters(album.shareId);
   const [filterOnlyHearts, setFilterOnlyHearts] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [gridCols, setGridCols] = useState<2 | 3>(2); // Mobile first: 2 or 3 cols
@@ -36,18 +44,16 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      void store
-        .filterPhotos(album.id, filterOnlyHearts, searchTerm)
-        .catch((e) => store.report(e));
+      filterPhotos(filterOnlyHearts, searchTerm);
     }, 200);
     return () => clearTimeout(timer);
-  }, [album.id, filterOnlyHearts, searchTerm]);
+  }, [filterOnlyHearts, filterPhotos, searchTerm]);
 
   const selectedCount = album.selectedPhotosCount;
 
   const handleToggleHeart = async (photo: Photo) => {
-    if (store.isPending(photo.id)) return;
-    const success = await store.toggleHeart(
+    if (photoSelection.isPending(photo.id)) return;
+    const success = await photoSelection.toggle(
       album.id,
       photo.id,
       !photo.isSelected,
@@ -55,7 +61,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
     setFailedSaves((previous) => ({ ...previous, [photo.id]: !success }));
   };
   const handleRetrySave = async (photo: Photo) => {
-    const success = await store.retryHeart(album.id, photo.id);
+    const success = await photoSelection.retry(album.id, photo.id);
     setFailedSaves((previous) => ({ ...previous, [photo.id]: !success }));
   };
 
@@ -195,8 +201,8 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
               <GuestPhotoCard
                 key={photo.id}
                 photo={photo}
-                isFailed={store.isFailed(photo.id)}
-                isPending={store.isPending(photo.id)}
+                isFailed={photoSelection.isFailed(photo.id)}
+                isPending={photoSelection.isPending(photo.id)}
                 onClick={() => {
                   setLightboxIndex(index);
                   setLightboxOpen(true);
@@ -212,7 +218,10 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
             <p className="text-sm">Không tìm thấy ảnh nào.</p>
           </div>
         )}
-        <LoadMore albumId={album.id} />
+        <LoadMore
+          hasMore={hasMorePhotos}
+          onLoadMore={onLoadMorePhotos}
+        />
       </main>
 
       {/* Floating Bottom Bar on Mobile */}
@@ -244,7 +253,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
         onClose={() => setLightboxOpen(false)}
         onNavigate={(idx) => setLightboxIndex(idx)}
         onToggleSelection={(photoId, currentSelected) => {
-          store.toggleHeart(album.id, photoId, !currentSelected);
+          void photoSelection.toggle(album.id, photoId, !currentSelected);
         }}
       />
     </div>
