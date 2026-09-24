@@ -166,11 +166,10 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             </p>
           </div>
 
-          {/* MVP Limits Note */}
+          {/* Album retention note */}
           <div className="p-3.5 bg-stone-50 rounded-2xl border border-stone-200/80 text-xs text-stone-600 space-y-1">
-            <p className="font-bold text-stone-800">Quy định hạn mức MVP:</p>
+            <p className="font-bold text-stone-800">Thời hạn lưu trữ:</p>
             <p>• Thời hạn lưu trữ album: <strong>30 ngày</strong> kể từ khi hoàn tất.</p>
-            <p>• Hạn mức: Tối đa <strong>3 album đang hoạt động</strong>/tài khoản.</p>
           </div>
 
           <DialogFooter className="pt-3 gap-2">

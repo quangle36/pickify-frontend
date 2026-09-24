@@ -53,7 +53,7 @@ export const FeaturesSection: FC = () => {
       color: "text-stone-700 bg-stone-100 border-stone-300",
       title: "Bảo vệ mật khẩu & Thu hồi phiên tức thì",
       description:
-        "Mật khẩu băm Argon2id bảo mật cao. Đổi mật khẩu sẽ lập tức thu hồi toàn bộ các phiên khách đang mở. Hạn mức album 30 ngày tự động dọn dẹp an toàn.",
+        "Mật khẩu băm Argon2id bảo mật cao. Đổi mật khẩu sẽ lập tức thu hồi toàn bộ các phiên khách đang mở. Album tự động dọn dẹp an toàn sau 30 ngày.",
     },
   ];
 

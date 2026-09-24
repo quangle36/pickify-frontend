@@ -41,7 +41,7 @@ export const FAQSection: FC = () => {
       question:
         "Giới hạn kích thước và số lượng ảnh trong bản MVP là bao nhiêu?",
       answer:
-        "Mỗi tài khoản photographer được duy trì tối đa 3 album đang hoạt động cùng lúc, mỗi album chứa tối đa 1.500 ảnh JPEG (mỗi ảnh tối đa 50MB). Thời hạn lưu trữ xem trước là 30 ngày kể từ lúc album hoàn tất xử lý.",
+        "Không giới hạn số album đang hoạt động. Mỗi album chứa tối đa 1.500 ảnh JPEG (mỗi ảnh tối đa 50MB). Thời hạn lưu trữ xem trước là 30 ngày kể từ lúc album hoàn tất xử lý.",
     },
   ];
 

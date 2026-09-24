@@ -33,7 +33,6 @@ const emptyProfile: PhotographerProfile = {
   email: "",
   avatarUrl: "",
   activeAlbumsCount: 0,
-  maxAlbumsLimit: 3,
   maxPhotosLimit: 1500,
   albumLifespanDays: 30,
 };

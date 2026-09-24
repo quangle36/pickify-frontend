@@ -12,7 +12,6 @@ export const apiMessages: Record<string, string> = {
   ORIGIN_DENIED: "Nguồn truy cập không hợp lệ.",
   DRIVE_DISCONNECTED: "Hãy kết nối Google Drive.",
   DRIVE_REAUTH_REQUIRED: "Hãy kết nối lại Google Drive.",
-  ACTIVE_ALBUM_LIMIT: "Bạn đã đạt giới hạn 3 album.",
   IMPORT_ALREADY_RUNNING: "Một album đang được nhập. Vui lòng chờ hoàn tất.",
   ALBUM_UNAVAILABLE: "Album chưa sẵn sàng, đã hết hạn hoặc đã bị xóa.",
   NOT_FOUND: "Không tìm thấy album hoặc ảnh.",

@@ -137,10 +137,7 @@ export function useDeleteAlbum() {
             current
               ? {
                   ...current,
-                  activeAlbumsCount: Math.min(
-                    current.maxAlbumsLimit,
-                    current.activeAlbumsCount + 1,
-                  ),
+                  activeAlbumsCount: current.activeAlbumsCount + 1,
                 }
               : current,
         );

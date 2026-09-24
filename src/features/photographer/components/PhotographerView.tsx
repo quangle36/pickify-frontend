@@ -17,8 +17,7 @@ export function PhotographerView({
   app: AppController;
   isDetailView: boolean;
 }) {
-  const { profile, albums, album, photos, actions, lightbox, openGuestDemo } =
-    app;
+  const { profile, albums, album, photos, actions, lightbox } = app;
   if (app.pending.owner) {
     return (
       <>
@@ -43,9 +42,6 @@ export function PhotographerView({
     <>
       <PhotographerNavbar
         profile={profile}
-        onCreateAlbum={actions.openCreate}
-        onOpenGuestDemo={openGuestDemo}
-        onOpenDriveModal={actions.openDrive}
         onLogout={actions.logout}
       />
       {isDetailView && album ? (
@@ -63,7 +59,6 @@ export function PhotographerView({
         </>
       ) : (
         <PhotographerDashboardPage
-          profile={profile}
           albums={albums}
           pending={app.pending.albums}
           onSelectAlbum={actions.selectAlbum}

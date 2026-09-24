@@ -31,7 +31,6 @@ export interface PhotographerProfile {
   email: string;
   avatarUrl: string;
   activeAlbumsCount: number;
-  maxAlbumsLimit: number;
   maxPhotosLimit: number;
   albumLifespanDays: number;
 }

@@ -67,7 +67,7 @@ export const PricingSection: FC<PricingSectionProps> = ({
                     <Check className="w-3.5 h-3.5 stroke-[3]" />
                   </div>
                   <span>
-                    <strong>Tối đa 3 album</strong> hoạt động cùng lúc
+                    <strong>Không giới hạn album</strong> hoạt động
                   </span>
                 </li>
                 <li className="flex items-center gap-3">
