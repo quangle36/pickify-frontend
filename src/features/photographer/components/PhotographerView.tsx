@@ -49,6 +49,7 @@ export function PhotographerView({
           <AlbumDetailPage
             album={album}
             photos={photos}
+            photosPending={app.pending.photos}
             onOpenGuestView={actions.openGuest}
             onOpenLightbox={lightbox.open}
           />
@@ -70,7 +71,7 @@ export function PhotographerView({
       )}
       <CreateAlbumModal {...actions.createModal} />
       <PublicDriveHelpModal {...actions.driveModal} />
-      <LightboxModal {...lightbox.props} />
+      <LightboxModal {...lightbox.props} selectionEnabled={false} />
     </>
   );
 }

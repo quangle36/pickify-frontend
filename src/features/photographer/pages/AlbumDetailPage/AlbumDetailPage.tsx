@@ -17,18 +17,19 @@ import {
   useUpdateAlbumPasscode,
 } from "@/features/photographer/queries/album.mutations";
 import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
-import { usePhotoSelection } from "@/features/photo/queries/photo.mutations";
 import { useAppStore } from "@/app/stores/app.store";
 import { PhotoCard } from "./components/PhotoCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
 interface AlbumDetailPageProps {
   album: Album;
   photos: Photo[];
+  photosPending: boolean;
   onOpenGuestView: (shareId: string) => void;
   onOpenLightbox: (photos: Photo[], index: number) => void;
 }
@@ -36,12 +37,12 @@ interface AlbumDetailPageProps {
 const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   album,
   photos,
+  photosPending,
   onOpenGuestView,
   onOpenLightbox,
 }) => {
   const report = useAppStore((state) => state.report);
   const filterPhotos = usePhotoFilters(album.id);
-  const photoSelection = usePhotoSelection("owner", null);
   const updatePasscode = useUpdateAlbumPasscode();
   const revokeSessions = useRevokeAlbumSessions();
   const [filterMode, setFilterMode] = useState<"all" | "selected" | "error">(
@@ -130,6 +131,24 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
     if (filterMode === "selected") return p.isSelected;
     return true;
   });
+
+  const photoGridClassName = `grid gap-3 sm:gap-4 ${
+    gridColumns === 3
+      ? "grid-cols-2 sm:grid-cols-3"
+      : gridColumns === 4
+        ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        : "grid-cols-2 sm:grid-cols-4 lg:grid-cols-6"
+  }`;
+
+  const skeletonVisibility = (index: number) => {
+    if (index < 2) return "";
+    if (gridColumns === 3) return index === 2 ? "hidden sm:block" : "hidden";
+    if (gridColumns === 4) {
+      if (index === 2) return "hidden sm:block";
+      return index === 3 ? "hidden lg:block" : "hidden";
+    }
+    return index < 4 ? "hidden sm:block" : "hidden lg:block";
+  };
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6 animate-fade-in">
@@ -333,30 +352,29 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       </div>
 
       {/* Photos Grid */}
-      {filteredPhotos.length > 0 ? (
+      {photosPending ? (
         <div
-          className={`grid gap-3 sm:gap-4 ${
-            gridColumns === 3
-              ? "grid-cols-2 sm:grid-cols-3"
-              : gridColumns === 4
-                ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
-                : "grid-cols-2 sm:grid-cols-4 lg:grid-cols-6"
-          }`}
+          role="status"
+          aria-label="Đang tải ảnh"
+          aria-busy="true"
+          className={photoGridClassName}
+        >
+          {Array.from({ length: 6 }, (_, index) => (
+            <Skeleton
+              key={index}
+              className={`aspect-[9/16] rounded-2xl ${skeletonVisibility(index)}`}
+            />
+          ))}
+        </div>
+      ) : filteredPhotos.length > 0 ? (
+        <div
+          className={photoGridClassName}
         >
           {filteredPhotos.map((photo, index) => (
             <PhotoCard
               key={photo.id}
               photo={photo}
-              pending={photoSelection.isPending(photo.id)}
-              failed={photoSelection.isFailed(photo.id)}
               onClick={() => onOpenLightbox(filteredPhotos, index)}
-              onToggleHeart={(photoId, currentSelected) => {
-                void photoSelection.toggle(
-                  album.id,
-                  photoId,
-                  !currentSelected,
-                );
-              }}
             />
           ))}
         </div>

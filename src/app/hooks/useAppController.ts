@@ -154,6 +154,11 @@ export function useAppController(route: AppRoute) {
     pending: {
       owner: !guestShare && owner.isPending,
       albums: !guestShare && !!owner.data?.id && albumsQuery.isPending,
+      photos:
+        !guestShare &&
+        route.isDetailView &&
+        !!albumId &&
+        photosQuery.isPending,
       guest:
         !!guestShare &&
         (guest.isPending ||

@@ -13,6 +13,7 @@ interface LightboxModalProps {
   onClose: () => void;
   onNavigate: (newIndex: number) => void;
   onToggleSelection: (photoId: string, currentSelected: boolean) => void;
+  selectionEnabled?: boolean;
 }
 
 export const LightboxModal: FC<LightboxModalProps> = ({
@@ -22,6 +23,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
   onClose,
   onNavigate,
   onToggleSelection,
+  selectionEnabled = true,
 }) => {
   const savingPhotos = usePhotoStore((state) => state.saving);
   const currentPhoto = photos[currentIndex];
@@ -36,11 +38,12 @@ export const LightboxModal: FC<LightboxModalProps> = ({
       } else if (e.key === "ArrowRight") {
         if (currentIndex < photos.length - 1) onNavigate(currentIndex + 1);
       } else if (
-        e.key === " " ||
-        e.key === "l" ||
-        e.key === "L" ||
-        e.key === "h" ||
-        e.key === "H"
+        selectionEnabled &&
+        (e.key === " " ||
+          e.key === "l" ||
+          e.key === "L" ||
+          e.key === "h" ||
+          e.key === "H")
       ) {
         e.preventDefault();
         if (savingPhotos[currentPhoto.id]) return;
@@ -55,6 +58,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
       onClose,
       onNavigate,
       onToggleSelection,
+      selectionEnabled,
       savingPhotos,
     ],
   );
@@ -98,26 +102,50 @@ export const LightboxModal: FC<LightboxModalProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Heart toggle inside lightbox */}
-          <Button
-            size="icon"
-            onClick={() =>
-              onToggleSelection(currentPhoto.id, currentPhoto.isSelected)
-            }
-            aria-label={currentPhoto.isSelected ? "Bỏ tim" : "Thả tim"}
-            aria-pressed={currentPhoto.isSelected}
-            title={currentPhoto.isSelected ? "Bỏ tim" : "Thả tim"}
-            variant={currentPhoto.isSelected ? "default" : "secondary"}
-            className={`rounded-full transition-all ${
-              currentPhoto.isSelected
-                ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/40 animate-heart-pop"
-                : "bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 border-stone-700"
-            }`}
-          >
-            <Heart
-              className={`w-5 h-5 ${currentPhoto.isSelected ? "fill-white" : ""}`}
-            />
-          </Button>
+          {selectionEnabled ? (
+            <Button
+              size="icon"
+              onClick={() =>
+                onToggleSelection(currentPhoto.id, currentPhoto.isSelected)
+              }
+              aria-label={currentPhoto.isSelected ? "Bỏ tim" : "Thả tim"}
+              aria-pressed={currentPhoto.isSelected}
+              title={currentPhoto.isSelected ? "Bỏ tim" : "Thả tim"}
+              variant={currentPhoto.isSelected ? "default" : "secondary"}
+              className={`rounded-full transition-all ${
+                currentPhoto.isSelected
+                  ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/40 animate-heart-pop"
+                  : "bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 border-stone-700"
+              }`}
+            >
+              <Heart
+                className={`w-5 h-5 ${currentPhoto.isSelected ? "fill-white" : ""}`}
+              />
+            </Button>
+          ) : (
+            <div
+              role="img"
+              aria-label={
+                currentPhoto.isSelected
+                  ? "Khách đã thả tim"
+                  : "Khách chưa thả tim"
+              }
+              title={
+                currentPhoto.isSelected
+                  ? "Khách đã thả tim"
+                  : "Chưa được chọn"
+              }
+              className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                currentPhoto.isSelected
+                  ? "bg-rose-500 text-white shadow-lg shadow-rose-500/40"
+                  : "bg-stone-800 text-stone-400"
+              }`}
+            >
+              <Heart
+                className={`h-5 w-5 ${currentPhoto.isSelected ? "fill-white" : ""}`}
+              />
+            </div>
+          )}
 
           <Button
             size="icon"
@@ -186,11 +214,15 @@ export const LightboxModal: FC<LightboxModalProps> = ({
             →
           </kbd>
           <span>Chuyển ảnh</span>
-          <span className="mx-1">•</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
-            Space
-          </kbd>
-          <span>Thả tim</span>
+          {selectionEnabled ? (
+            <>
+              <span className="mx-1">•</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+                Space
+              </kbd>
+              <span>Thả tim</span>
+            </>
+          ) : null}
           <span className="mx-1">•</span>
           <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
             Esc

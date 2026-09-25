@@ -1,4 +1,4 @@
-import { FC, MouseEvent } from "react";
+import { FC } from "react";
 import type { Photo } from "@/features/photo/types/photo.types";
 import { Heart } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -6,24 +6,13 @@ import { preloadImage } from "@/features/photo/utils/imagePreloader";
 
 interface PhotoCardProps {
   photo: Photo;
-  pending: boolean;
-  failed: boolean;
   onClick: () => void;
-  onToggleHeart: (photoId: string, currentSelected: boolean) => void;
 }
 
 export const PhotoCard: FC<PhotoCardProps> = ({
   photo,
-  pending,
-  failed,
   onClick,
-  onToggleHeart,
 }) => {
-  const handleHeartClick = (e: MouseEvent) => {
-    e.stopPropagation();
-    onToggleHeart(photo.id, photo.isSelected);
-  };
-
   return (
     <Card
       onClick={photo.status === "ready" ? onClick : undefined}
@@ -60,39 +49,34 @@ export const PhotoCard: FC<PhotoCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20 pointer-events-none" />
       )}
 
-      {/* Heart Button Top-Right */}
+      {/* Read-only guest selection indicator */}
       {photo.status === "ready" && (
         <div className="absolute top-2.5 right-2.5 z-10">
-          <button
-            type="button"
-            onClick={handleHeartClick}
-            disabled={pending || photo.status !== "ready"}
-            aria-label={photo.isSelected ? "Bỏ tim" : "Thả tim"}
-            aria-pressed={photo.isSelected}
-            className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-transform active:scale-90 shadow-md ${
+          <div
+            role="img"
+            aria-label={
+              photo.isSelected ? "Khách đã thả tim" : "Khách chưa thả tim"
+            }
+            className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md shadow-md ${
               photo.isSelected
                 ? "bg-rose-500 text-white animate-heart-pop"
-                : "bg-black/40 text-white/70 hover:bg-black/60 hover:text-white"
+                : "bg-black/40 text-white/70"
             }`}
             title={photo.isSelected ? "Khách đã thả tim" : "Chưa được chọn"}
           >
             <Heart
               className={`w-4 h-4 ${photo.isSelected ? "fill-white" : ""}`}
             />
-          </button>
+          </div>
         </div>
       )}
 
-      {(pending || failed || photo.status === "error") && (
+      {photo.status === "error" && (
         <span
           role="status"
           className="absolute top-2 left-2 bg-white text-stone-900 p-1 text-xs"
         >
-          {pending
-            ? "Đang lưu…"
-            : failed
-              ? "Chưa lưu — thử lại"
-              : photo.errorReason}
+          {photo.errorReason}
         </span>
       )}
       {/* Bottom Label */}
