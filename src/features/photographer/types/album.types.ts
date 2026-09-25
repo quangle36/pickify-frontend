@@ -17,6 +17,7 @@ export interface Album {
   totalPhotos: number;
   importedPhotos: number;
   selectedPhotosCount: number;
+  selectionLimit: number | null;
   createdAt: string;
   expiresAt: string | null;
   readyAt?: string;

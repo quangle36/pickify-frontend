@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { ApiError } from "@/api/errors";
 import { useAlbums } from "@/features/photographer/queries/album.queries";
+import { albumKeys } from "@/features/photographer/queries/album.key";
 import { useOwnerQuery } from "@/features/auth/queries/auth.queries";
 import { useGuestAlbumQuery } from "@/features/guest/queries/guest.queries";
 import {
@@ -13,7 +14,10 @@ import { photoKeys } from "@/features/photo/queries/photo.key";
 import type { PhotoPage } from "@/features/photo/types/photo.types";
 import { usePhotoStore } from "@/features/photo/stores/photo.store";
 import { useAlbumStore } from "@/features/photographer/stores/album.store";
-import type { PhotographerProfile } from "@/features/photographer/types/album.types";
+import type {
+  Album,
+  PhotographerProfile,
+} from "@/features/photographer/types/album.types";
 import type { ViewRole } from "../app.types";
 import { useAppStore } from "../stores/app.store";
 import { useAppActions } from "./useAppActions";
@@ -45,6 +49,7 @@ export function useAppController(route: AppRoute) {
     route.pathname.match(/^\/album\/([a-zA-Z0-9_-]+)\/?$/)?.[1] ?? null;
   const report = useAppStore((state) => state.report);
   const error = useAppStore((state) => state.error);
+  const clearError = useAppStore((state) => state.clearError);
   const filters = usePhotoStore((state) => state.filters);
   const hiddenAlbumIds = useAlbumStore((state) => state.hiddenAlbumIds);
 
@@ -92,6 +97,10 @@ export function useAppController(route: AppRoute) {
       ? selectedAlbum
       : (selectedAlbum ?? albums[0]);
   const photos = photosFromPages(photosQuery.data);
+  const firstPhotoCoverUrl = photos.find(
+    (photo) => photo.status === "ready" && photo.displayUrl,
+  )?.displayUrl;
+  const nextCoverUrl = photoAlbum?.coverUrl || firstPhotoCoverUrl;
   const hasGuestData =
     !!guestShare &&
     client
@@ -106,6 +115,17 @@ export function useAppController(route: AppRoute) {
     );
 
   useEffect(() => {
+    if (scope !== "owner" || !albumId || !nextCoverUrl) return;
+    client.setQueryData<Album[]>(albumKeys.all, (current) =>
+      current?.map((currentAlbum) =>
+        currentAlbum.id === albumId && currentAlbum.coverUrl !== nextCoverUrl
+          ? { ...currentAlbum, coverUrl: nextCoverUrl }
+          : currentAlbum,
+      ),
+    );
+  }, [albumId, client, nextCoverUrl, scope]);
+
+  useEffect(() => {
     const queryError =
       owner.error ?? albumsQuery.error ?? guest.error ?? photosQuery.error;
     if (
@@ -113,9 +133,12 @@ export function useAppController(route: AppRoute) {
       !(guestShare && queryError instanceof ApiError && queryError.status === 401)
     ) {
       report(queryError);
+    } else {
+      clearError();
     }
   }, [
     albumsQuery.error,
+    clearError,
     guest.error,
     guestShare,
     owner.error,

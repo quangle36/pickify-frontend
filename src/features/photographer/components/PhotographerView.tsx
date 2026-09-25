@@ -66,7 +66,6 @@ export function PhotographerView({
           onRetryAlbum={actions.retryAlbum}
           onDeleteAlbum={actions.deleteAlbum}
           onCreateAlbum={actions.openCreate}
-          onOpenDriveModal={actions.openDrive}
         />
       )}
       <CreateAlbumModal {...actions.createModal} />

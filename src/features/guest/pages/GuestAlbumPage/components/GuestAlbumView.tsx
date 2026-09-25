@@ -1,5 +1,5 @@
 import { LoadMore } from "@/features/photo/components/LoadMore";
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useRef } from "react";
 import type { Photo } from "@/features/photo/types/photo.types";
 import type { Album } from "@/features/photographer/types/album.types";
 import {
@@ -39,8 +39,18 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [gridCols, setGridCols] = useState<2 | 3>(2); // Mobile first: 2 or 3 cols
   const [failedSaves, setFailedSaves] = useState<Record<string, boolean>>({}); // photoId -> boolean
+  const [limitNotice, setLimitNotice] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const limitNoticeTimer = useRef<number>();
+
+  useEffect(
+    () => () => {
+      if (limitNoticeTimer.current)
+        window.clearTimeout(limitNoticeTimer.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -50,9 +60,26 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   }, [filterOnlyHearts, filterPhotos, searchTerm]);
 
   const selectedCount = album.selectedPhotosCount;
+  const selectionTarget = album.selectionLimit ?? album.totalPhotos;
+  const selectionLimitReached =
+    album.selectionLimit !== null && selectedCount >= album.selectionLimit;
+
+  const showLimitNotice = () => {
+    setLimitNotice(true);
+    if (limitNoticeTimer.current)
+      window.clearTimeout(limitNoticeTimer.current);
+    limitNoticeTimer.current = window.setTimeout(
+      () => setLimitNotice(false),
+      3000,
+    );
+  };
 
   const handleToggleHeart = async (photo: Photo) => {
     if (photoSelection.isPending(photo.id)) return;
+    if (!photo.isSelected && selectionLimitReached) {
+      showLimitNotice();
+      return;
+    }
     const success = await photoSelection.toggle(
       album.id,
       photo.id,
@@ -121,11 +148,24 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
               }`}
             />
             <span>
-              {selectedCount}/{album.totalPhotos}
+              {selectedCount}/{selectionTarget}
             </span>
           </Button>
         </div>
       </header>
+
+      {/* Selection limit notice */}
+      {limitNotice && (
+        <div className="max-w-4xl mx-auto w-full px-4 pt-3">
+          <Alert className="bg-rose-950/80 border-rose-600/60 rounded-2xl text-xs text-rose-100 p-3">
+            <AlertCircle className="w-4 h-4 text-rose-400" />
+            <AlertDescription className="text-xs text-rose-100">
+              Album chỉ cho phép chọn tối đa {album.selectionLimit} ảnh. Hãy bỏ
+              chọn một ảnh trước khi chọn ảnh khác.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
 
       {/* Network Error Alert Notice if any */}
       {Object.values(failedSaves).some(Boolean) && (
@@ -230,7 +270,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
           <div className="flex items-center gap-2 text-xs">
             <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
             <span>
-              Đã chọn <strong>{selectedCount}</strong> / {album.totalPhotos} ảnh
+              Đã chọn <strong>{selectedCount}</strong> / {selectionTarget} ảnh
             </span>
           </div>
           <div className="h-4 w-px bg-stone-700" />
@@ -253,6 +293,10 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
         onClose={() => setLightboxOpen(false)}
         onNavigate={(idx) => setLightboxIndex(idx)}
         onToggleSelection={(photoId, currentSelected) => {
+          if (!currentSelected && selectionLimitReached) {
+            showLimitNotice();
+            return;
+          }
           void photoSelection.toggle(album.id, photoId, !currentSelected);
         }}
       />

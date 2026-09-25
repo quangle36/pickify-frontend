@@ -1,19 +1,34 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
+import { ToastAction } from "@/components/ui/toast";
 import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/use-toast";
 import { useAppStore } from "../stores/app.store";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const error = useAppStore((state) => state.error);
-  const clearError = useAppStore((state) => state.clearError);
+  const lastShownError = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!error) {
+      lastShownError.current = null;
+      return;
+    }
+    if (lastShownError.current === error) return;
+
+    lastShownError.current = error;
+    toast({
+      variant: "destructive",
+      title: error,
+      action: (
+        <ToastAction altText="Thử lại" onClick={() => location.reload()}>
+          Thử lại
+        </ToastAction>
+      ),
+    });
+  }, [error]);
+
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col font-sans">
-      {error && (
-        <div role="alert" className="bg-amber-100 text-amber-950 p-4 flex justify-between gap-4">
-          <span>{error}</span>
-          <button onClick={clearError}>Đóng</button>
-          <button onClick={() => location.reload()}>Thử lại</button>
-        </div>
-      )}
       {children}
       <Toaster />
     </div>

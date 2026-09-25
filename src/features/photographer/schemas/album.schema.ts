@@ -30,6 +30,7 @@ function folderIdFromUrl(value: string): string {
 export const createAlbumSchema = z.object({
   name: z.string().trim().min(1).max(120),
   password: z.string().min(4).max(128),
+  selectionLimit: z.coerce.number().int().min(1).max(1500),
   folderUrl: z
     .string()
     .max(2048)

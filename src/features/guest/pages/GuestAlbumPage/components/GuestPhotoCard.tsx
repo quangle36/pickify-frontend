@@ -89,14 +89,6 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
         </div>
       )}
 
-      {isPending && (
-        <span
-          role="status"
-          className="absolute top-2 left-2 bg-stone-900 text-white p-1 text-xs"
-        >
-          Đang lưu…
-        </span>
-      )}
       {/* Unsaved warning badge per plan.md */}
       {isFailed && (
         <div

@@ -1,5 +1,5 @@
 import { FC, useState, FormEvent } from 'react';
-import { UploadCloud, Lock, AlertCircle, HelpCircle } from 'lucide-react';
+import { UploadCloud, Lock, AlertCircle, HelpCircle, Images } from 'lucide-react';
 import { extractDriveFolderId } from '@/lib/utils';
 import {
   Dialog,
@@ -17,7 +17,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface CreateAlbumModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { name: string; folderUrl: string; passcode: string }) => Promise<{
+  onSubmit: (data: { name: string; folderUrl: string; passcode: string; selectionLimit: number }) => Promise<{
     success: boolean;
     error?: string;
   }>;
@@ -32,6 +32,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
   const [name, setName] = useState('');
   const [folderUrl, setFolderUrl] = useState('');
   const [passcode, setPasscode] = useState('');
+  const [selectionLimit, setSelectionLimit] = useState('50');
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -60,11 +61,22 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       return;
     }
 
+    const parsedSelectionLimit = Number(selectionLimit);
+    if (
+      !Number.isInteger(parsedSelectionLimit) ||
+      parsedSelectionLimit < 1 ||
+      parsedSelectionLimit > 1500
+    ) {
+      setError('Số lượng ảnh được chọn phải từ 1 đến 1.500');
+      return;
+    }
+
     setPending(true);
     const res = await onSubmit({
       name: name.trim(),
       folderUrl: folderUrl.trim(),
       passcode: passcode.trim(),
+      selectionLimit: parsedSelectionLimit,
     });
 
     setPending(false);
@@ -72,6 +84,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       setName('');
       setFolderUrl('');
       setPasscode('');
+      setSelectionLimit('50');
       onClose();
     } else {
       setError(res.error || 'Có lỗi xảy ra khi tạo album');
@@ -163,6 +176,32 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             </div>
             <p className="text-[11px] text-stone-400 mt-1">
               Khách bắt buộc phải nhập đúng mật khẩu này mới có thể xem ảnh và thả tim.
+            </p>
+          </div>
+
+          {/* Selection limit */}
+          <div className="space-y-1.5">
+            <Label htmlFor="selection-limit" className="text-xs font-bold text-stone-700 uppercase tracking-wider">
+              Số lượng ảnh khách được chọn <span className="text-rose-500">*</span>
+            </Label>
+            <div className="relative">
+              <Input
+                id="selection-limit"
+                type="number"
+                min={1}
+                max={1500}
+                step={1}
+                inputMode="numeric"
+                value={selectionLimit}
+                onChange={(e) => setSelectionLimit(e.target.value)}
+                className="h-11 rounded-2xl pr-10 font-mono"
+              />
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
+                <Images className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-[11px] text-stone-400 mt-1">
+              Khi đạt đủ số lượng này, khách cần bỏ chọn một ảnh trước khi chọn ảnh khác.
             </p>
           </div>
 

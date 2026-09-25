@@ -6,6 +6,7 @@ export interface CreateAlbumInput {
   name: string;
   folderUrl: string;
   password: string;
+  selectionLimit: number;
 }
 
 export const albumService = {

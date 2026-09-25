@@ -1,9 +1,7 @@
 import { FC, MouseEvent } from "react";
 import type { Photo } from "@/features/photo/types/photo.types";
 import { Heart } from "lucide-react";
-import { formatBytes } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { preloadImage } from "@/features/photo/utils/imagePreloader";
 
 interface PhotoCardProps {
@@ -99,15 +97,9 @@ export const PhotoCard: FC<PhotoCardProps> = ({
       )}
       {/* Bottom Label */}
       <div
-        className={`absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] font-mono pointer-events-none ${photo.status === "ready" ? "text-stone-200" : "text-stone-600"}`}
+        className={`absolute bottom-2 left-2.5 right-2.5 text-[11px] font-mono pointer-events-none ${photo.status === "ready" ? "text-stone-200" : "text-stone-600"}`}
       >
-        <span className="truncate">{photo.name}</span>
-        <Badge
-          variant="outline"
-          className="text-[10px] text-stone-400 bg-black/40 border-0 font-sans px-1.5 py-0"
-        >
-          {formatBytes(photo.sizeBytes)}
-        </Badge>
+        <span className="block truncate">{photo.name}</span>
       </div>
     </Card>
   );

@@ -16,6 +16,7 @@ export interface CreateAlbumFormInput {
   name: string;
   folderUrl: string;
   passcode: string;
+  selectionLimit: number;
 }
 
 async function invalidateAlbumData(
@@ -39,6 +40,7 @@ export function useCreateAlbum() {
         name: form.name,
         folderUrl: form.folderUrl,
         password: form.passcode,
+        selectionLimit: form.selectionLimit,
       });
       return albumService.createAlbum(input);
     },

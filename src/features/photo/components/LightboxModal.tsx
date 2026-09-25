@@ -2,7 +2,6 @@ import { FC, useEffect, useCallback } from "react";
 import { usePhotoStore } from "../stores/photo.store";
 import { Photo } from "../types/photo.types";
 import { X, ChevronLeft, ChevronRight, Heart } from "lucide-react";
-import { formatBytes } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { preloadImage } from "../utils/imagePreloader";
@@ -25,7 +24,6 @@ export const LightboxModal: FC<LightboxModalProps> = ({
   onToggleSelection,
 }) => {
   const savingPhotos = usePhotoStore((state) => state.saving);
-  const failedSelections = usePhotoStore((state) => state.failedSelections);
   const currentPhoto = photos[currentIndex];
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -102,30 +100,23 @@ export const LightboxModal: FC<LightboxModalProps> = ({
         <div className="flex items-center gap-3">
           {/* Heart toggle inside lightbox */}
           <Button
-            size="sm"
-            disabled={!!savingPhotos[currentPhoto.id]}
+            size="icon"
             onClick={() =>
               onToggleSelection(currentPhoto.id, currentPhoto.isSelected)
             }
+            aria-label={currentPhoto.isSelected ? "Bỏ tim" : "Thả tim"}
+            aria-pressed={currentPhoto.isSelected}
+            title={currentPhoto.isSelected ? "Bỏ tim" : "Thả tim"}
             variant={currentPhoto.isSelected ? "default" : "secondary"}
-            className={`gap-2 rounded-full font-bold transition-all ${
+            className={`rounded-full transition-all ${
               currentPhoto.isSelected
                 ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/40 animate-heart-pop"
                 : "bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 border-stone-700"
             }`}
           >
             <Heart
-              className={`w-4 h-4 ${currentPhoto.isSelected ? "fill-white" : ""}`}
+              className={`w-5 h-5 ${currentPhoto.isSelected ? "fill-white" : ""}`}
             />
-            <span>
-              {savingPhotos[currentPhoto.id]
-                ? "Đang lưu…"
-                : currentPhoto.id in failedSelections
-                  ? "Chưa lưu — thử lại"
-                  : currentPhoto.isSelected
-                    ? "Đã thả tim"
-                    : "Thả tim"}
-            </span>
           </Button>
 
           <Button
@@ -185,8 +176,6 @@ export const LightboxModal: FC<LightboxModalProps> = ({
             Kích thước: {currentPhoto.dimensions.width} ×{" "}
             {currentPhoto.dimensions.height} px
           </span>
-          <span>•</span>
-          <span>Dung lượng: {formatBytes(currentPhoto.sizeBytes)}</span>
         </div>
 
         <div className="hidden md:flex items-center gap-2 text-[11px] text-stone-400">

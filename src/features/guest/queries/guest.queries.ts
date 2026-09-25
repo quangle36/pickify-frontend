@@ -17,6 +17,7 @@ export function useGuestAlbumQuery(shareId: string | null) {
         totalPhotos: 0,
         importedPhotos: 0,
         selectedPhotosCount: 0,
+        selectionLimit: metadata.selectionLimit ?? null,
         guestSessionCount: 0,
         folderUrl: "",
         folderId: "",

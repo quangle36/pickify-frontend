@@ -5,17 +5,13 @@ import type { Album } from "@/features/photographer/types/album.types";
 import {
   ArrowLeft,
   Heart,
-  FileSpreadsheet,
   Copy,
   Check,
   Lock,
   Search,
   Eye,
-  Clock,
   RefreshCw,
 } from "lucide-react";
-import { getDaysRemaining } from "@/lib/utils";
-import { exportSelectedPhotosToCsv } from "@/features/photographer/utils/exportCsv";
 import {
   useRevokeAlbumSessions,
   useUpdateAlbumPasscode,
@@ -65,7 +61,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
     return () => clearTimeout(timer);
   }, [filterMode, filterPhotos, searchTerm]);
 
-  const daysLeft = getDaysRemaining(album.expiresAt);
   const selectedCount = album.selectedPhotosCount;
 
   const handleCopyLink = () => {
@@ -73,10 +68,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
     navigator.clipboard.writeText(guestUrl);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
-  };
-
-  const handleExportCsv = () => {
-    exportSelectedPhotosToCsv(album, photos);
   };
 
   const handleSavePasscode = async () => {
@@ -191,31 +182,12 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             <span>{copiedLink ? "Đã chép link!" : "Chép link chia sẻ"}</span>
           </Button>
 
-          <Button
-            size="sm"
-            onClick={handleExportCsv}
-            className="rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 gap-2"
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>Xuất CSV cho Lightroom ({selectedCount})</span>
-          </Button>
         </div>
       </div>
 
       {/* Album Meta Banner */}
       <Card className="rounded-3xl p-6 sm:p-7 border-stone-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white">
         <div>
-          <div className="flex items-center gap-2 text-xs text-stone-500 mb-2">
-            <span className="font-mono bg-stone-100 px-2 py-0.5 rounded text-[11px] text-stone-700">
-              ID: {album.folderId}
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-stone-400" />
-              <span>Thời hạn: Còn {daysLeft} ngày (30 ngày)</span>
-            </span>
-          </div>
-
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
               {album.title}
@@ -294,23 +266,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
           </div>
         </div>
 
-        {/* Selected count pill */}
-        <Card className="p-4 rounded-2xl bg-brand-50 border-brand-100 flex items-center gap-4 shrink-0 shadow-none">
-          <div className="w-12 h-12 rounded-2xl bg-brand-500 text-white flex items-center justify-center shadow-md shadow-brand-500/30">
-            <Heart className="w-6 h-6 fill-white" />
-          </div>
-          <div>
-            <span className="text-xs font-bold text-brand-800 uppercase tracking-wider">
-              Khách đã chọn
-            </span>
-            <div className="text-2xl font-black text-brand-700 font-mono">
-              {selectedCount}{" "}
-              <span className="text-sm font-medium text-brand-600/70">
-                / {readyPhotos.length} ảnh
-              </span>
-            </div>
-          </div>
-        </Card>
       </Card>
 
       {/* Gallery Controls Bar */}
@@ -326,7 +281,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
               value="all"
               className="rounded-xl px-3.5 py-2 font-bold"
             >
-              Tất cả ảnh ({readyPhotos.length})
+              Tất cả ảnh ({album.totalPhotos})
             </TabsTrigger>
             <TabsTrigger
               value="selected"

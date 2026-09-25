@@ -1,11 +1,19 @@
+import { lazy, Suspense } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { PhotographerView } from "@/features/photographer/components/PhotographerView";
-import LandingPage from "@/features/landing/pages/LandingPage";
-import GuestAlbumPage from "@/features/guest/pages/GuestAlbumPage";
 import type { ViewRole } from "./app.types";
 import { AppShell } from "./components/AppShell";
 import { GuestAlbumSkeleton } from "./components/GuestAlbumSkeleton";
 import { useAppController } from "./hooks/useAppController";
+
+const LandingPage = lazy(() => import("@/features/landing/pages/LandingPage"));
+const GuestAlbumPage = lazy(
+  () => import("@/features/guest/pages/GuestAlbumPage"),
+);
+const PhotographerView = lazy(() =>
+  import("@/features/photographer/components/PhotographerView").then(
+    (module) => ({ default: module.PhotographerView }),
+  ),
+);
 
 interface AppProps {
   currentRole: ViewRole;
@@ -30,41 +38,43 @@ export function App({
 
   return (
     <AppShell>
-      {currentRole === "landing" ? (
-        <LandingPage
-          onGoToDashboard={app.actions.dashboard}
-          onOpenGuestDemo={app.actions.dashboard}
-          onLogin={app.actions.loginHome}
-          onLogout={app.actions.logout}
-          onCreateAlbum={app.actions.dashboard}
-          isAuthenticated={Boolean(app.profile.id)}
-          isAuthPending={app.pending.owner}
-          userName={app.profile.name || undefined}
-          userEmail={app.profile.email || undefined}
-          avatarUrl={app.profile.avatarUrl || undefined}
-        />
-      ) : currentRole === "guest" ? (
-        app.pending.guest ? (
-          <GuestAlbumSkeleton />
-        ) : app.album ? (
-          <GuestAlbumPage
-            album={app.album}
-            photos={app.photos}
-            hasMorePhotos={app.hasMorePhotos}
-            onLoadMorePhotos={app.loadMorePhotos}
-            guestVerified={app.verified}
-            onVerified={() => {}}
-            onExitGuestView={app.actions.exitGuest}
+      <Suspense fallback={<GuestAlbumSkeleton />}>
+        {currentRole === "landing" ? (
+          <LandingPage
+            onGoToDashboard={app.actions.dashboard}
+            onOpenGuestDemo={app.actions.dashboard}
+            onLogin={app.actions.loginHome}
+            onLogout={app.actions.logout}
+            onCreateAlbum={app.actions.loginHome}
+            isAuthenticated={Boolean(app.profile.id)}
+            isAuthPending={app.pending.owner}
+            userName={app.profile.name || undefined}
+            userEmail={app.profile.email || undefined}
+            avatarUrl={app.profile.avatarUrl || undefined}
           />
+        ) : currentRole === "guest" ? (
+          app.pending.guest ? (
+            <GuestAlbumSkeleton />
+          ) : app.album ? (
+            <GuestAlbumPage
+              album={app.album}
+              photos={app.photos}
+              hasMorePhotos={app.hasMorePhotos}
+              onLoadMorePhotos={app.loadMorePhotos}
+              guestVerified={app.verified}
+              onVerified={() => {}}
+              onExitGuestView={app.actions.exitGuest}
+            />
+          ) : (
+            <p className="p-12 text-center">
+              Không thể mở album. Kiểm tra lại liên kết hoặc liên hệ nhiếp ảnh
+              gia.
+            </p>
+          )
         ) : (
-          <p className="p-12 text-center">
-            Không thể mở album. Kiểm tra lại liên kết hoặc liên hệ nhiếp ảnh
-            gia.
-          </p>
-        )
-      ) : (
-        <PhotographerView app={app} isDetailView={isDetailView} />
-      )}
+          <PhotographerView app={app} isDetailView={isDetailView} />
+        )}
+      </Suspense>
     </AppShell>
   );
 }

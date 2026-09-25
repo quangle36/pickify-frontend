@@ -1,6 +1,8 @@
 import axios from "axios";
 
 export const apiMessages: Record<string, string> = {
+  NETWORK_ERROR: "Không thể kết nối máy chủ. Vui lòng thử lại.",
+  INTERNAL_ERROR: "Máy chủ đang gặp sự cố. Vui lòng thử lại sau.",
   DRIVE_NOT_PUBLIC:
     "Không thể đọc link Drive public. Đặt folder và ảnh thành “Bất kỳ ai có đường liên kết — Người xem”, rồi thử lại.",
   DRIVE_API_KEY_NOT_CONFIGURED:
@@ -13,6 +15,8 @@ export const apiMessages: Record<string, string> = {
   DRIVE_DISCONNECTED: "Hãy kết nối Google Drive.",
   DRIVE_REAUTH_REQUIRED: "Hãy kết nối lại Google Drive.",
   IMPORT_ALREADY_RUNNING: "Một album đang được nhập. Vui lòng chờ hoàn tất.",
+  SELECTION_LIMIT_REACHED:
+    "Album đã đạt đủ số lượng ảnh được phép chọn.",
   ALBUM_UNAVAILABLE: "Album chưa sẵn sàng, đã hết hạn hoặc đã bị xóa.",
   NOT_FOUND: "Không tìm thấy album hoặc ảnh.",
   RATE_LIMITED: "Bạn thử quá nhiều lần. Vui lòng chờ một phút.",

@@ -1,4 +1,4 @@
-import { ArrowRight, FolderPlus, Plus } from "lucide-react";
+import { FolderPlus, Plus } from "lucide-react";
 
 interface CreateAlbumCardProps {
   onCreate: () => void;
@@ -9,7 +9,7 @@ export function CreateAlbumCard({ onCreate }: CreateAlbumCardProps) {
     <button
       type="button"
       onClick={onCreate}
-      className="group relative flex min-h-[360px] w-full flex-col items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-stone-300 bg-white px-8 py-10 text-center shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-400 hover:bg-brand-50/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+      className="group relative flex aspect-[4/3] w-full flex-col items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-stone-300 bg-white px-8 py-10 text-center shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-400 hover:bg-brand-50/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 md:aspect-auto"
       aria-label="Tạo album mới"
     >
       <span className="pointer-events-none absolute inset-x-10 top-0 h-28 rounded-full bg-brand-100/60 blur-3xl transition-colors group-hover:bg-brand-200/70" />
@@ -22,13 +22,6 @@ export function CreateAlbumCard({ onCreate }: CreateAlbumCardProps) {
 
       <span className="relative mt-6 text-lg font-extrabold tracking-tight text-stone-900">
         Tạo album mới
-      </span>
-      <span className="relative mt-2 max-w-56 text-sm leading-6 text-stone-500">
-        Dán link Google Drive để bắt đầu một album chọn ảnh cho khách.
-      </span>
-      <span className="relative mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-brand-700">
-        Bắt đầu ngay
-        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
       </span>
     </button>
   );

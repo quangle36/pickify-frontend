@@ -37,14 +37,9 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-rose-500 flex items-center justify-center shadow-md shadow-brand-500/20 text-white group-hover:scale-105 transition-transform">
               <Heart className="w-4 h-4 fill-white" />
             </div>
-            <div className="text-left hidden sm:block">
-              <span className="font-extrabold text-base tracking-tight text-stone-900 block leading-tight">
-                Pickify
-              </span>
-              <span className="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">
-                Photographer Studio
-              </span>
-            </div>
+            <span className="hidden text-left text-base font-extrabold leading-tight tracking-tight text-stone-900 sm:block">
+              Pickify
+            </span>
           </Link>
 
           <div className="h-5 w-px bg-stone-200 hidden md:block mx-1" />

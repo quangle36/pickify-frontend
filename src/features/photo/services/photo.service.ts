@@ -6,6 +6,11 @@ interface SelectionInput {
   clientMutationId: string;
 }
 
+interface SelectionResult extends SelectionInput {
+  version: string;
+  selectedPhotosCount: number;
+}
+
 function photoParams(cursor: string | null, filters: PhotoFilters) {
   return {
     ...(cursor ? { cursor } : {}),
@@ -48,7 +53,7 @@ export const photoService = {
       selected,
       clientMutationId: crypto.randomUUID(),
     };
-    const result = await apiRequest<SelectionInput>({
+    const result = await apiRequest<SelectionResult>({
       url: `${basePath}/photos/${photoId}/selection`,
       method: "PUT",
       data: input,

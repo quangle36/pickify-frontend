@@ -2,7 +2,11 @@ import { apiRequest } from "@/api/apiClient";
 
 export const guestService = {
   getAlbum: (shareId: string, signal?: AbortSignal) =>
-    apiRequest<{ title: string; shareId: string }>({
+    apiRequest<{
+      title: string;
+      shareId: string;
+      selectionLimit?: number | null;
+    }>({
       url: `/public/albums/${shareId}`,
       signal,
     }),
