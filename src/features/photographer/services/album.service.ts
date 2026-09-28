@@ -4,9 +4,14 @@ import type { Album } from "../types/album.types";
 
 export interface CreateAlbumInput {
   name: string;
+  slug?: string;
   folderUrl: string;
   password: string;
   selectionLimit: number;
+}
+
+export interface SelectedFileManifest {
+  files: Array<{ name: string }>;
 }
 
 export const albumService = {
@@ -48,5 +53,18 @@ export const albumService = {
     apiRequest<Album>({
       url: `/albums/${albumId}/sessions`,
       method: "DELETE",
+    }),
+
+  setSelectionLocked: (albumId: string, locked: boolean) =>
+    apiRequest<Album>({
+      url: `/albums/${albumId}/selection-lock`,
+      method: "PUT",
+      data: { locked },
+    }),
+
+  getSelectedFiles: (albumId: string, signal?: AbortSignal) =>
+    apiRequest<SelectedFileManifest>({
+      url: `/albums/${albumId}/selected-files`,
+      signal,
     }),
 };

@@ -47,6 +47,9 @@ export function useAppController(route: AppRoute) {
   const client = useQueryClient();
   const guestShare =
     route.pathname.match(/^\/album\/([a-zA-Z0-9_-]+)\/?$/)?.[1] ?? null;
+  const guestReadOnly =
+    !!guestShare &&
+    new URLSearchParams(window.location.search).get("mode") === "view";
   const report = useAppStore((state) => state.report);
   const error = useAppStore((state) => state.error);
   const clearError = useAppStore((state) => state.clearError);
@@ -55,7 +58,7 @@ export function useAppController(route: AppRoute) {
 
   const owner = useOwnerQuery(!guestShare);
   const albumsQuery = useAlbums(owner.data?.id);
-  const guest = useGuestAlbumQuery(guestShare);
+  const guest = useGuestAlbumQuery(guestShare, guestReadOnly);
   const albumId = guestShare ?? route.selectedAlbumId;
   const scope = guestShare ? "guest" : "owner";
   const photosQuery = usePhotosQuery({
@@ -65,6 +68,7 @@ export function useAppController(route: AppRoute) {
     enabled: guestShare
       ? !!guest.data
       : !!route.isDetailView && !!albumId && !!owner.data?.id,
+    readOnly: guestReadOnly,
   });
   const photoSelection = usePhotoSelection(scope, guestShare);
 
@@ -73,20 +77,34 @@ export function useAppController(route: AppRoute) {
         .getQueriesData<InfiniteData<PhotoPage>>({
           queryKey: photoKeys.prefix("guest", guestShare),
         })
-        .map(([, data]) => data?.pages.slice(-1)[0]?.album)
+        .map(([key, data]) =>
+          key[3] === (guestReadOnly ? "view" : "interactive")
+            ? data?.pages.slice(-1)[0]?.album
+            : undefined,
+        )
         .find(Boolean)
     : undefined;
   const photoAlbum =
     photosQuery.data?.pages.slice(-1)[0]?.album ?? cachedGuestAlbum;
   const albums = guestShare
     ? guest.data
-      ? [{ ...guest.data, ...photoAlbum }]
+      ? [
+          {
+            ...guest.data,
+            ...photoAlbum,
+            selectionLocked: guest.data.selectionLocked,
+          },
+        ]
       : []
     : (albumsQuery.data ?? [])
         .filter((album) => !hiddenAlbumIds.includes(album.id))
         .map((album) =>
           album.id === albumId && photoAlbum
-            ? { ...album, ...photoAlbum }
+            ? {
+                ...album,
+                ...photoAlbum,
+                selectionLocked: album.selectionLocked,
+              }
             : album,
         );
   const selectedAlbum = albums.find(
@@ -107,7 +125,10 @@ export function useAppController(route: AppRoute) {
       .getQueriesData<InfiniteData<PhotoPage>>({
         queryKey: photoKeys.prefix("guest", guestShare),
       })
-      .some(([, data]) => !!data);
+      .some(
+        ([key, data]) =>
+          key[3] === (guestReadOnly ? "view" : "interactive") && !!data,
+      );
   const verified =
     hasGuestData &&
     !(
@@ -130,7 +151,11 @@ export function useAppController(route: AppRoute) {
       owner.error ?? albumsQuery.error ?? guest.error ?? photosQuery.error;
     if (
       queryError &&
-      !(guestShare && queryError instanceof ApiError && queryError.status === 401)
+      !(
+        guestShare &&
+        queryError instanceof ApiError &&
+        queryError.status === 401
+      )
     ) {
       report(queryError);
     } else {
@@ -147,7 +172,12 @@ export function useAppController(route: AppRoute) {
   ]);
 
   const actions = useAppActions();
-  const lightbox = useAppLightbox(album?.id, photos, photoSelection.toggle);
+  const lightbox = useAppLightbox(
+    album?.id,
+    album?.totalPhotos ?? 0,
+    photos,
+    photoSelection.toggle,
+  );
   useAppEffects({ ...route, album, closeLightbox: lightbox.close });
 
   return {
@@ -155,10 +185,7 @@ export function useAppController(route: AppRoute) {
       owner: !guestShare && owner.isPending,
       albums: !guestShare && !!owner.data?.id && albumsQuery.isPending,
       photos:
-        !guestShare &&
-        route.isDetailView &&
-        !!albumId &&
-        photosQuery.isPending,
+        !guestShare && route.isDetailView && !!albumId && photosQuery.isPending,
       guest:
         !!guestShare &&
         (guest.isPending ||
@@ -170,7 +197,9 @@ export function useAppController(route: AppRoute) {
     album,
     photos,
     verified,
+    guestReadOnly,
     hasMorePhotos: !!photosQuery.hasNextPage,
+    loadingMorePhotos: photosQuery.isFetchingNextPage,
     loadMorePhotos: async () => {
       const result = await photosQuery.fetchNextPage({ cancelRefetch: false });
       if (result.error) throw result.error;
@@ -178,7 +207,7 @@ export function useAppController(route: AppRoute) {
     actions,
     lightbox,
     openGuestDemo: () => {
-      if (album) actions.openGuest(album.shareId);
+      if (album) actions.openGuest(album.slug ?? album.shareId);
     },
   };
 }

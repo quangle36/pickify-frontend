@@ -3,6 +3,7 @@ import type { Album } from "@/features/photographer/types/album.types";
 export interface Photo {
   id: string;
   albumId: string;
+  position: number;
   driveFileId: string;
   name: string;
   displayUrl: string;

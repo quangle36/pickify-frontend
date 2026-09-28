@@ -12,6 +12,7 @@ interface GuestPhotoCardProps {
   onClick: () => void;
   onToggleHeart: (photo: Photo) => void;
   onRetrySave: (photo: Photo) => void;
+  selectionEnabled?: boolean;
 }
 
 export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
@@ -21,6 +22,7 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
   onClick,
   onToggleHeart,
   onRetrySave,
+  selectionEnabled = true,
 }) => {
   const handleHeartClick = (e: MouseEvent) => {
     e.stopPropagation();
@@ -68,7 +70,7 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
 
       {/* Heart Button Overlay (Tap target >= 44px) */}
-      {photo.status === "ready" && (
+      {photo.status === "ready" && selectionEnabled && (
         <div className="absolute top-1.5 right-1.5 z-10">
           <button
             type="button"
@@ -90,7 +92,7 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
       )}
 
       {/* Unsaved warning badge per plan.md */}
-      {isFailed && (
+      {selectionEnabled && isFailed && (
         <div
           onClick={handleRetryClick}
           className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-bold flex items-center gap-1 shadow-md cursor-pointer animate-pulse"

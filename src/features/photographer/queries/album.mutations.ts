@@ -14,15 +14,13 @@ import { albumKeys } from "./album.key";
 
 export interface CreateAlbumFormInput {
   name: string;
+  slug: string;
   folderUrl: string;
   passcode: string;
   selectionLimit: number;
 }
 
-async function invalidateAlbumData(
-  client: QueryClient,
-  includePhotos = true,
-) {
+async function invalidateAlbumData(client: QueryClient, includePhotos = true) {
   await Promise.all([
     client.invalidateQueries({ queryKey: authKeys.owner }),
     client.invalidateQueries({ queryKey: albumKeys.all }),
@@ -38,6 +36,7 @@ export function useCreateAlbum() {
     mutationFn: async (form: CreateAlbumFormInput) => {
       const input = createAlbumSchema.parse({
         name: form.name,
+        slug: form.slug,
         folderUrl: form.folderUrl,
         password: form.passcode,
         selectionLimit: form.selectionLimit,
@@ -59,8 +58,13 @@ export function useRetryAlbum() {
 export function useUpdateAlbumPasscode() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: ({ albumId, password }: { albumId: string; password: string }) =>
-      albumService.updatePasscode(albumId, password),
+    mutationFn: ({
+      albumId,
+      password,
+    }: {
+      albumId: string;
+      password: string;
+    }) => albumService.updatePasscode(albumId, password),
     onSuccess: () => invalidateAlbumData(client),
   });
 }
@@ -70,6 +74,38 @@ export function useRevokeAlbumSessions() {
   return useMutation({
     mutationFn: albumService.revokeGuestSessions,
     onSuccess: () => invalidateAlbumData(client),
+  });
+}
+
+export function useSetAlbumSelectionLocked() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ albumId, locked }: { albumId: string; locked: boolean }) =>
+      albumService.setSelectionLocked(albumId, locked),
+    onMutate: async ({ albumId, locked }) => {
+      await client.cancelQueries({ queryKey: albumKeys.all });
+      const previousAlbums = client.getQueryData<Album[]>(albumKeys.all);
+      client.setQueryData<Album[]>(albumKeys.all, (current) =>
+        current?.map((album) =>
+          album.id === albumId ? { ...album, selectionLocked: locked } : album,
+        ),
+      );
+      return { previousAlbums };
+    },
+    onError: (_error, _input, context) => {
+      if (context?.previousAlbums) {
+        client.setQueryData(albumKeys.all, context.previousAlbums);
+      }
+    },
+    onSuccess: (updatedAlbum) => {
+      client.setQueryData<Album[]>(albumKeys.all, (current) =>
+        current?.map((album) =>
+          album.id === updatedAlbum.id
+            ? { ...album, ...updatedAlbum }
+            : album,
+        ),
+      );
+    },
   });
 }
 
@@ -88,7 +124,9 @@ export function useDeleteAlbum() {
       ]);
 
       const previousAlbums = client.getQueryData<Album[]>(albumKeys.all);
-      const removedAlbum = previousAlbums?.find((album) => album.id === albumId);
+      const removedAlbum = previousAlbums?.find(
+        (album) => album.id === albumId,
+      );
       const removedIndex = previousAlbums?.findIndex(
         (album) => album.id === albumId,
       );
@@ -106,15 +144,16 @@ export function useDeleteAlbum() {
             current
               ? {
                   ...current,
-                  activeAlbumsCount: Math.max(
-                    0,
-                    current.activeAlbumsCount - 1,
-                  ),
+                  activeAlbumsCount: Math.max(0, current.activeAlbumsCount - 1),
                 }
               : current,
         );
       }
-      return { removedAlbum, removedIndex: removedIndex ?? -1, countedAsActive };
+      return {
+        removedAlbum,
+        removedIndex: removedIndex ?? -1,
+        countedAsActive,
+      };
     },
     onError: (_error, albumId, context) => {
       showAlbum(albumId);

@@ -1,3 +1,4 @@
 export const guestKeys = {
-  album: (shareId: string | null) => ["guest", shareId] as const,
+  album: (shareId: string | null, readOnly = false) =>
+    ["guest", shareId, readOnly ? "view" : "interactive"] as const,
 };

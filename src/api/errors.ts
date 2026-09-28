@@ -15,8 +15,11 @@ export const apiMessages: Record<string, string> = {
   DRIVE_DISCONNECTED: "Hãy kết nối Google Drive.",
   DRIVE_REAUTH_REQUIRED: "Hãy kết nối lại Google Drive.",
   IMPORT_ALREADY_RUNNING: "Một album đang được nhập. Vui lòng chờ hoàn tất.",
-  SELECTION_LIMIT_REACHED:
-    "Album đã đạt đủ số lượng ảnh được phép chọn.",
+  SLUG_ALREADY_EXISTS:
+    "Đường dẫn album này đã được sử dụng. Hãy chọn slug khác.",
+  SELECTION_LIMIT_REACHED: "Album đã đạt đủ số lượng ảnh được phép chọn.",
+  ALBUM_SELECTION_LOCKED:
+    "Album đã khóa lựa chọn. Liên hệ nhiếp ảnh gia nếu bạn cần thay đổi.",
   ALBUM_UNAVAILABLE: "Album chưa sẵn sàng, đã hết hạn hoặc đã bị xóa.",
   NOT_FOUND: "Không tìm thấy album hoặc ảnh.",
   RATE_LIMITED: "Bạn thử quá nhiều lần. Vui lòng chờ một phút.",

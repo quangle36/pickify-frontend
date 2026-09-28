@@ -27,8 +27,26 @@ function folderIdFromUrl(value: string): string {
   return match[1];
 }
 
+export const albumSlugSchema = z
+  .string()
+  .max(200)
+  .transform(normalizeAlbumSlug)
+  .pipe(
+    z
+      .string()
+      .min(3)
+      .max(80)
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .refine((value) => !/^[a-f0-9]{32}$/.test(value)),
+  );
+
 export const createAlbumSchema = z.object({
   name: z.string().trim().min(1).max(120),
+  slug: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim() === "" ? undefined : value,
+    albumSlugSchema.optional(),
+  ),
   password: z.string().min(4).max(128),
   selectionLimit: z.coerce.number().int().min(1).max(1500),
   folderUrl: z
@@ -43,6 +61,18 @@ export const createAlbumSchema = z.object({
       }
     }, "Link folder Google Drive không hợp lệ"),
 });
+
+export function normalizeAlbumSlug(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/đ/g, "d")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+}
 
 export type SelectionInput = {
   selected: boolean;

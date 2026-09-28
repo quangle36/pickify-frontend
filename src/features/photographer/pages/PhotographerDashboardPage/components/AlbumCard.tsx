@@ -190,7 +190,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
                   variant="secondary"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onOpenGuestView(album.shareId);
+                    onOpenGuestView(album.slug ?? album.shareId);
                   }}
                   className="rounded-xl text-xs gap-1"
                   title="Mở giao diện khách hàng thả tim"

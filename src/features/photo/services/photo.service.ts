@@ -11,11 +11,16 @@ interface SelectionResult extends SelectionInput {
   selectedPhotosCount: number;
 }
 
-function photoParams(cursor: string | null, filters: PhotoFilters) {
+function photoParams(
+  cursor: string | null,
+  filters: PhotoFilters,
+  readOnly = false,
+) {
   return {
     ...(cursor ? { cursor } : {}),
     ...(filters.selected ? { selected: true } : {}),
     ...(filters.search ? { search: filters.search } : {}),
+    ...(readOnly ? { mode: "view" } : {}),
   };
 }
 
@@ -36,11 +41,12 @@ export const photoService = {
     shareId: string,
     cursor: string | null,
     filters: PhotoFilters,
+    readOnly: boolean,
     signal?: AbortSignal,
   ) =>
     apiRequest<PhotoPage>({
       url: `/public/albums/${shareId}/photos`,
-      params: photoParams(cursor, filters),
+      params: photoParams(cursor, filters, readOnly),
       signal,
     }),
 

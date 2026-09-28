@@ -58,7 +58,7 @@ function updateSelectionCount(
 }
 
 function hasSelectedFilter(queryKey: QueryKey) {
-  const filters = queryKey[3] as PhotoFilters | undefined;
+  const filters = queryKey[4] as PhotoFilters | undefined;
   return filters?.selected === true;
 }
 
@@ -131,7 +131,7 @@ export function usePhotoSelectionMutation(
       ),
     onMutate: async (input) => {
       const albumId = guestShare ?? input.albumId;
-      const prefix = photoKeys.prefix(scope, albumId);
+      const prefix = photoKeys.access(scope, albumId, "interactive");
       await client.cancelQueries({ queryKey: prefix });
 
       const removedPhotos: RemovedPhoto[] = [];
@@ -139,8 +139,8 @@ export function usePhotoSelectionMutation(
         queryKey: prefix,
       });
       const previousSelected = photoQueries
-        .flatMap(([, current]) =>
-          current?.pages.flatMap((page) => page.photos) ?? [],
+        .flatMap(
+          ([, current]) => current?.pages.flatMap((page) => page.photos) ?? [],
         )
         .find((photo) => photo.id === input.photoId)?.isSelected;
       const countDelta =
@@ -217,7 +217,8 @@ export function usePhotoSelectionMutation(
     },
     onError: (_error, input, context) => {
       const prefix =
-        context?.prefix ?? photoKeys.prefix(scope, guestShare ?? input.albumId);
+        context?.prefix ??
+        photoKeys.access(scope, guestShare ?? input.albumId, "interactive");
       const rollbackDelta = -(context?.countDelta ?? (input.selected ? 1 : -1));
       client.setQueriesData<InfiniteData<PhotoPage>>(
         { queryKey: prefix },
@@ -257,7 +258,8 @@ export function usePhotoSelectionMutation(
     },
     onSuccess: (result, input, context) => {
       const prefix =
-        context?.prefix ?? photoKeys.prefix(scope, guestShare ?? input.albumId);
+        context?.prefix ??
+        photoKeys.access(scope, guestShare ?? input.albumId, "interactive");
       client.setQueriesData<InfiniteData<PhotoPage>>(
         { queryKey: prefix },
         (current) =>
@@ -286,7 +288,8 @@ export function usePhotoSelectionMutation(
     onSettled: (_result, _error, input, context) => {
       const albumId = context?.albumId ?? guestShare ?? input.albumId;
       const prefix =
-        context?.prefix ?? photoKeys.prefix(scope, guestShare ?? input.albumId);
+        context?.prefix ??
+        photoKeys.access(scope, guestShare ?? input.albumId, "interactive");
       const mutationState = pendingAlbums.current.get(albumId);
       if (!mutationState) return;
 
@@ -311,7 +314,10 @@ export function usePhotoSelectionMutation(
       }
 
       if (mutationState.hadError) {
-        void client.invalidateQueries({ queryKey: prefix, refetchType: "active" });
+        void client.invalidateQueries({
+          queryKey: prefix,
+          refetchType: "active",
+        });
         if (scope === "owner")
           void client.invalidateQueries({
             queryKey: albumKeys.all,

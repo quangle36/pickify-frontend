@@ -60,8 +60,10 @@ export function App({
               album={app.album}
               photos={app.photos}
               hasMorePhotos={app.hasMorePhotos}
+              loadingMorePhotos={app.loadingMorePhotos}
               onLoadMorePhotos={app.loadMorePhotos}
               guestVerified={app.verified}
+              readOnly={app.guestReadOnly}
               onVerified={() => {}}
               onExitGuestView={app.actions.exitGuest}
             />

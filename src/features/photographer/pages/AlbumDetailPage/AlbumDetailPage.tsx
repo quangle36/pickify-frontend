@@ -8,12 +8,15 @@ import {
   Copy,
   Check,
   Lock,
+  LockOpen,
   Search,
-  Eye,
   RefreshCw,
+  FolderHeart,
+  Images,
+  Share2,
 } from "lucide-react";
 import {
-  useRevokeAlbumSessions,
+  useSetAlbumSelectionLocked,
   useUpdateAlbumPasscode,
 } from "@/features/photographer/queries/album.mutations";
 import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
@@ -25,12 +28,15 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { LocalPhotoFilterModal } from "./components/LocalPhotoFilterModal";
+import { ShareAlbumModal } from "./components/ShareAlbumModal";
 
 interface AlbumDetailPageProps {
   album: Album;
   photos: Photo[];
   photosPending: boolean;
-  onOpenGuestView: (shareId: string) => void;
   onOpenLightbox: (photos: Photo[], index: number) => void;
 }
 
@@ -38,22 +44,22 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   album,
   photos,
   photosPending,
-  onOpenGuestView,
   onOpenLightbox,
 }) => {
   const report = useAppStore((state) => state.report);
   const filterPhotos = usePhotoFilters(album.id);
   const updatePasscode = useUpdateAlbumPasscode();
-  const revokeSessions = useRevokeAlbumSessions();
+  const selectionLock = useSetAlbumSelectionLocked();
   const [filterMode, setFilterMode] = useState<"all" | "selected" | "error">(
     "all",
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [gridColumns, setGridColumns] = useState<3 | 4 | 6>(4);
-  const [copiedLink, setCopiedLink] = useState(false);
   const [editingPasscode, setEditingPasscode] = useState(false);
   const [newPasscode, setNewPasscode] = useState("");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [localFilterOpen, setLocalFilterOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -63,13 +69,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   }, [filterMode, filterPhotos, searchTerm]);
 
   const selectedCount = album.selectedPhotosCount;
-
-  const handleCopyLink = () => {
-    const guestUrl = `${window.location.origin}/album/${album.shareId}`;
-    navigator.clipboard.writeText(guestUrl);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
 
   const handleSavePasscode = async () => {
     if (!newPasscode || newPasscode.length < 4) {
@@ -91,19 +90,19 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
     );
   };
 
-  const handleRevokeSessions = async () => {
-    if (
-      window.confirm(
-        "Thu hồi toàn bộ phiên khách đang mở? Khách sẽ phải nhập lại mật khẩu để tiếp tục.",
-      )
-    ) {
-      try {
-        await revokeSessions.mutateAsync(album.id);
-      } catch (error) {
-        report(error);
-        return;
-      }
-      showNotice("Đã thu hồi tất cả phiên của khách.");
+  const handleSelectionEditingChange = async (editable: boolean) => {
+    try {
+      await selectionLock.mutateAsync({
+        albumId: album.id,
+        locked: !editable,
+      });
+      showNotice(
+        editable
+          ? "Đã cho phép khách tiếp tục chỉnh sửa lựa chọn."
+          : "Đã khóa chỉnh sửa lựa chọn của khách.",
+      );
+    } catch (error) {
+      report(error);
     }
   };
 
@@ -111,9 +110,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3000);
   };
-
-  // Only photos that have been successfully uploaded to DB
-  const readyPhotos = photos.filter((p) => p.status === "ready");
 
   // Filtered photos
   const filteredPhotos = photos.filter((p) => {
@@ -172,7 +168,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
         >
           <Link to="/dashboard">
             <ArrowLeft className="w-4 h-4" />
-            <span>Quay lại Danh sách Album</span>
+            <span>Danh sách Album</span>
           </Link>
         </Button>
 
@@ -180,27 +176,30 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => onOpenGuestView(album.shareId)}
+            disabled={album.status !== "ready" || selectedCount === 0}
+            onClick={() => setLocalFilterOpen(true)}
             className="rounded-xl text-xs gap-1.5"
+            title={
+              selectedCount === 0
+                ? "Chưa có ảnh nào được khách thả tim"
+                : album.status !== "ready"
+                  ? "Album chưa sẵn sàng"
+                  : "Sao chép ảnh đã tim từ thư mục trên máy"
+            }
           >
-            <Eye className="w-3.5 h-3.5 text-stone-500" />
-            <span>Mở link Khách xem</span>
+            <FolderHeart className="w-3.5 h-3.5 text-stone-500" />
+            <span>Lọc ảnh</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            onClick={handleCopyLink}
+            onClick={() => setShareModalOpen(true)}
             className="rounded-xl text-xs gap-1.5 shadow-2xs"
           >
-            {copiedLink ? (
-              <Check className="w-3.5 h-3.5 text-emerald-600" />
-            ) : (
-              <Copy className="w-3.5 h-3.5" />
-            )}
-            <span>{copiedLink ? "Đã chép link!" : "Chép link chia sẻ"}</span>
+            <Share2 className="w-3.5 h-3.5" />
+            <span>Chia sẻ</span>
           </Button>
-
         </div>
       </div>
 
@@ -217,7 +216,9 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
                 className="gap-1.5 px-3 py-1 shadow-xs bg-blue-500/95 text-white border-0"
               >
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                <span>Đang xử lý ảnh ({readyPhotos.length}/{album.totalPhotos})</span>
+                <span>
+                  Đang xử lý ảnh ({album.importedPhotos}/{album.totalPhotos})
+                </span>
               </Badge>
             )}
           </div>
@@ -272,19 +273,39 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
               )}
             </div>
 
-            {/* Revoke session action */}
-            <Button
-              variant="link"
-              size="sm"
-              onClick={handleRevokeSessions}
-              className="text-stone-500 hover:text-stone-900 text-xs font-medium underline underline-offset-2 p-0 h-auto"
-              title="Đăng xuất toàn bộ các thiết bị khách hàng đang mở link"
+            <div
+              className={`inline-flex items-center gap-2.5 rounded-xl border px-3 py-1.5 transition-colors ${
+                album.selectionLocked
+                  ? "border-rose-200 bg-rose-50"
+                  : "border-emerald-200 bg-emerald-50"
+              }`}
             >
-              Thu hồi tất cả phiên khách
-            </Button>
+              {!album.selectionLocked ? (
+                <LockOpen className="h-3.5 w-3.5 text-emerald-600" />
+              ) : (
+                <Lock className="h-3.5 w-3.5 text-rose-500" />
+              )}
+              <Label
+                htmlFor={`selection-editing-${album.id}`}
+                className="cursor-pointer text-xs font-semibold text-stone-700"
+              >
+                Cho phép chỉnh sửa
+              </Label>
+              <Switch
+                id={`selection-editing-${album.id}`}
+                checked={!album.selectionLocked}
+                onCheckedChange={handleSelectionEditingChange}
+                disabled={album.status !== "ready" || selectionLock.isPending}
+                aria-label={
+                  album.selectionLocked
+                    ? "Cho phép khách chỉnh sửa lựa chọn"
+                    : "Ngừng cho phép khách chỉnh sửa lựa chọn"
+                }
+                className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-stone-300"
+              />
+            </div>
           </div>
         </div>
-
       </Card>
 
       {/* Gallery Controls Bar */}
@@ -298,16 +319,19 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
           <TabsList className="bg-stone-200/70 p-1 rounded-2xl">
             <TabsTrigger
               value="all"
-              className="rounded-xl px-3.5 py-2 font-bold"
+              className="gap-1.5 rounded-xl px-3.5 py-2 font-bold"
+              aria-label={`Tất cả ảnh (${album.totalPhotos})`}
             >
-              Tất cả ảnh ({album.totalPhotos})
+              <Images className="w-3.5 h-3.5" />
+              <span>{album.totalPhotos}</span>
             </TabsTrigger>
             <TabsTrigger
               value="selected"
               className="rounded-xl px-3.5 py-2 font-bold gap-1.5"
+              aria-label={`Ảnh đã tim (${selectedCount})`}
             >
               <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
-              <span>Khách đã tim ({selectedCount})</span>
+              <span>{selectedCount}</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -319,7 +343,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm theo tên file (DSC_...)"
+              placeholder=""
               className="pl-9 pr-3 h-10 rounded-2xl bg-white border-stone-200 text-xs font-mono shadow-2xs"
             />
             <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -367,9 +391,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
           ))}
         </div>
       ) : filteredPhotos.length > 0 ? (
-        <div
-          className={photoGridClassName}
-        >
+        <div className={photoGridClassName}>
           {filteredPhotos.map((photo, index) => (
             <PhotoCard
               key={photo.id}
@@ -387,7 +409,8 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
                 Đang xử lý ảnh từ Google Drive...
               </h3>
               <p className="text-xs text-stone-500">
-                Ảnh sau khi tối ưu và tải lên thành công sẽ tự động xuất hiện tại đây.
+                Ảnh sau khi tối ưu và tải lên thành công sẽ tự động xuất hiện
+                tại đây.
               </p>
             </>
           ) : (
@@ -403,6 +426,17 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
           )}
         </Card>
       )}
+
+      <LocalPhotoFilterModal
+        albumId={album.id}
+        open={localFilterOpen}
+        onOpenChange={setLocalFilterOpen}
+      />
+      <ShareAlbumModal
+        shareId={album.slug ?? album.shareId}
+        open={shareModalOpen}
+        onOpenChange={setShareModalOpen}
+      />
     </div>
   );
 };

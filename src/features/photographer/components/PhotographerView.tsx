@@ -7,7 +7,7 @@ import { PhotographerNavbar } from "@/features/photographer/components/Photograp
 import { PhotographerNavbarSkeleton } from "@/features/photographer/components/PhotographerNavbarSkeleton";
 import { CreateAlbumModal } from "@/features/photographer/pages/PhotographerDashboardPage/components/CreateAlbumModal";
 import { PublicDriveHelpModal } from "@/features/photographer/pages/PhotographerDashboardPage/components/PublicDriveHelpModal";
-import { LoadMore } from "@/features/photo/components/LoadMore";
+import { InfinitePhotoLoader } from "@/features/photo/components/InfinitePhotoLoader";
 import { LightboxModal } from "@/features/photo/components/LightboxModal";
 
 export function PhotographerView({
@@ -40,21 +40,18 @@ export function PhotographerView({
   }
   return (
     <>
-      <PhotographerNavbar
-        profile={profile}
-        onLogout={actions.logout}
-      />
+      <PhotographerNavbar profile={profile} onLogout={actions.logout} />
       {isDetailView && album ? (
         <>
           <AlbumDetailPage
             album={album}
             photos={photos}
             photosPending={app.pending.photos}
-            onOpenGuestView={actions.openGuest}
             onOpenLightbox={lightbox.open}
           />
-          <LoadMore
+          <InfinitePhotoLoader
             hasMore={app.hasMorePhotos}
+            loading={app.loadingMorePhotos}
             onLoadMore={app.loadMorePhotos}
           />
         </>

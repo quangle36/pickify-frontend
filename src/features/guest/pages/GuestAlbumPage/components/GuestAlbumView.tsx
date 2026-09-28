@@ -1,4 +1,4 @@
-import { LoadMore } from "@/features/photo/components/LoadMore";
+import { InfinitePhotoLoader } from "@/features/photo/components/InfinitePhotoLoader";
 import { FC, useState, useEffect, useRef } from "react";
 import type { Photo } from "@/features/photo/types/photo.types";
 import type { Album } from "@/features/photographer/types/album.types";
@@ -7,6 +7,7 @@ import {
   Search,
   ArrowLeft,
   AlertCircle,
+  Lock,
   Columns,
   Grid,
 } from "lucide-react";
@@ -22,16 +23,20 @@ interface GuestAlbumViewProps {
   album: Album;
   photos: Photo[];
   hasMorePhotos: boolean;
+  loadingMorePhotos: boolean;
   onLoadMorePhotos: () => Promise<unknown>;
   onExitGuestView: () => void;
+  readOnly: boolean;
 }
 
 export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   album,
   photos,
   hasMorePhotos,
+  loadingMorePhotos,
   onLoadMorePhotos,
   onExitGuestView,
+  readOnly,
 }) => {
   const photoSelection = usePhotoSelection("guest", album.shareId);
   const filterPhotos = usePhotoFilters(album.shareId);
@@ -61,13 +66,13 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
 
   const selectedCount = album.selectedPhotosCount;
   const selectionTarget = album.selectionLimit ?? album.totalPhotos;
+  const selectionLocked = album.selectionLocked;
   const selectionLimitReached =
     album.selectionLimit !== null && selectedCount >= album.selectionLimit;
 
   const showLimitNotice = () => {
     setLimitNotice(true);
-    if (limitNoticeTimer.current)
-      window.clearTimeout(limitNoticeTimer.current);
+    if (limitNoticeTimer.current) window.clearTimeout(limitNoticeTimer.current);
     limitNoticeTimer.current = window.setTimeout(
       () => setLimitNotice(false),
       3000,
@@ -75,6 +80,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   };
 
   const handleToggleHeart = async (photo: Photo) => {
+    if (readOnly || selectionLocked) return;
     if (photoSelection.isPending(photo.id)) return;
     if (!photo.isSelected && selectionLimitReached) {
       showLimitNotice();
@@ -104,7 +110,9 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   });
 
   return (
-    <div className="min-h-screen bg-stone-900 text-stone-100 flex flex-col font-sans pb-24">
+    <div
+      className={`min-h-screen bg-stone-900 text-stone-100 flex flex-col font-sans ${readOnly ? "pb-8" : "pb-24"}`}
+    >
       {/* Sticky Mobile-First Header */}
       <header className="sticky top-0 z-30 bg-stone-900/90 backdrop-blur-md border-b border-stone-800 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
@@ -124,38 +132,54 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
               </h1>
               <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-medium">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>Lựa chọn được lưu tự động</span>
+                <span>
+                  {readOnly ? "Chế độ chỉ xem" : "Lựa chọn được lưu tự động"}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Hearts Count Pill */}
-          <Button
-            size="sm"
-            onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
-            variant={filterOnlyHearts ? "default" : "secondary"}
-            className={`rounded-2xl text-xs font-bold gap-1.5 shrink-0 ${
-              filterOnlyHearts
-                ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/30"
-                : "bg-stone-800 text-stone-300 hover:text-white border-stone-700 hover:bg-stone-700"
-            }`}
-          >
-            <Heart
-              className={`w-4 h-4 ${
+          {!readOnly && (
+            <Button
+              size="sm"
+              onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
+              variant={filterOnlyHearts ? "default" : "secondary"}
+              className={`rounded-2xl text-xs font-bold gap-1.5 shrink-0 ${
                 filterOnlyHearts
-                  ? "fill-white text-white"
-                  : "fill-rose-500 text-rose-500"
+                  ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/30"
+                  : "bg-stone-800 text-stone-300 hover:text-white border-stone-700 hover:bg-stone-700"
               }`}
-            />
-            <span>
-              {selectedCount}/{selectionTarget}
-            </span>
-          </Button>
+            >
+              <Heart
+                className={`w-4 h-4 ${
+                  filterOnlyHearts
+                    ? "fill-white text-white"
+                    : "fill-rose-500 text-rose-500"
+                }`}
+              />
+              <span>
+                {selectedCount}/{selectionTarget}
+              </span>
+            </Button>
+          )}
         </div>
       </header>
 
+      {/* Locked selection notice */}
+      {!readOnly && selectionLocked && (
+        <div className="max-w-4xl mx-auto w-full px-4 pt-3">
+          <Alert className="rounded-2xl border-stone-700 bg-stone-800/90 p-3 text-stone-200">
+            <Lock className="h-4 w-4 text-rose-400" />
+            <AlertDescription className="text-xs text-stone-200">
+              Album đã khóa lựa chọn. Bạn vẫn có thể xem lại những ảnh đã chọn.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       {/* Selection limit notice */}
-      {limitNotice && (
+      {!readOnly && limitNotice && (
         <div className="max-w-4xl mx-auto w-full px-4 pt-3">
           <Alert className="bg-rose-950/80 border-rose-600/60 rounded-2xl text-xs text-rose-100 p-3">
             <AlertCircle className="w-4 h-4 text-rose-400" />
@@ -168,7 +192,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
       )}
 
       {/* Network Error Alert Notice if any */}
-      {Object.values(failedSaves).some(Boolean) && (
+      {!readOnly && Object.values(failedSaves).some(Boolean) && (
         <div className="max-w-4xl mx-auto w-full px-4 pt-3">
           <Alert className="bg-amber-950/80 border-amber-600/60 rounded-2xl text-xs text-amber-200 flex items-center justify-between gap-2 p-3">
             <div className="flex items-center gap-2">
@@ -200,18 +224,20 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
 
         {/* Filter & Grid Cols */}
         <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant={filterOnlyHearts ? "default" : "outline"}
-            onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
-            className={`rounded-xl text-xs font-semibold gap-1.5 h-9 ${
-              filterOnlyHearts
-                ? "bg-rose-600 hover:bg-rose-700 text-white"
-                : "bg-stone-800 text-stone-400 hover:text-white border-stone-700 hover:bg-stone-700"
-            }`}
-          >
-            <span>Đã tim</span>
-          </Button>
+          {!readOnly && (
+            <Button
+              size="sm"
+              variant={filterOnlyHearts ? "default" : "outline"}
+              onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
+              className={`rounded-xl text-xs font-semibold gap-1.5 h-9 ${
+                filterOnlyHearts
+                  ? "bg-rose-600 hover:bg-rose-700 text-white"
+                  : "bg-stone-800 text-stone-400 hover:text-white border-stone-700 hover:bg-stone-700"
+              }`}
+            >
+              <span>Đã tim</span>
+            </Button>
+          )}
 
           <Button
             size="icon-sm"
@@ -249,6 +275,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
                 }}
                 onToggleHeart={handleToggleHeart}
                 onRetrySave={handleRetrySave}
+                selectionEnabled={!readOnly && !selectionLocked}
               />
             ))}
           </div>
@@ -258,47 +285,53 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
             <p className="text-sm">Không tìm thấy ảnh nào.</p>
           </div>
         )}
-        <LoadMore
+        <InfinitePhotoLoader
           hasMore={hasMorePhotos}
+          loading={loadingMorePhotos}
           onLoadMore={onLoadMorePhotos}
         />
       </main>
 
       {/* Floating Bottom Bar on Mobile */}
-      <div className="fixed bottom-3 inset-x-0 z-20 flex justify-center px-4 pointer-events-none">
-        <div className="bg-stone-800/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-stone-700/80 flex items-center gap-4 backdrop-blur-md pointer-events-auto">
-          <div className="flex items-center gap-2 text-xs">
-            <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
-            <span>
-              Đã chọn <strong>{selectedCount}</strong> / {selectionTarget} ảnh
-            </span>
+      {!readOnly && (
+        <div className="fixed bottom-3 inset-x-0 z-20 flex justify-center px-4 pointer-events-none">
+          <div className="bg-stone-800/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-stone-700/80 flex items-center gap-4 backdrop-blur-md pointer-events-auto">
+            <div className="flex items-center gap-2 text-xs">
+              <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
+              <span>
+                Đã chọn <strong>{selectedCount}</strong> / {selectionTarget} ảnh
+              </span>
+            </div>
+            <div className="h-4 w-px bg-stone-700" />
+            <Button
+              variant="link"
+              size="sm"
+              onClick={onExitGuestView}
+              className="text-xs text-stone-400 hover:text-white font-medium p-0 h-auto"
+            >
+              Đóng
+            </Button>
           </div>
-          <div className="h-4 w-px bg-stone-700" />
-          <Button
-            variant="link"
-            size="sm"
-            onClick={onExitGuestView}
-            className="text-xs text-stone-400 hover:text-white font-medium p-0 h-auto"
-          >
-            Đóng
-          </Button>
         </div>
-      </div>
+      )}
 
       {/* Lightbox for Guest View */}
       <LightboxModal
         photos={filteredPhotos}
+        totalPhotos={album.totalPhotos}
         currentIndex={lightboxIndex}
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
         onNavigate={(idx) => setLightboxIndex(idx)}
         onToggleSelection={(photoId, currentSelected) => {
+          if (readOnly || selectionLocked) return;
           if (!currentSelected && selectionLimitReached) {
             showLimitNotice();
             return;
           }
           void photoSelection.toggle(album.id, photoId, !currentSelected);
         }}
+        selectionEnabled={!readOnly && !selectionLocked}
       />
     </div>
   );

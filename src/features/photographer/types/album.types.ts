@@ -13,11 +13,13 @@ export interface Album {
   folderUrl: string;
   folderId: string;
   shareId: string;
+  slug: string | null;
   status: AlbumStatus;
   totalPhotos: number;
   importedPhotos: number;
   selectedPhotosCount: number;
   selectionLimit: number | null;
+  selectionLocked: boolean;
   createdAt: string;
   expiresAt: string | null;
   readyAt?: string;

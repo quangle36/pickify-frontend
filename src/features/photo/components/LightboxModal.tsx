@@ -8,6 +8,7 @@ import { preloadImage } from "../utils/imagePreloader";
 
 interface LightboxModalProps {
   photos: Photo[];
+  totalPhotos: number;
   currentIndex: number;
   isOpen: boolean;
   onClose: () => void;
@@ -18,6 +19,7 @@ interface LightboxModalProps {
 
 export const LightboxModal: FC<LightboxModalProps> = ({
   photos,
+  totalPhotos,
   currentIndex,
   isOpen,
   onClose,
@@ -96,8 +98,9 @@ export const LightboxModal: FC<LightboxModalProps> = ({
           <Badge
             variant="outline"
             className="text-stone-400 border-stone-700 bg-stone-900/50"
+            aria-label={`Ảnh ${currentPhoto.position} trên tổng ${totalPhotos} ảnh`}
           >
-            {currentIndex + 1} / {photos.length}
+            Ảnh {currentPhoto.position} / {totalPhotos}
           </Badge>
         </div>
 

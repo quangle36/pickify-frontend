@@ -18,6 +18,7 @@ interface PhotosQueryOptions {
   filters: PhotoFilters;
   enabled: boolean;
   targetStatus?: string;
+  readOnly?: boolean;
 }
 
 export function usePhotosQuery(options: PhotosQueryOptions) {
@@ -26,6 +27,7 @@ export function usePhotosQuery(options: PhotosQueryOptions) {
       options.scope,
       options.albumId,
       options.filters,
+      options.readOnly ? "view" : "interactive",
     ),
     enabled: options.enabled,
     initialPageParam: null as string | null,
@@ -35,6 +37,7 @@ export function usePhotosQuery(options: PhotosQueryOptions) {
             options.albumId,
             pageParam,
             options.filters,
+            !!options.readOnly,
             signal,
           )
         : photoService.getOwnerPhotos(
