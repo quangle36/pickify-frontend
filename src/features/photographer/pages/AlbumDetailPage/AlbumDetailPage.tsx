@@ -5,8 +5,6 @@ import type { Album } from "@/features/photographer/types/album.types";
 import {
   ArrowLeft,
   Heart,
-  Copy,
-  Check,
   Lock,
   LockOpen,
   Search,
@@ -30,6 +28,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/use-toast";
 import { LocalPhotoFilterModal } from "./components/LocalPhotoFilterModal";
 import { ShareAlbumModal } from "./components/ShareAlbumModal";
 
@@ -47,6 +46,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   onOpenLightbox,
 }) => {
   const report = useAppStore((state) => state.report);
+  const { toast } = useToast();
   const filterPhotos = usePhotoFilters(album.id);
   const updatePasscode = useUpdateAlbumPasscode();
   const selectionLock = useSetAlbumSelectionLocked();
@@ -57,7 +57,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   const [gridColumns, setGridColumns] = useState<3 | 4 | 6>(4);
   const [editingPasscode, setEditingPasscode] = useState(false);
   const [newPasscode, setNewPasscode] = useState("");
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [localFilterOpen, setLocalFilterOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
@@ -107,8 +106,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   };
 
   const showNotice = (msg: string) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3000);
+    toast({ variant: "dark", title: msg });
   };
 
   // Filtered photos
@@ -148,16 +146,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6 animate-fade-in">
-      {/* Toast Notice */}
-      {toastMsg && (
-        <div className="fixed top-4 inset-x-0 z-50 flex justify-center pointer-events-none animate-fade-in">
-          <div className="bg-stone-900 text-white text-xs font-semibold px-4 py-2 rounded-2xl shadow-xl flex items-center gap-2 pointer-events-auto">
-            <Check className="w-4 h-4 text-emerald-400" />
-            <span>{toastMsg}</span>
-          </div>
-        </div>
-      )}
-
       {/* Top Breadcrumb & Actions Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200">
         <Button
