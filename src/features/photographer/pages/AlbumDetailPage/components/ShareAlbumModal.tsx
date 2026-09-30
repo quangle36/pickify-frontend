@@ -62,6 +62,7 @@ export function ShareAlbumModal({
       description="Chọn quyền phù hợp trước khi gửi link cho khách."
       contentClassName="max-w-xl"
       bodyClassName="space-y-4"
+      onOpenAutoFocus={(event) => event.preventDefault()}
     >
       <section className="rounded-2xl border border-stone-200 bg-white p-4 shadow-xs">
         <div className="flex items-start gap-3">

@@ -7,7 +7,6 @@ import {
   Trash2,
   ChevronRight,
   Lock,
-  Eye,
   ImageIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -17,7 +16,6 @@ import { Button } from "@/components/ui/button";
 interface AlbumCardProps {
   album: Album;
   onSelect: (id: string) => void;
-  onOpenGuestView: (shareId: string) => void;
   onRetry: (id: string) => void;
   onDelete: (id: string) => void;
 }
@@ -25,7 +23,6 @@ interface AlbumCardProps {
 export const AlbumCard: FC<AlbumCardProps> = ({
   album,
   onSelect,
-  onOpenGuestView,
   onRetry,
   onDelete,
 }) => {
@@ -181,27 +178,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
         )}
 
         {/* Card Footer Actions */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
-            {album.status === "ready" && (
-              <>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenGuestView(album.slug ?? album.shareId);
-                  }}
-                  className="rounded-xl text-xs gap-1"
-                  title="Mở giao diện khách hàng thả tim"
-                >
-                  <Eye className="w-3.5 h-3.5 text-stone-500" />
-                  <span>Khách xem</span>
-                </Button>
-              </>
-            )}
-          </div>
-
+        <div className="flex items-center justify-end gap-2">
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"

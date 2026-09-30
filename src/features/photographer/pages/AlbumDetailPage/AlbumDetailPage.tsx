@@ -5,20 +5,14 @@ import type { Album } from "@/features/photographer/types/album.types";
 import {
   ArrowLeft,
   Heart,
-  Lock,
-  LockOpen,
+  Menu,
   Search,
   RefreshCw,
   FolderHeart,
   Images,
   Share2,
 } from "lucide-react";
-import {
-  useSetAlbumSelectionLocked,
-  useUpdateAlbumPasscode,
-} from "@/features/photographer/queries/album.mutations";
 import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
-import { useAppStore } from "@/app/stores/app.store";
 import { PhotoCard } from "./components/PhotoCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,9 +20,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/components/ui/use-toast";
+import { AlbumSettingsModal } from "./components/AlbumSettingsModal";
 import { LocalPhotoFilterModal } from "./components/LocalPhotoFilterModal";
 import { ShareAlbumModal } from "./components/ShareAlbumModal";
 
@@ -45,20 +37,15 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   photosPending,
   onOpenLightbox,
 }) => {
-  const report = useAppStore((state) => state.report);
-  const { toast } = useToast();
   const filterPhotos = usePhotoFilters(album.id);
-  const updatePasscode = useUpdateAlbumPasscode();
-  const selectionLock = useSetAlbumSelectionLocked();
   const [filterMode, setFilterMode] = useState<"all" | "selected" | "error">(
     "all",
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [gridColumns, setGridColumns] = useState<3 | 4 | 6>(4);
-  const [editingPasscode, setEditingPasscode] = useState(false);
-  const [newPasscode, setNewPasscode] = useState("");
   const [localFilterOpen, setLocalFilterOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -68,46 +55,6 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   }, [filterMode, filterPhotos, searchTerm]);
 
   const selectedCount = album.selectedPhotosCount;
-
-  const handleSavePasscode = async () => {
-    if (!newPasscode || newPasscode.length < 4) {
-      alert("Mật khẩu phải có ít nhất 4 ký tự.");
-      return;
-    }
-    try {
-      await updatePasscode.mutateAsync({
-        albumId: album.id,
-        password: newPasscode,
-      });
-    } catch (error) {
-      report(error);
-      return;
-    }
-    setEditingPasscode(false);
-    showNotice(
-      "Đã đổi mật khẩu và thu hồi toàn bộ phiên đăng nhập cũ của khách hàng.",
-    );
-  };
-
-  const handleSelectionEditingChange = async (editable: boolean) => {
-    try {
-      await selectionLock.mutateAsync({
-        albumId: album.id,
-        locked: !editable,
-      });
-      showNotice(
-        editable
-          ? "Đã cho phép khách tiếp tục chỉnh sửa lựa chọn."
-          : "Đã khóa chỉnh sửa lựa chọn của khách.",
-      );
-    } catch (error) {
-      report(error);
-    }
-  };
-
-  const showNotice = (msg: string) => {
-    toast({ variant: "dark", title: msg });
-  };
 
   // Filtered photos
   const filteredPhotos = photos.filter((p) => {
@@ -192,9 +139,9 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       </div>
 
       {/* Album Meta Banner */}
-      <Card className="rounded-3xl p-6 sm:p-7 border-stone-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
+      <Card className="rounded-3xl border-stone-200 bg-white p-6 shadow-xs sm:p-7">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
               {album.title}
             </h1>
@@ -210,89 +157,16 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
               </Badge>
             )}
           </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
-            {/* Passcode Setting */}
-            <div className="inline-flex items-center gap-2 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200">
-              <Lock className="w-3.5 h-3.5 text-stone-500" />
-              <span className="text-stone-500">Mật khẩu khách:</span>
-              {editingPasscode ? (
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="text"
-                    value={newPasscode}
-                    onChange={(e) => setNewPasscode(e.target.value)}
-                    className="w-16 h-7 px-1.5 py-0.5 rounded border-brand-400 text-xs font-mono font-bold"
-                  />
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={handleSavePasscode}
-                    className="text-[11px] font-bold text-emerald-600 hover:underline p-0 h-auto"
-                  >
-                    Lưu
-                  </Button>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => {
-                      setNewPasscode("");
-                      setEditingPasscode(false);
-                    }}
-                    className="text-[11px] text-stone-400 hover:underline p-0 h-auto"
-                  >
-                    Hủy
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-stone-900">
-                    {"••••"}
-                  </span>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => setEditingPasscode(true)}
-                    className="text-[11px] text-brand-600 hover:underline font-bold p-0 h-auto"
-                  >
-                    Đổi
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            <div
-              className={`inline-flex items-center gap-2.5 rounded-xl border px-3 py-1.5 transition-colors ${
-                album.selectionLocked
-                  ? "border-rose-200 bg-rose-50"
-                  : "border-emerald-200 bg-emerald-50"
-              }`}
-            >
-              {!album.selectionLocked ? (
-                <LockOpen className="h-3.5 w-3.5 text-emerald-600" />
-              ) : (
-                <Lock className="h-3.5 w-3.5 text-rose-500" />
-              )}
-              <Label
-                htmlFor={`selection-editing-${album.id}`}
-                className="cursor-pointer text-xs font-semibold text-stone-700"
-              >
-                Cho phép chỉnh sửa
-              </Label>
-              <Switch
-                id={`selection-editing-${album.id}`}
-                checked={!album.selectionLocked}
-                onCheckedChange={handleSelectionEditingChange}
-                disabled={album.status !== "ready" || selectionLock.isPending}
-                aria-label={
-                  album.selectionLocked
-                    ? "Cho phép khách chỉnh sửa lựa chọn"
-                    : "Ngừng cho phép khách chỉnh sửa lựa chọn"
-                }
-                className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-stone-300"
-              />
-            </div>
-          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => setSettingsModalOpen(true)}
+            aria-label="Mở cài đặt album"
+            className="shrink-0 rounded-xl text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
         </div>
       </Card>
 
@@ -424,6 +298,11 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
         shareId={album.slug ?? album.shareId}
         open={shareModalOpen}
         onOpenChange={setShareModalOpen}
+      />
+      <AlbumSettingsModal
+        album={album}
+        open={settingsModalOpen}
+        onOpenChange={setSettingsModalOpen}
       />
     </div>
   );

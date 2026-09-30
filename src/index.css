@@ -85,3 +85,20 @@
 .animate-heart-pop {
   animation: heartPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+@keyframes toastCountdown {
+  from { stroke-dasharray: 100; stroke-dashoffset: 0; }
+  to { stroke-dasharray: 100; stroke-dashoffset: 100; }
+}
+
+.toast-countdown-ring {
+  animation: toastCountdown var(--toast-duration, 5000ms) linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-countdown-ring {
+    animation: none;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+  }
+}

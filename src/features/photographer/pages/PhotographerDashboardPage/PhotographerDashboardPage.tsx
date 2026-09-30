@@ -7,7 +7,6 @@ import { PhotographerDashboardSkeleton } from "./components/PhotographerDashboar
 interface PhotographerDashboardPageProps {
   albums: Album[];
   onSelectAlbum: (albumId: string) => void;
-  onOpenGuestView: (shareId: string) => void;
   onRetryAlbum: (albumId: string) => void;
   onDeleteAlbum: (albumId: string) => void;
   onCreateAlbum: () => void;
@@ -17,7 +16,6 @@ interface PhotographerDashboardPageProps {
 const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
   albums,
   onSelectAlbum,
-  onOpenGuestView,
   onRetryAlbum,
   onDeleteAlbum,
   onCreateAlbum,
@@ -36,7 +34,6 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
             key={album.id}
             album={album}
             onSelect={onSelectAlbum}
-            onOpenGuestView={onOpenGuestView}
             onRetry={onRetryAlbum}
             onDelete={onDeleteAlbum}
           />

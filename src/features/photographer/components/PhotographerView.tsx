@@ -60,7 +60,6 @@ export function PhotographerView({
           albums={albums}
           pending={app.pending.albums}
           onSelectAlbum={actions.selectAlbum}
-          onOpenGuestView={actions.openGuest}
           onRetryAlbum={actions.retryAlbum}
           onDeleteAlbum={actions.deleteAlbum}
           onCreateAlbum={actions.openCreate}

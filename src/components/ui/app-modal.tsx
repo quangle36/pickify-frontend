@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,9 @@ interface AppModalProps {
   headerClassName?: string;
   bodyClassName?: string;
   footerClassName?: string;
+  onOpenAutoFocus?: ComponentPropsWithoutRef<
+    typeof DialogContent
+  >["onOpenAutoFocus"];
 }
 
 export function AppModal({
@@ -37,6 +40,7 @@ export function AppModal({
   headerClassName,
   bodyClassName,
   footerClassName,
+  onOpenAutoFocus,
 }: AppModalProps) {
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && preventClose) return;
@@ -51,6 +55,7 @@ export function AppModal({
           contentClassName,
         )}
         onEscapeKeyDown={(event) => preventClose && event.preventDefault()}
+        onOpenAutoFocus={onOpenAutoFocus}
         onPointerDownOutside={(event) => preventClose && event.preventDefault()}
       >
         <div

@@ -2,7 +2,6 @@ import { FC, MouseEvent } from "react";
 import type { Photo } from "@/features/photo/types/photo.types";
 import { Heart, RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { preloadImage } from "@/features/photo/utils/imagePreloader";
 
 interface GuestPhotoCardProps {
@@ -103,16 +102,8 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
       )}
 
       {/* Bottom name label */}
-      <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between text-[11px] font-mono text-stone-300 pointer-events-none">
+      <div className="pointer-events-none absolute right-2 bottom-1.5 left-2 text-[11px] font-mono text-stone-300">
         <span className="truncate">{photo.name}</span>
-        {photo.isSelected && (
-          <Badge
-            variant="destructive"
-            className="text-[10px] font-sans font-black text-rose-400 bg-rose-950/80 px-1.5 py-0 rounded shrink-0 border-rose-800/50"
-          >
-            ĐÃ CHỌN
-          </Badge>
-        )}
       </div>
     </Card>
   );
