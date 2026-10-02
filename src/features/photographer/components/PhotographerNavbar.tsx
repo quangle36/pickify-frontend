@@ -25,8 +25,8 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
   onLogout,
 }) => {
   return (
-    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-2xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-30 border-b border-stone-200 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
         {/* Left: Brand Logo & Landing Link */}
         <div className="flex items-center gap-3">
           <Link
@@ -34,15 +34,15 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
             className="flex items-center gap-2.5 group focus:outline-hidden"
             title="Quay về Trang chủ Landing Page"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-rose-500 flex items-center justify-center shadow-md shadow-brand-500/20 text-white group-hover:scale-105 transition-transform">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white">
               <Heart className="w-4 h-4 fill-white" />
             </div>
-            <span className="hidden text-left text-base font-extrabold leading-tight tracking-tight text-stone-900 sm:block">
+            <span className="text-left text-base font-semibold leading-tight text-stone-900">
               Pickify
             </span>
           </Link>
 
-          <div className="h-5 w-px bg-stone-200 hidden md:block mx-1" />
+
         </div>
 
         {/* Center/Right: Drive connection + Actions */}
@@ -52,20 +52,17 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex items-center gap-2 pl-2 border-l border-stone-200 hover:opacity-90 transition-all outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 rounded-xl p-1 -m-1 text-left cursor-pointer group"
+                className="flex min-h-9 cursor-pointer items-center gap-2 rounded-xl p-1 text-left outline-none hover:bg-stone-100 transition-colors"
                 title="Tài khoản cá nhân"
               >
                 <img
                   src={profile.avatarUrl}
                   alt={profile.name}
-                  className="w-8 h-8 rounded-xl object-cover ring-2 ring-stone-200 group-hover:ring-brand-500 transition-all"
+                  className="h-8 w-8 rounded-[10px] object-cover"
                 />
-                <div className="hidden xl:block text-left">
-                  <p className="text-xs font-bold text-stone-900 leading-tight">
+                <div className="hidden sm:block text-left">
+                  <p className="text-xs font-normal text-stone-600 leading-tight">
                     {profile.name}
-                  </p>
-                  <p className="text-[10px] text-stone-400 truncate max-w-[120px]">
-                    {profile.email}
                   </p>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-stone-400 group-hover:text-stone-600 transition-colors hidden sm:block" />

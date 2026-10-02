@@ -84,7 +84,8 @@ export function ShareAlbumModal({
             type="button"
             variant="outline"
             onClick={() => handleOpenChange(false)}
-            className="h-8 sm:h-9 rounded-xl px-4 text-xs font-semibold"
+            size="sm"
+            className="rounded-xl px-4 font-medium"
           >
             Đóng
           </Button>
@@ -119,14 +120,15 @@ export function ShareAlbumModal({
           <Button
             type="button"
             onClick={() => void copyLink("interactive")}
-            className="h-8 sm:h-9 shrink-0 gap-1.5 rounded-lg bg-stone-900 px-3 sm:px-3.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-stone-800 active:scale-[0.98]"
+            size="sm"
+            aria-label="Sao chép link khách chọn ảnh"
+            className="shrink-0 rounded-lg"
           >
             {copied === "interactive" ? (
               <Check className="h-3.5 w-3.5 text-emerald-400" />
             ) : (
               <Copy className="h-3.5 w-3.5" />
             )}
-            <span>{copied === "interactive" ? "Đã chép" : "Sao chép"}</span>
           </Button>
         </div>
       </section>
@@ -158,14 +160,15 @@ export function ShareAlbumModal({
             type="button"
             variant="outline"
             onClick={() => void copyLink("view")}
-            className="h-8 sm:h-9 shrink-0 gap-1.5 rounded-lg border-stone-300 bg-white px-3 sm:px-3.5 text-xs font-semibold text-stone-800 transition-all hover:bg-stone-100 hover:text-stone-900 active:scale-[0.98]"
+            size="sm"
+            aria-label="Sao chép link chỉ xem"
+            className="shrink-0 rounded-lg"
           >
             {copied === "view" ? (
               <Check className="h-3.5 w-3.5 text-emerald-600" />
             ) : (
               <Copy className="h-3.5 w-3.5 text-stone-500" />
             )}
-            <span>{copied === "view" ? "Đã chép" : "Sao chép"}</span>
           </Button>
         </div>
       </section>

@@ -1,13 +1,5 @@
 import { FC, useState, FormEvent } from "react";
-import {
-  UploadCloud,
-  Lock,
-  AlertCircle,
-  HelpCircle,
-  Images,
-  Link2,
-  Pencil,
-} from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { extractDriveFolderId } from "@/lib/utils";
 import { AppModal } from "@/components/ui/app-modal";
 import { Input } from "@/components/ui/input";
@@ -48,7 +40,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
   const [folderUrl, setFolderUrl] = useState(album?.folderUrl ?? "");
   const [passcode, setPasscode] = useState("");
   const [selectionLimit, setSelectionLimit] = useState(
-    album ? String(album.selectionLimit ?? album.totalPhotos) : "",
+    album ? String(album.selectionLimit ?? album.totalPhotos) : "50",
   );
   const [error, setError] = useState<string | null>(null);
 
@@ -141,21 +133,16 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       open={isOpen}
       onOpenChange={(open) => !open && onClose()}
       preventClose={pending}
-      title={album ? "Chỉnh sửa album" : "Tạo Album Mới"}
+      title={album ? "Chỉnh sửa album" : "Tạo album mới"}
       description={
         album
           ? "Cập nhật thông tin và thiết lập chọn ảnh của album."
-          : "Nhập link Google Drive để hệ thống quét và tạo ảnh xem trước"
+          : "Thêm ảnh từ thư mục Google Drive của bạn."
       }
-      icon={
-        album ? (
-          <Pencil className="h-5 w-5" />
-        ) : (
-          <UploadCloud className="h-5 w-5" />
-        )
-      }
-      contentClassName="max-w-lg"
-      bodyClassName="space-y-4"
+      contentClassName="w-[calc(100%-2rem)] max-w-lg rounded-2xl border-stone-200 sm:rounded-2xl [&>button]:flex [&>button]:h-8 [&>button]:w-8 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-lg [&>button>svg]:h-4 [&>button>svg]:w-4"
+      headerClassName="border-stone-200 px-5 py-5 sm:px-6 sm:py-6 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:leading-[1.35] [&_p]:text-xs [&_p]:leading-relaxed"
+      bodyClassName="space-y-[18px] bg-white px-5 py-5 sm:px-6 sm:py-6"
+      footerClassName="flex-row justify-end gap-2 space-x-0 border-stone-200 bg-white px-5 py-4 sm:px-6 sm:space-x-0"
       footer={
         <>
           <Button
@@ -163,27 +150,25 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             variant="ghost"
             onClick={onClose}
             disabled={pending}
-            className="rounded-xl"
+            className="min-h-11 flex-1 sm:min-h-10 sm:flex-none"
           >
             Hủy
           </Button>
           <Button
             type="submit"
             form="create-album-form"
-            disabled={pending}
-            variant="brand"
-            className="rounded-xl font-bold shadow-md shadow-brand-600/25"
+            isLoading={pending}
+            className="min-h-11 flex-1 sm:min-h-10 sm:flex-none"
           >
-            {pending ? "Đang lưu…" : album ? "Lưu thay đổi" : "Tạo"}
+            {album ? "Lưu thay đổi" : "Tạo album"}
           </Button>
         </>
       }
     >
-      {/* Error Alert */}
       {error && (
-        <Alert variant="destructive" className="py-2.5 px-3.5 rounded-2xl">
-          <AlertCircle className="w-4 h-4" />
-          <AlertDescription className="font-medium text-xs ml-2">
+        <Alert variant="destructive" className="rounded-lg border-0 bg-rose-50 px-3 py-3 text-rose-700">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="text-xs leading-relaxed">
             {error}
           </AlertDescription>
         </Alert>
@@ -192,15 +177,11 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       <form
         id="create-album-form"
         onSubmit={handleSubmit}
-        className="space-y-4"
+        className="space-y-[18px]"
       >
-        {/* Album Name */}
-        <div className="space-y-1.5">
-          <Label
-            htmlFor="album-name"
-            className="text-xs font-bold text-stone-700 uppercase tracking-wider"
-          >
-            Tên Album <span className="text-rose-500">*</span>
+        <div className="space-y-2">
+          <Label htmlFor="album-name" className="text-[13px] font-medium text-stone-900">
+            Tên album <span aria-hidden="true" className="text-rose-700">*</span>
           </Label>
           <Input
             id="album-name"
@@ -209,135 +190,74 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             maxLength={120}
             onChange={(e) => setName(e.target.value)}
             placeholder="VD: Tiệc cưới Tuấn & Trang — Đà Lạt"
-            className="h-11 rounded-2xl"
+            className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 focus-visible:border-stone-400 focus-visible:ring-stone-200/50 focus-visible:ring-offset-0 sm:h-10"
           />
         </div>
 
-        {/* Optional public slug */}
-        <div className="space-y-1.5">
-          <Label
-            htmlFor="album-slug"
-            className="text-xs font-bold text-stone-700 uppercase tracking-wider"
-          >
-            Đường dẫn album{" "}
-            <span className="text-stone-400">(không bắt buộc)</span>
+        <div className="space-y-2">
+          <Label htmlFor="drive-url" className="text-[13px] font-medium text-stone-900">
+            Thư mục Google Drive <span aria-hidden="true" className="text-rose-700">*</span>
           </Label>
-          <div className="relative">
-            <Input
-              id="album-slug"
-              type="text"
-              value={slug}
-              onChange={(event) => setSlug(event.target.value)}
-              onBlur={() => slug.trim() && setSlug(normalizedSlug)}
-              placeholder="tiec-cuoi-thu-trang"
-              maxLength={200}
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              className="h-11 rounded-2xl pl-10 font-mono text-xs"
-            />
-            <Link2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
-          </div>
-          {normalizedSlug ? (
-            <p className="break-all text-[11px] text-stone-500">
-              Link xem trước:{" "}
-              <span className="font-mono font-semibold text-stone-700">
-                {window.location.origin}/album/{normalizedSlug}
-              </span>
-            </p>
-          ) : (
-            <p className="text-[11px] text-stone-400">
-              {album
-                ? "Để trống để sử dụng link chia sẻ gốc của album."
-                : "Để trống để Pickify tạo ID album ngẫu nhiên như hiện tại."}
-            </p>
-          )}
-        </div>
-
-        {/* Drive Folder URL */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label
-              htmlFor="drive-url"
-              className="text-xs font-bold text-stone-700 uppercase tracking-wider"
-            >
-              Đường dẫn thư mục Google Drive{" "}
-              <span className="text-rose-500">*</span>
-            </Label>
-          </div>
           <Input
             id="drive-url"
             type="url"
             value={folderUrl}
             readOnly={!!album}
             onChange={(e) => setFolderUrl(e.target.value)}
-            placeholder="https://drive.google.com/drive/folders/1aBcDeFgHiJk..."
-            className="h-11 rounded-2xl font-mono text-xs"
+            placeholder="Dán liên kết thư mục Google Drive"
+            className={`h-11 rounded-xl border-stone-200 text-[13px] transition-colors placeholder:text-stone-500 focus-visible:border-stone-400 focus-visible:ring-stone-200/50 focus-visible:ring-offset-0 sm:h-10 ${
+              album ? "cursor-not-allowed bg-stone-100 text-stone-500" : "bg-white text-stone-900"
+            }`}
           />
-          <p className="text-[11px] text-stone-400 mt-1 flex items-center gap-1">
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>
-              {album
-                ? "Nguồn ảnh được giữ nguyên. Tạo album mới nếu muốn dùng thư mục khác."
-                : "Chỉ quét file ảnh JPEG trực tiếp trong folder, giới hạn 1.500 ảnh, tối đa 50MB/ảnh."}
-            </span>
-          </p>
         </div>
 
-        {/* Guest Passcode */}
-        {!album && (
-          <p className="rounded-xl bg-blue-50 p-3 text-xs text-blue-900">
-            Folder và ảnh bên trong phải được chia sẻ:{" "}
-            <strong>Bất kỳ ai có đường liên kết — Người xem</strong>. Không cần
-            kết nối tài khoản Drive.
-          </p>
-        )}
-        <div className="space-y-1.5">
-          <Label
-            htmlFor="guest-passcode"
-            className="text-xs font-bold text-stone-700 uppercase tracking-wider"
-          >
-            {album ? (
-              "Mật khẩu mới (không bắt buộc)"
-            ) : (
-              <>
-                Mật khẩu truy cập cho Khách (Passcode){" "}
-                <span className="text-rose-500">*</span>
-              </>
-            )}
+        <div className="space-y-2">
+          <Label htmlFor="album-slug" className="text-[13px] font-medium text-stone-900">
+            Đường dẫn tùy chỉnh <span className="text-xs font-normal text-stone-500">· không bắt buộc</span>
           </Label>
-          <div className="relative">
+          <div className="flex h-11 items-center overflow-hidden rounded-xl border border-stone-200 bg-white transition-colors focus-within:border-stone-400 focus-within:ring-2 focus-within:ring-stone-200/50 sm:h-10">
+            <span className="shrink-0 select-none pl-3 text-xs text-stone-500">/album/</span>
+            <Input
+              id="album-slug"
+              type="text"
+              value={slug}
+              onChange={(event) => setSlug(event.target.value)}
+              onBlur={() => slug.trim() && setSlug(normalizedSlug)}
+              placeholder="tiec-cuoi-tuan-trang"
+              maxLength={80}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              className="h-full min-w-0 flex-1 rounded-none border-0 bg-white pl-[5px] font-mono text-xs text-stone-900 transition-colors placeholder:text-stone-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="guest-passcode" className="text-[13px] font-medium text-stone-900">
+              {album ? "Mật khẩu mới" : "Mật khẩu khách"}
+              {album ? (
+                <span className="ml-1 text-xs font-normal text-stone-500">· tùy chọn</span>
+              ) : (
+                <span aria-hidden="true" className="ml-1 text-rose-700">*</span>
+              )}
+            </Label>
             <Input
               id="guest-passcode"
               type={album ? "password" : "text"}
               value={passcode}
               onChange={(e) => setPasscode(e.target.value)}
-              placeholder={album ? "Để trống để giữ mật khẩu hiện tại" : "1234"}
+              placeholder={album ? "Giữ mật khẩu cũ" : "Ít nhất 4 ký tự"}
               maxLength={128}
               autoComplete="new-password"
-              className="h-11 rounded-2xl font-mono tracking-wider pr-10"
+              className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 focus-visible:border-stone-400 focus-visible:ring-stone-200/50 focus-visible:ring-offset-0 sm:h-10"
             />
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
-              <Lock className="w-4 h-4" />
-            </div>
           </div>
-          <p className="text-[11px] text-stone-400 mt-1">
-            {album
-              ? "Đổi mật khẩu sẽ kết thúc các phiên truy cập của khách hiện tại."
-              : "Khách bắt buộc phải nhập đúng mật khẩu này mới có thể xem ảnh và thả tim."}
-          </p>
-        </div>
-
-        {/* Selection limit */}
-        <div className="space-y-1.5">
-          <Label
-            htmlFor="selection-limit"
-            className="text-xs font-bold text-stone-700 uppercase tracking-wider"
-          >
-            Số lượng ảnh khách được chọn{" "}
-            <span className="text-rose-500">*</span>
-          </Label>
-          <div className="relative">
+          <div className="space-y-2">
+            <Label htmlFor="selection-limit" className="text-[13px] font-medium text-stone-900">
+              Số ảnh chọn tối đa <span aria-hidden="true" className="text-rose-700">*</span>
+            </Label>
             <Input
               id="selection-limit"
               type="number"
@@ -347,28 +267,14 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
               inputMode="numeric"
               value={selectionLimit}
               onChange={(e) => setSelectionLimit(e.target.value)}
-              className="h-11 rounded-2xl pr-10 font-mono"
+              placeholder="50"
+              className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 focus-visible:border-stone-400 focus-visible:ring-stone-200/50 focus-visible:ring-offset-0 sm:h-10"
             />
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
-              <Images className="w-4 h-4" />
-            </div>
           </div>
-          <p className="text-[11px] text-stone-400 mt-1">
-            Khi đạt đủ số lượng này, khách cần bỏ chọn một ảnh trước khi chọn
-            ảnh khác.
-          </p>
-        </div>
-
-        {/* Album retention note */}
-        <div className="p-3.5 bg-stone-50 rounded-2xl border border-stone-200/80 text-xs text-stone-600 space-y-1">
-          <p className="font-bold text-stone-800">Thời hạn lưu trữ:</p>
-          <p>
-            • Thời hạn lưu trữ album: <strong>30 ngày</strong> kể từ khi hoàn
-            tất.
-          </p>
         </div>
       </form>
     </AppModal>
   );
 };
+
 export default CreateAlbumModal;

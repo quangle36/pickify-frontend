@@ -2,8 +2,7 @@ import { FC, useEffect, useState } from "react";
 import type { Album } from "@/features/photographer/types/album.types";
 import {
   RefreshCw,
-  AlertTriangle,
-  Heart,
+  AlertCircle,
   Trash2,
   MoreHorizontal,
   Pencil,
@@ -38,11 +37,25 @@ export const AlbumCard: FC<AlbumCardProps> = ({
   onShare,
 }) => {
   const [coverFailed, setCoverFailed] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     setCoverFailed(false);
   }, [album.coverUrl]);
+
+  const selectionLimit = album.selectionLimit ?? album.totalPhotos;
+  const selectionProgress = selectionLimit > 0
+    ? Math.min(100, Math.max(0, (album.selectedPhotosCount / selectionLimit) * 100))
+    : 0;
+  const processing = album.status === "scanning" || album.status === "importing";
+  const statusText = {
+    scanning: "Đang quét Drive",
+    importing: "Đang nhập ảnh",
+    needs_attention: "Cần xử lý",
+    expired: "Đã hết hạn",
+    deleting: "Đang dọn dữ liệu",
+    deleted: "Đã xóa",
+    ready: "",
+  }[album.status];
 
   const handleDelete = () => {
     if (
@@ -57,106 +70,54 @@ export const AlbumCard: FC<AlbumCardProps> = ({
   return (
     <Card
       onClick={() => onSelect(album.id)}
-      className="rounded-3xl border-stone-200 shadow-xs hover:shadow-xl hover:border-stone-300 transition-all duration-200 overflow-hidden flex flex-col group cursor-pointer bg-white"
+      className="flex cursor-pointer flex-col rounded-2xl border-stone-200 bg-white shadow-none transition-colors hover:border-stone-300"
     >
-      {/* Top Media & Status Header */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-stone-100">
+      <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-t-[15px] bg-stone-100">
         {album.coverUrl && !coverFailed ? (
           <img
             src={album.coverUrl}
             alt={album.title}
-            className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04] ${menuOpen ? "scale-[1.04]" : ""}`}
+            className="absolute inset-0 h-full w-full object-cover object-[center_35%]"
             loading="lazy"
             onError={() => setCoverFailed(true)}
           />
         ) : (
-          <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-stone-700 via-stone-800 to-stone-950 text-stone-400">
-            <div className="flex flex-col items-center gap-2">
-              <ImageIcon className="h-9 w-9" />
-              <span className="text-[11px] font-semibold text-stone-300">
-                {album.status === "scanning" || album.status === "importing"
-                  ? "Đang tạo ảnh đại diện"
-                  : "Chưa có ảnh đại diện"}
-              </span>
-            </div>
+          <div className="flex flex-col items-center gap-2 p-4 text-center text-xs text-stone-600">
+            <ImageIcon className="h-6 w-6 text-stone-400" strokeWidth={1.5} aria-hidden="true" />
+            <span>{processing ? "Đang tạo ảnh đại diện" : "Chưa có ảnh đại diện"}</span>
           </div>
         )}
+      </div>
 
-        {/* Gradient dark overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-        {/* Status Badge Top-Left */}
-        <div className="absolute top-3 left-3 z-10">
-          {album.status === "scanning" && (
-            <Badge
-              variant="info"
-              className="gap-1.5 px-3 py-1 shadow-md backdrop-blur-xs bg-purple-500/95 text-white border-0 animate-pulse"
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="flex min-h-9 items-start gap-3">
+          <h3 className="min-w-0 flex-1 sm:min-h-12">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={(event) => {
+                event.stopPropagation();
+                onSelect(album.id);
+              }}
+              className="min-h-9 w-full justify-start rounded-none p-0 text-left text-base font-semibold leading-6 text-stone-900 [text-wrap:balance] hover:bg-transparent hover:text-stone-900 hover:underline hover:underline-offset-4"
             >
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              <span>Đang quét Drive</span>
-            </Badge>
-          )}
-
-          {album.status === "importing" && (
-            <Badge
-              variant="info"
-              className="gap-1.5 px-3 py-1 shadow-md backdrop-blur-xs bg-blue-500/95 text-white border-0"
-            >
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              <span>Đang nhập ({album.totalPhotos} ảnh)</span>
-            </Badge>
-          )}
-
-          {album.status === "needs_attention" && (
-            <Badge
-              variant="destructive"
-              className="gap-1.5 px-3 py-1 shadow-md backdrop-blur-xs bg-rose-600/95 text-white border-0"
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Cần xử lý</span>
-            </Badge>
-          )}
-        </div>
-
-        {["expired", "deleting", "deleted"].includes(album.status) && (
-          <Badge className="absolute top-3 left-3">
-            {album.status === "expired" ? "Đã hết hạn" : "Đang dọn dữ liệu"}
-          </Badge>
-        )}
-
-        {/* Title and bottom info over image */}
-        <div className="absolute bottom-3 left-3 right-3 z-10 flex items-end justify-between gap-3 text-white">
-          <div className="min-w-0 flex-1">
-            <h3 className="font-extrabold text-base sm:text-lg line-clamp-1 group-hover:text-amber-200 transition-colors">
               {album.title}
-            </h3>
-            <div className="flex items-center gap-3 text-xs text-stone-300 mt-1 font-medium">
-              <span>{album.totalPhotos} ảnh</span>
-              <span>•</span>
-              <span className="flex items-center gap-1 text-rose-400 font-bold">
-                <Heart className="w-3.5 h-3.5 fill-rose-400" />
-                {album.selectedPhotosCount}/
-                {album.selectionLimit ?? album.totalPhotos} đã chọn
-              </span>
-            </div>
-          </div>
-
-          <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            </Button>
+          </h3>
+          <div className="shrink-0" onClick={(event) => event.stopPropagation()}>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="icon"
                   aria-label={`Thao tác với album ${album.title}`}
-                  className="h-8 w-8 rounded-xl bg-black/40 text-white hover:bg-black/60 hover:text-white backdrop-blur-xs"
+                  className="h-8 w-8 rounded-[10px] text-stone-500 sm:h-9 sm:w-9"
                 >
-                  <MoreHorizontal className="h-4 w-4" />
+                  <MoreHorizontal className="h-4 w-4" strokeWidth={1.5} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                onClick={(e) => e.stopPropagation()}
-              >
+              <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
                 <DropdownMenuItem onSelect={() => onEdit(album)}>
                   <Pencil />
                   Chỉnh sửa
@@ -165,10 +126,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
                   <Share2 />
                   Chia sẻ
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={handleDelete}
-                  className="text-rose-700 focus:bg-rose-50 focus:text-rose-700"
-                >
+                <DropdownMenuItem onSelect={handleDelete} className="text-rose-700 focus:bg-rose-50 focus:text-rose-700">
                   <Trash2 />
                   Xóa
                 </DropdownMenuItem>
@@ -176,51 +134,50 @@ export const AlbumCard: FC<AlbumCardProps> = ({
             </DropdownMenu>
           </div>
         </div>
-      </div>
 
-      {(album.status === "importing" || album.status === "needs_attention") && (
-        <div className="border-t border-stone-100 px-4 py-2.5 flex flex-col gap-2.5">
-          {/* Progress bar if importing */}
-          {album.status === "importing" && (
-            <div className="space-y-1.5 bg-blue-50/70 p-3 rounded-2xl border border-blue-100">
-              <div className="flex justify-between text-xs font-semibold text-blue-900">
-                <span className="flex items-center gap-1.5">
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-600" />
-                  Đang tối ưu & lưu ảnh vào hệ thống
-                </span>
-              </div>
-              <div className="h-1.5 w-full bg-blue-200/70 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-600 animate-pulse w-full rounded-full" />
-              </div>
-              <p className="text-[11px] text-blue-700">
-                Ảnh được xử lý ngầm, bấm vào album để xem các ảnh đã hoàn thành.
-              </p>
-            </div>
-          )}
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
+          <span>{album.totalPhotos.toLocaleString("vi-VN")} ảnh</span>
+          <span className="whitespace-nowrap text-stone-700">
+            <strong className="font-medium text-stone-900">{album.selectedPhotosCount.toLocaleString("vi-VN")} / {selectionLimit.toLocaleString("vi-VN")}</strong> đã chọn
+          </span>
+        </div>
+        <div className="h-[3px] overflow-hidden rounded-sm bg-stone-100" aria-hidden="true">
+          <div className="h-full rounded-sm bg-stone-400" style={{ width: `${selectionProgress}%` }} />
+        </div>
 
-          {/* Error message if needs attention */}
-          {album.status === "needs_attention" && (
-            <div className="space-y-2 bg-rose-50 p-3.5 rounded-2xl border border-rose-200 text-xs">
-              <p className="text-rose-800 font-medium leading-relaxed">
-                {album.errorMessage ||
-                  "Phát hiện ảnh lỗi hoặc vượt quá giới hạn 50MB."}
-              </p>
+        {statusText && (
+          <div className="flex min-h-8 flex-wrap items-center justify-between gap-2">
+            <Badge
+              title={album.status === "needs_attention" ? album.errorMessage : undefined}
+              className={`gap-1.5 rounded-md border-0 px-2 py-[3px] text-xs font-normal hover:bg-stone-100 ${
+                processing
+                  ? "bg-blue-50 text-blue-700 hover:bg-blue-50"
+                  : album.status === "needs_attention"
+                    ? "bg-rose-50 text-rose-700 hover:bg-rose-50"
+                    : "bg-stone-100 text-stone-600"
+              }`}
+            >
+              {processing && <RefreshCw className="h-4 w-4 animate-spin motion-reduce:animate-none" strokeWidth={1.5} aria-hidden="true" />}
+              {album.status === "needs_attention" && <AlertCircle className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />}
+              {statusText}
+            </Badge>
+            {album.status === "needs_attention" && (
               <Button
+                type="button"
+                variant="outline"
                 size="sm"
-                variant="destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
+                className="min-h-8 rounded-lg px-2.5 py-[5px] sm:min-h-8 sm:px-2.5"
+                onClick={(event) => {
+                  event.stopPropagation();
                   onRetry(album.id);
                 }}
-                className="gap-1.5 rounded-xl font-bold"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Thử lại phần chưa hoàn thành</span>
+                Thử lại
               </Button>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
     </Card>
   );
 };
