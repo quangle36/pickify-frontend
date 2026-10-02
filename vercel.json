@@ -3,6 +3,10 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/album/:shareId",
+      "destination": "https://p01--pickify-api--cx5nvhfxlc2k.code.run/album/:shareId"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://p01--pickify-api--cx5nvhfxlc2k.code.run/api/:path*"
     },

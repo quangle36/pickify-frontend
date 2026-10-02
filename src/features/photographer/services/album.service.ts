@@ -19,6 +19,7 @@ export interface UpdateAlbumInput {
   slug: string;
   selectionLimit: number;
   password?: string;
+  sharePreviewEnabled?: boolean;
 }
 
 export const albumService = {

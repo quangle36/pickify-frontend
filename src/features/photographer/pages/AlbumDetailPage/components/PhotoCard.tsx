@@ -26,7 +26,7 @@ export const PhotoCard: FC<PhotoCardProps> = ({
           void preloadImage(photo.displayUrl, "high").catch(() => undefined);
         }
       }}
-      className={`group relative aspect-[9/16] overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 transition-all select-none ${photo.status === "ready" ? "cursor-pointer hover:border-brand-500 hover:shadow-md" : "cursor-default"}`}
+      className={`group relative aspect-[9/16] overflow-hidden rounded-2xl border border-stone-200/90 bg-stone-100 transition-all select-none ${photo.status === "ready" ? "cursor-pointer hover:border-stone-400 hover:shadow-md" : "cursor-default"}`}
     >
       {photo.status === "processing" && (
         <div
@@ -46,7 +46,7 @@ export const PhotoCard: FC<PhotoCardProps> = ({
       )}
 
       {photo.status === "ready" && (
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
       )}
 
       {/* Read-only guest selection indicator */}
@@ -57,15 +57,15 @@ export const PhotoCard: FC<PhotoCardProps> = ({
             aria-label={
               photo.isSelected ? "Khách đã thả tim" : "Khách chưa thả tim"
             }
-            className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md shadow-md ${
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-transform active:scale-90 ${
               photo.isSelected
-                ? "bg-rose-500 text-white animate-heart-pop"
-                : "bg-black/40 text-white/70"
+                ? "bg-rose-500 text-white shadow-xs shadow-rose-600/30 animate-heart-pop"
+                : "bg-black/35 text-white/75 hover:bg-black/50"
             }`}
             title={photo.isSelected ? "Khách đã thả tim" : "Chưa được chọn"}
           >
             <Heart
-              className={`w-4 h-4 ${photo.isSelected ? "fill-white" : ""}`}
+              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${photo.isSelected ? "fill-white" : ""}`}
             />
           </div>
         </div>

@@ -15,6 +15,10 @@ export default defineConfig(({ mode, command }) => {
       strictPort: true,
       host: origin.hostname,
       proxy: {
+        "/album": {
+          target: process.env.PICKIFY_API_TARGET || "http://localhost:3001",
+          changeOrigin: false,
+        },
         "/api": {
           target: process.env.PICKIFY_API_TARGET || "http://localhost:3001",
           changeOrigin: false,

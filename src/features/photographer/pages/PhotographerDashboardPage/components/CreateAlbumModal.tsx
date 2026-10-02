@@ -190,7 +190,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             maxLength={120}
             onChange={(e) => setName(e.target.value)}
             placeholder="VD: Tiệc cưới Tuấn & Trang — Đà Lạt"
-            className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 focus-visible:border-stone-400 focus-visible:ring-stone-200/50 focus-visible:ring-offset-0 sm:h-10"
+            className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 sm:h-10"
           />
         </div>
 
@@ -205,7 +205,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             readOnly={!!album}
             onChange={(e) => setFolderUrl(e.target.value)}
             placeholder="Dán liên kết thư mục Google Drive"
-            className={`h-11 rounded-xl border-stone-200 text-[13px] transition-colors placeholder:text-stone-500 focus-visible:border-stone-400 focus-visible:ring-stone-200/50 focus-visible:ring-offset-0 sm:h-10 ${
+            className={`h-11 rounded-xl border-stone-200 text-[13px] transition-colors placeholder:text-stone-500 sm:h-10 ${
               album ? "cursor-not-allowed bg-stone-100 text-stone-500" : "bg-white text-stone-900"
             }`}
           />
@@ -251,7 +251,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
               placeholder={album ? "Giữ mật khẩu cũ" : "Ít nhất 4 ký tự"}
               maxLength={128}
               autoComplete="new-password"
-              className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 focus-visible:border-stone-400 focus-visible:ring-stone-200/50 focus-visible:ring-offset-0 sm:h-10"
+              className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 sm:h-10"
             />
           </div>
           <div className="space-y-2">
@@ -268,7 +268,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
               value={selectionLimit}
               onChange={(e) => setSelectionLimit(e.target.value)}
               placeholder="50"
-              className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 focus-visible:border-stone-400 focus-visible:ring-stone-200/50 focus-visible:ring-offset-0 sm:h-10"
+              className="h-11 rounded-xl border-stone-200 bg-white text-[13px] text-stone-900 transition-colors placeholder:text-stone-500 sm:h-10"
             />
           </div>
         </div>
