@@ -1,6 +1,12 @@
 import axios from "axios";
 
 export const apiMessages: Record<string, string> = {
+  ALBUM_PASSWORD_REVEAL_UNAVAILABLE:
+    "Không thể hiển thị mật khẩu này. Hãy đổi mật khẩu album để sử dụng tính năng hiển thị.",
+  EMAIL_INVALID_CREDENTIALS: "Email hoặc mật khẩu không đúng.",
+  EMAIL_ALREADY_REGISTERED:
+    "Email này đã có tài khoản. Vui lòng đăng nhập bằng phương thức đã đăng ký.",
+  BETA_INVITE_REQUIRED: "Email này chưa được cấp quyền tạo tài khoản.",
   NETWORK_ERROR: "Không thể kết nối máy chủ. Vui lòng thử lại.",
   INTERNAL_ERROR: "Máy chủ đang gặp sự cố. Vui lòng thử lại sau.",
   DRIVE_NOT_PUBLIC:
@@ -9,7 +15,7 @@ export const apiMessages: Record<string, string> = {
     "Máy chủ chưa được cấu hình API key cho Google Drive.",
   DRIVE_API_KEY_INVALID:
     "API key Google Drive không hợp lệ hoặc Drive API chưa được bật.",
-  UNAUTHENTICATED: "Vui lòng đăng nhập Google.",
+  UNAUTHENTICATED: "Vui lòng đăng nhập.",
   INVALID_CREDENTIALS: "Mật khẩu không đúng hoặc phiên đã hết hạn.",
   ORIGIN_DENIED: "Nguồn truy cập không hợp lệ.",
   DRIVE_DISCONNECTED: "Hãy kết nối Google Drive.",

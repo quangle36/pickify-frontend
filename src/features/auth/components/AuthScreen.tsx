@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Heart,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Heart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { errorMessage } from "@/api/errors";
 import {
@@ -13,7 +8,8 @@ import {
   useOwnerQuery,
 } from "@/features/auth/queries/auth.queries";
 import { GoogleMark } from "./GoogleMark";
-import { ProductPreview } from "./ProductPreview";
+import { EmailAuthForm } from "./EmailAuthForm";
+import { useEmailAuthMutation } from "../queries/auth.mutations";
 
 export type AuthMode = "sign-in" | "sign-up";
 
@@ -23,7 +19,7 @@ interface AuthScreenProps {
 
 const content = {
   "sign-in": {
-    eyebrow: "Chào mừng bạn trở lại",
+    eyebrow: null,
     title: "Tiếp tục với những khoảnh khắc đẹp.",
     description:
       "Đăng nhập để quản lý album, theo dõi ảnh khách đã chọn và xuất danh sách cho Lightroom.",
@@ -51,6 +47,22 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   const authConfig = useAuthConfigQuery();
   const [isStarting, setIsStarting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const emailAuth = useEmailAuthMutation(mode);
+  const busy = isStarting || emailAuth.isPending || owner.isPending;
+
+  const continueWithEmail = async (input: {
+    email: string;
+    password: string;
+    name?: string;
+  }) => {
+    setAuthError(null);
+    try {
+      await emailAuth.mutateAsync(input);
+      await navigate({ to: "/dashboard", replace: true });
+    } catch (error) {
+      setAuthError(errorMessage(error));
+    }
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -94,84 +106,123 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
       <div className="relative mx-auto flex min-h-screen max-w-[1440px] flex-col px-5 sm:px-8 lg:px-12">
         <header className="flex h-20 items-center justify-between sm:h-24">
-          <Link to="/" aria-label="Pickify — về trang chủ" className="group flex items-center gap-2.5">
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-stone-900 text-white shadow-lg shadow-stone-900/15 transition-transform group-hover:-rotate-6">
+          <Link
+            to="/"
+            aria-label="Pickify — về trang chủ"
+            className="group flex items-center gap-2.5"
+          >
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-stone-900 text-white shadow-lg shadow-stone-900/15 transition-all duration-200 group-hover:-rotate-6">
               <Heart className="h-[18px] w-[18px] fill-white" />
             </span>
-            <span className="text-xl font-extrabold tracking-[-0.04em]">Pickify</span>
+            <span className="text-xl font-extrabold tracking-[-0.04em]">
+              Pickify
+            </span>
           </Link>
           <Link
             to="/"
-            className="flex items-center gap-2 text-sm font-bold text-stone-500 transition-colors hover:text-stone-900"
+            className="inline-flex min-h-[40px] items-center gap-2 px-2.5 py-1 text-sm font-bold text-stone-700 transition-colors hover:text-stone-950"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Về trang chủ</span>
           </Link>
         </header>
 
-        <div className="grid flex-1 items-center gap-12 pb-12 pt-4 lg:grid-cols-[minmax(0,0.84fr)_minmax(480px,1.16fr)] lg:gap-20 lg:pb-20">
-          <section className="mx-auto w-full max-w-[480px] animate-fade-in lg:mx-0 lg:pl-7">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50/80 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-rose-700">
-              <Sparkles className="h-3.5 w-3.5" />
-              {copy.eyebrow}
+        <div className="my-auto py-8">
+          <div className="mx-auto w-full max-w-[480px] rounded-3xl border border-stone-200/90 bg-white p-8 sm:p-10 shadow-xl shadow-stone-900/5 animate-fade-in">
+            {/* Khối 2: Tiêu đề & Giới thiệu */}
+            <div className="mb-8">
+              {copy.eyebrow && (
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50/80 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-rose-700">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {copy.eyebrow}
+                </div>
+              )}
+              <h1 className="text-3xl font-extrabold leading-[1.15] tracking-tight text-stone-950 sm:text-4xl">
+                {copy.title}
+              </h1>
+              <p className="mt-3 text-[15px] leading-relaxed text-stone-600">
+                {copy.description}
+              </p>
             </div>
-            <h1 className="max-w-md text-[2.55rem] font-extrabold leading-[1.08] tracking-[-0.055em] text-stone-950 sm:text-5xl">
-              {copy.title}
-            </h1>
-            <p className="mt-5 max-w-md text-[15px] leading-7 text-stone-600">
-              {copy.description}
-            </p>
 
-            <div className="mt-9 rounded-[1.75rem] border border-white/90 bg-white/75 p-3 shadow-[0_24px_70px_-38px_rgba(41,37,36,0.45)] backdrop-blur-md">
-              <Button
-                type="button"
-                onClick={continueWithGoogle}
-                disabled={isStarting || owner.isPending}
-                className="h-14 w-full justify-between rounded-[1.15rem] bg-stone-950 px-5 text-[15px] font-bold text-white shadow-xl shadow-stone-900/15 hover:bg-stone-800"
-              >
-                <span className="flex items-center gap-3">
-                  <span className="grid h-8 w-8 place-items-center rounded-xl bg-white">
-                    <GoogleMark />
-                  </span>
-                  {isStarting ? "Đang chuyển đến Google…" : copy.action}
-                </span>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+            {/* Khối 4: Form Email & Mật khẩu (Hoán đổi lên trước theo yêu cầu) */}
+            <EmailAuthForm
+              key={mode}
+              mode={mode}
+              disabled={busy}
+              pending={emailAuth.isPending}
+              onSubmit={continueWithEmail}
+            />
+
+            {/* Vạch ngăn cách */}
+            <div className="my-6 flex items-center gap-4 text-xs font-semibold text-stone-600">
+              <span className="h-px flex-1 bg-stone-200" />
+              <span>hoặc {mode === "sign-in" ? "đăng nhập" : "đăng ký"} với Google</span>
+              <span className="h-px flex-1 bg-stone-200" />
             </div>
+
+            {/* Khối 3: Nút Google (Hoán đổi xuống dưới Form Email) */}
+            <Button
+              type="button"
+              onClick={continueWithGoogle}
+              disabled={busy}
+              variant="outline"
+              className="h-12 w-full justify-between rounded-xl border-stone-300 bg-white px-5 text-sm font-semibold text-stone-900 hover:bg-stone-100 transition-all shadow-sm active:scale-[0.99]"
+            >
+              <span className="flex items-center gap-3">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-white">
+                  <GoogleMark />
+                </span>
+                <span>{isStarting ? "Đang chuyển đến Google…" : copy.action}</span>
+              </span>
+              <ArrowRight className="h-4 w-4 text-stone-500" />
+            </Button>
 
             {authError ? (
-              <p role="alert" className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+              <p
+                role="alert"
+                className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm font-medium text-red-700"
+              >
                 {authError}
               </p>
             ) : null}
 
-            <p className="mt-6 text-sm text-stone-500">
-              {copy.alternateText}{" "}
-              <Link to={copy.alternateTo} className="font-extrabold text-stone-900 underline decoration-rose-300 decoration-2 underline-offset-4 hover:text-rose-600">
-                {copy.alternateAction}
-              </Link>
-            </p>
+            {/* Khối 5: Chuyển đổi tài khoản & Điều khoản */}
+            <div className="mt-8 border-t border-stone-100 pt-6 text-center">
+              <p className="text-sm text-stone-700">
+                {copy.alternateText}{" "}
+                <Link
+                  to={copy.alternateTo}
+                  className="font-extrabold text-stone-950 underline decoration-stone-400 decoration-2 underline-offset-4 hover:decoration-stone-900 transition-colors"
+                >
+                  {copy.alternateAction}
+                </Link>
+              </p>
 
-            <p className="mt-8 max-w-md text-xs leading-5 text-stone-400">
-              Bằng cách tiếp tục, bạn đồng ý với{" "}
-              <Link to="/terms" className="font-semibold text-stone-600 hover:text-stone-900">Điều khoản sử dụng</Link>{" "}
-              và{" "}
-              <Link to="/privacy" className="font-semibold text-stone-600 hover:text-stone-900">Chính sách quyền riêng tư</Link>{" "}
-              của Pickify.
-            </p>
-          </section>
-
-          <section className="relative hidden min-h-[620px] items-center justify-center overflow-hidden rounded-[2.5rem] border border-white/80 bg-[linear-gradient(145deg,#282421_0%,#403731_50%,#6f4b43_100%)] px-12 shadow-[0_40px_100px_-50px_rgba(28,25,23,0.65)] lg:flex">
-            <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(120deg,transparent_45%,rgba(255,255,255,.25)_50%,transparent_55%)]" />
-            <div className="absolute left-10 top-10 max-w-sm text-white">
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-stone-300">Dành cho photographer & studio</p>
-              <p className="mt-3 text-2xl font-extrabold leading-tight tracking-[-0.035em]">Một quy trình chọn ảnh mà khách hàng thực sự muốn dùng.</p>
+              <p className="mt-6 text-xs leading-relaxed text-stone-600">
+                Bằng cách tiếp tục, bạn đồng ý với{" "}
+                <Link
+                  to="/terms"
+                  className="font-semibold text-stone-700 hover:text-stone-950 underline"
+                >
+                  Điều khoản sử dụng
+                </Link>{" "}
+                và{" "}
+                <Link
+                  to="/privacy"
+                  className="font-semibold text-stone-700 hover:text-stone-950 underline"
+                >
+                  Chính sách quyền riêng tư
+                </Link>{" "}
+                của Pickify.
+              </p>
             </div>
-            <div className="mt-24 w-full">
-              <ProductPreview />
-            </div>
-          </section>
+          </div>
         </div>
+
+        <footer className="pb-6 text-center text-xs text-stone-600">
+          Pickify &copy; 2026. Nền tảng chọn ảnh số 1 cho photographer.
+        </footer>
       </div>
     </main>
   );

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Lock, LockOpen } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Eye, EyeOff, Lock, LockOpen } from "lucide-react";
 import { useAppStore } from "@/app/stores/app.store";
 import { AppModal } from "@/components/ui/app-modal";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   useSetAlbumSelectionLocked,
   useUpdateAlbumPasscode,
+  useRevealAlbumPasscode,
 } from "@/features/photographer/queries/album.mutations";
 import type { Album } from "@/features/photographer/types/album.types";
 
@@ -30,9 +31,48 @@ export function AlbumSettingsModal({
   const selectionLock = useSetAlbumSelectionLocked();
   const [editingPasscode, setEditingPasscode] = useState(false);
   const [newPasscode, setNewPasscode] = useState("");
+  const [visiblePasscode, setVisiblePasscode] = useState<string | null>(null);
+  const [newPasscodeVisible, setNewPasscodeVisible] = useState(false);
+  const revealPasscode = useRevealAlbumPasscode();
+  const revealRequest = useRef(0);
+
+  useEffect(() => {
+    revealRequest.current++;
+    setVisiblePasscode(null);
+    setNewPasscodeVisible(false);
+  }, [open, album.id]);
+
+  const togglePasscode = async () => {
+    if (visiblePasscode !== null) {
+      setVisiblePasscode(null);
+      return;
+    }
+    const request = ++revealRequest.current;
+    try {
+      const result = await revealPasscode.mutateAsync(album.id);
+      revealPasscode.reset();
+      if (request !== revealRequest.current) return;
+      if (result.password === null) {
+        toast({
+          variant: "dark",
+          title:
+            "Mật khẩu cũ chưa hỗ trợ hiển thị. Hãy đổi mật khẩu một lần để sử dụng tính năng này.",
+        });
+      } else {
+        setVisiblePasscode(result.password);
+      }
+    } catch (error) {
+      revealPasscode.reset();
+      if (request === revealRequest.current) report(error);
+    }
+  };
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
+      revealRequest.current++;
+      setVisiblePasscode(null);
+      setNewPasscodeVisible(false);
+      revealPasscode.reset();
       setEditingPasscode(false);
       setNewPasscode("");
     }
@@ -53,6 +93,9 @@ export function AlbumSettingsModal({
         albumId: album.id,
         password: newPasscode,
       });
+      revealRequest.current++;
+      setVisiblePasscode(null);
+      setNewPasscodeVisible(false);
       setEditingPasscode(false);
       setNewPasscode("");
       toast({
@@ -100,16 +143,43 @@ export function AlbumSettingsModal({
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-extrabold text-stone-900">Mật khẩu khách</h3>
-            <p className="mt-0.5 text-xs text-stone-500">
-              Mật khẩu hiện tại: <span className="font-mono">••••</span>
-            </p>
+            <div className="mt-0.5 flex items-center gap-1 text-xs text-stone-500">
+              <p className="min-w-0 break-all">
+                Mật khẩu hiện tại:{" "}
+                <span className="font-mono">{visiblePasscode ?? "••••"}</span>
+              </p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => void togglePasscode()}
+                disabled={revealPasscode.isPending || updatePasscode.isPending}
+                aria-label={
+                  visiblePasscode !== null
+                    ? "Ẩn mật khẩu khách"
+                    : "Hiển thị mật khẩu khách"
+                }
+                aria-pressed={visiblePasscode !== null}
+                className="shrink-0 rounded-full hover:bg-stone-100 hover:text-stone-900"
+              >
+                {visiblePasscode !== null ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
           {!editingPasscode && (
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setEditingPasscode(true)}
+              onClick={() => {
+                revealRequest.current++;
+                setVisiblePasscode(null);
+                setEditingPasscode(true);
+              }}
             >
               Đổi mật khẩu
             </Button>
@@ -118,14 +188,36 @@ export function AlbumSettingsModal({
 
         {editingPasscode && (
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-            <Input
-              type="text"
-              value={newPasscode}
-              onChange={(event) => setNewPasscode(event.target.value)}
-              placeholder="Nhập mật khẩu mới"
-              aria-label="Mật khẩu khách mới"
-              className="font-mono"
-            />
+            <div className="relative min-w-0 flex-1">
+              <Input
+                type={newPasscodeVisible ? "text" : "password"}
+                value={newPasscode}
+                onChange={(event) => setNewPasscode(event.target.value)}
+                placeholder="Nhập mật khẩu mới"
+                aria-label="Mật khẩu khách mới"
+                disabled={updatePasscode.isPending}
+                className="font-mono pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setNewPasscodeVisible((value) => !value)}
+                aria-label={
+                  newPasscodeVisible
+                    ? "Ẩn mật khẩu mới"
+                    : "Hiển thị mật khẩu mới"
+                }
+                aria-pressed={newPasscodeVisible}
+                className="absolute right-1.5 top-1.5 hover:bg-stone-100 hover:text-stone-900"
+              >
+                {newPasscodeVisible ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
             <div className="flex shrink-0 gap-2">
               <Button
                 type="button"
@@ -142,6 +234,7 @@ export function AlbumSettingsModal({
                 onClick={() => {
                   setNewPasscode("");
                   setEditingPasscode(false);
+                  setNewPasscodeVisible(false);
                 }}
                 disabled={updatePasscode.isPending}
                 className="flex-1 sm:flex-none"

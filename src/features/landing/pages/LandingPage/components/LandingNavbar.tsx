@@ -43,56 +43,58 @@ export function LandingNavbar({
 }: LandingNavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const links = [
+    { id: "how-it-works", label: "Cách dùng" },
     { id: "features", label: "Tính năng" },
-    { id: "how-it-works", label: "Cách hoạt động" },
     { id: "pricing", label: "Bảng giá" },
-    { id: "faq", label: "Hỏi đáp" },
   ];
   const navigate = (id: string) => {
     setMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(id)?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    });
   };
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200/80">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-20 py-3 flex items-center justify-between gap-2 sm:gap-5">
-        <button
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 h-[72px] flex items-center justify-between gap-4">
+        <Button
+          variant="ghost"
           aria-label="Pickify — về đầu trang"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="flex items-center gap-2 shrink-0"
+          onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}
+          className="flex items-center gap-2.5 shrink-0 px-0 hover:bg-transparent"
         >
-          <span className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-brand-600 via-rose-500 to-amber-400 grid place-items-center text-white">
-            <Heart className="w-5 h-5 fill-white" />
+          <span className="w-8 h-8 rounded-full bg-neutral-900 grid place-items-center text-white">
+            <Heart className="w-4 h-4 fill-white" />
           </span>
-          <span className="hidden sm:block text-xl font-extrabold tracking-tight">
+          <span className="text-xl font-medium tracking-tight text-neutral-900">
             Pickify
           </span>
-        </button>
+        </Button>
+
         <nav
           aria-label="Điều hướng chính"
-          className="hidden lg:flex gap-6 text-sm text-stone-600"
+          className="hidden md:flex items-center gap-1 text-sm text-neutral-600"
         >
           {links.map((link) => (
-            <button
+            <Button
+              variant="ghost"
               key={link.id}
               onClick={() => navigate(link.id)}
-              className="hover:text-stone-900"
+              className="rounded-full px-4 font-normal text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
             >
               {link.label}
-            </button>
+            </Button>
           ))}
         </nav>
-        <div
-          className="flex items-center gap-2 sm:gap-3 min-w-0"
-          aria-label="Tài khoản"
-        >
+
+        <div className="flex items-center gap-2" aria-label="Tài khoản">
           {isAuthPending ? (
             <div
               role="status"
               aria-label="Đang kiểm tra trạng thái đăng nhập"
               className="flex items-center gap-2"
             >
-              <span className="h-9 w-28 animate-pulse rounded-xl bg-stone-100" />
-              <span className="h-9 w-9 animate-pulse rounded-full bg-stone-100" />
+              <span className="h-8 w-20 animate-pulse rounded-lg bg-stone-100" />
+              <span className="h-8 w-8 animate-pulse rounded-full bg-stone-100" />
             </div>
           ) : isAuthenticated ? (
             <>
@@ -100,9 +102,9 @@ export function LandingNavbar({
                 onClick={onGoToDashboard}
                 variant="secondary"
                 size="sm"
-                className="rounded-xl gap-1.5 shrink-0"
+                className="rounded-full gap-1.5 text-xs"
               >
-                <LayoutDashboard className="w-4 h-4" />
+                <LayoutDashboard className="w-3.5 h-3.5" />
                 <span>Dashboard</span>
               </Button>
               <DropdownMenu>
@@ -114,8 +116,7 @@ export function LandingNavbar({
                         ? `Mở menu tài khoản của ${userName}`
                         : "Mở menu tài khoản"
                     }
-                    title="Tài khoản cá nhân"
-                    className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white bg-stone-900 text-sm font-bold text-white shadow-sm ring-1 ring-stone-200 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                    className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white bg-stone-900 text-xs font-bold text-white shadow-sm ring-1 ring-stone-200 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                   >
                     {avatarUrl ? (
                       <img
@@ -133,7 +134,7 @@ export function LandingNavbar({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-56 border-stone-200 p-1.5 shadow-xl"
+                  className="w-52 border-stone-200 p-1.5 shadow-lg"
                 >
                   <DropdownMenuLabel className="px-2.5 py-2 font-normal">
                     <div className="flex flex-col space-y-1">
@@ -164,18 +165,18 @@ export function LandingNavbar({
                 onClick={onLogin}
                 variant="ghost"
                 size="sm"
-                className="rounded-xl gap-1.5 shrink-0"
+                className="rounded-full text-xs text-neutral-700 hover:bg-neutral-100"
               >
-                <LogIn className="hidden sm:block w-4 h-4" />
-                <span>Đăng nhập</span>
+                <LogIn className="hidden sm:block w-3.5 h-3.5 mr-1.5" />
+                Đăng nhập
               </Button>
               <Button
                 onClick={onCreateAlbum}
                 size="sm"
-                className="rounded-xl gap-1.5 shrink-0 bg-stone-900 text-white shadow-sm hover:bg-stone-800"
+                className="rounded-full text-xs bg-neutral-900 text-white shadow-none hover:bg-neutral-700 gap-1.5"
               >
-                <Plus className="hidden sm:block w-4 h-4" />
-                <span>Tạo album mới</span>
+                <Plus className="hidden sm:block w-3.5 h-3.5" />
+                Tạo album
               </Button>
             </>
           )}
@@ -183,7 +184,7 @@ export function LandingNavbar({
             onClick={() => setMenuOpen((open) => !open)}
             size="icon-sm"
             variant="ghost"
-            className="lg:hidden shrink-0"
+            className="md:hidden shrink-0"
             aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
             aria-expanded={menuOpen}
           >
@@ -195,19 +196,21 @@ export function LandingNavbar({
           </Button>
         </div>
       </div>
+
       {menuOpen && (
         <nav
           aria-label="Điều hướng di động"
-          className="lg:hidden border-t p-3 flex flex-col text-sm"
+          className="md:hidden border-t border-stone-100 p-3 flex flex-col text-sm"
         >
           {links.map((link) => (
-            <button
+            <Button
+              variant="ghost"
               key={link.id}
               onClick={() => navigate(link.id)}
-              className="text-left px-3 py-2.5"
+              className="justify-start rounded-lg px-3 py-2.5 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 font-normal"
             >
               {link.label}
-            </button>
+            </Button>
           ))}
         </nav>
       )}

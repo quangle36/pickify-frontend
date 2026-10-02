@@ -1,103 +1,66 @@
 import { FC } from "react";
-import {
-  UploadCloud,
-  Smartphone,
-  FileSpreadsheet,
-  CheckCircle2,
-} from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { FolderOpen, Heart, FolderSearch } from "lucide-react";
 
 export const HowItWorksSection: FC = () => {
   const steps = [
     {
-      step: "01",
-      title: "Dán Link Google Drive",
+      step: "1",
+      title: "Dán link Google Drive",
       description:
-        "Chỉ cần copy đường link thư mục JPEG trên Drive của bạn, đặt tên album và tạo mã mật khẩu 4 chữ số cho khách.",
-      subtext:
-        "Hệ thống tự quét tối đa 1.500 JPEG và tạo ảnh preview siêu nét.",
-      icon: UploadCloud,
-      color: "bg-blue-500 text-white shadow-blue-500/25",
+        "Tạo album, dán link thư mục ảnh và đặt mã bảo mật. Hệ thống tự quét và tạo preview.",
+      icon: FolderOpen,
     },
     {
-      step: "02",
-      title: "Gửi Link Cho Khách",
+      step: "2",
+      title: "Khách thả tim chọn ảnh",
       description:
-        "Gửi link rút gọn kèm mã mật khẩu qua Zalo/Facebook. Khách mở trên điện thoại, bấm chạm tim ❤️ để chọn các tấm ưng ý.",
-      subtext:
-        "Mỗi lượt tim được lưu vào danh sách chung; thiết bị khác tải lại trang để xem thay đổi mới nhất.",
-      icon: Smartphone,
-      color: "bg-rose-500 text-white shadow-rose-500/25",
+        "Gửi link cho khách qua Zalo, tin nhắn. Khách mở trên điện thoại, nhập mã và chạm tim ảnh ưng ý.",
+      icon: Heart,
     },
     {
-      step: "03",
-      title: "Xuất CSV Cho Lightroom",
+      step: "3",
+      title: "Lọc ảnh RAW trên máy",
       description:
-        "Vào Dashboard xem tổng số tim đã chọn, bấm 1-click để tải file CSV. Lọc và chỉnh sửa ngay trong Lightroom hoặc Photoshop.",
-      subtext:
-        "File CSV có UTF-8 BOM hiển thị tiếng Việt chuẩn, không bao giờ nhầm file.",
-      icon: FileSpreadsheet,
-      color: "bg-amber-500 text-white shadow-amber-500/25",
+        "Dùng danh sách khách đã chọn để lọc đúng các file RAW trong thư mục ảnh trên máy.",
+      icon: FolderSearch,
     },
   ];
 
   return (
     <section
       id="how-it-works"
-      className="py-16 sm:py-24 bg-white border-t border-stone-200/80"
+      className="border-t border-neutral-100 py-20 sm:py-28"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge
-            variant="brand"
-            className="mb-2 uppercase tracking-widest font-bold"
-          >
-            Quy Trình Siêu Đơn Giản
-          </Badge>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight mt-2">
-            3 bước để hoàn tất việc chọn ảnh của một album
+      <div className="max-w-5xl mx-auto px-6 sm:px-8">
+        <div className="mb-14">
+          <h2 className="text-3xl sm:text-4xl font-medium tracking-[-0.04em]">
+            3 bước đơn giản
           </h2>
-          <p className="mt-4 text-stone-600 text-sm sm:text-base">
-            Không cần hướng dẫn dài dòng cho khách, không cần cài app, không cần
-            cấu hình server phức tạp.
+          <p className="mt-3 text-stone-500 text-sm sm:text-base">
+            Từ link Drive đến bộ ảnh RAW khách đã chọn chỉ trong vài phút.
           </p>
         </div>
 
-        {/* 3 Step Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {steps.map((item, idx) => {
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+          {steps.map((item) => {
             const Icon = item.icon;
             return (
-              <Card
-                key={idx}
-                className="relative bg-stone-50 rounded-3xl p-7 border-stone-200/80 shadow-xs flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <div
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${item.color}`}
-                    >
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <span className="text-3xl font-black text-stone-300 font-mono tracking-tighter">
-                      {item.step}
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl font-extrabold text-stone-900">
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-stone-600 leading-relaxed">
-                    {item.description}
-                  </p>
+              <div key={item.step}>
+                <div
+                  className="w-12 h-12 rounded-full bg-neutral-100 text-neutral-700 flex items-center justify-center mb-6"
+                >
+                  <Icon className="w-6 h-6" />
                 </div>
-
-                <div className="mt-6 pt-4 border-t border-stone-200/60 text-xs font-medium text-stone-500 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>{item.subtext}</span>
+                <div className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">
+                  Bước {item.step}
                 </div>
-              </Card>
+                <h3 className="text-lg font-medium text-neutral-900 mb-3 tracking-tight">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-neutral-500 leading-7 max-w-xs">
+                  {item.description}
+                </p>
+              </div>
             );
           })}
         </div>

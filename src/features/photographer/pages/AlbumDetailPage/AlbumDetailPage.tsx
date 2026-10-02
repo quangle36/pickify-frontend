@@ -138,17 +138,17 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
         </div>
       </div>
 
-      {/* Album Meta Banner */}
-      <Card className="rounded-3xl border-stone-200 bg-white p-6 shadow-xs sm:p-7">
+      {/* Album heading */}
+      <header className="py-2 sm:py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 flex-wrap items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+            <h1 className="break-words text-2xl sm:text-[28px] font-medium leading-tight tracking-[-0.035em] text-neutral-900">
               {album.title}
             </h1>
             {album.status === "importing" && (
               <Badge
                 variant="info"
-                className="gap-1.5 px-3 py-1 shadow-xs bg-blue-500/95 text-white border-0"
+                className="gap-1.5 rounded-full px-3 py-1 font-normal bg-neutral-100 text-neutral-600 border-0 shadow-none"
               >
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                 <span>
@@ -163,12 +163,14 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             size="icon"
             onClick={() => setSettingsModalOpen(true)}
             aria-label="Mở cài đặt album"
-            className="shrink-0 rounded-xl text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+            aria-haspopup="dialog"
+            aria-expanded={settingsModalOpen}
+            className="h-10 w-10 shrink-0 rounded-full text-neutral-600 hover:bg-neutral-200/60 hover:text-neutral-900 focus-visible:ring-neutral-400"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-5 w-5" strokeWidth={1.5} />
           </Button>
         </div>
-      </Card>
+      </header>
 
       {/* Gallery Controls Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

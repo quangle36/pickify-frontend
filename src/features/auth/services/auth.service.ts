@@ -12,6 +12,18 @@ interface CurrentUserResponse {
 }
 
 export const authService = {
+  authenticateEmail: async (
+    input: { email: string; password: string; name?: string },
+    mode: "sign-in" | "sign-up",
+  ) => {
+    const result = await apiRequest<{ ok: boolean; csrfToken: string }>({
+      url: `/auth/email/${mode}`,
+      method: "POST",
+      data: input,
+    });
+    setCsrfToken(result.csrfToken);
+    return result;
+  },
   getConfig: (signal?: AbortSignal) =>
     apiRequest<AuthConfig>({ url: "/auth/config", signal }),
 

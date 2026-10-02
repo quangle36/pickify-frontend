@@ -20,6 +20,10 @@ export interface CreateAlbumFormInput {
   selectionLimit: number;
 }
 
+export function useRevealAlbumPasscode() {
+  return useMutation({ mutationFn: albumService.revealPasscode, gcTime: 0 });
+}
+
 async function invalidateAlbumData(client: QueryClient, includePhotos = true) {
   await Promise.all([
     client.invalidateQueries({ queryKey: authKeys.owner }),
@@ -100,9 +104,7 @@ export function useSetAlbumSelectionLocked() {
     onSuccess: (updatedAlbum) => {
       client.setQueryData<Album[]>(albumKeys.all, (current) =>
         current?.map((album) =>
-          album.id === updatedAlbum.id
-            ? { ...album, ...updatedAlbum }
-            : album,
+          album.id === updatedAlbum.id ? { ...album, ...updatedAlbum } : album,
         ),
       );
     },

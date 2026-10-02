@@ -1,13 +1,13 @@
 import { FC } from 'react';
 import { LandingNavbar } from './components/LandingNavbar';
 import { HeroSection } from './components/HeroSection';
-import { ProblemSolution } from './components/ProblemSolution';
-import { InteractivePreview } from './components/InteractivePreview';
-import { FeaturesSection } from './components/FeaturesSection';
 import { HowItWorksSection } from './components/HowItWorksSection';
+import { FeaturesSection } from './components/FeaturesSection';
 import { PricingSection } from './components/PricingSection';
 import { FAQSection } from './components/FAQSection';
 import { LandingFooter } from './components/LandingFooter';
+import { ScrollReveal } from './components/ScrollReveal';
+import './LandingPage.css';
 
 interface LandingPageProps {
   onGoToDashboard: () => void;
@@ -34,8 +34,10 @@ const LandingPage: FC<LandingPageProps> = ({
   userEmail,
   avatarUrl,
 }) => {
+  const handleStart = isAuthenticated ? onGoToDashboard : onLogin;
+
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="landing-page flex-1 flex flex-col bg-white text-neutral-900">
       <LandingNavbar
         onGoToDashboard={onGoToDashboard}
         onLogin={onLogin}
@@ -48,24 +50,28 @@ const LandingPage: FC<LandingPageProps> = ({
         avatarUrl={avatarUrl}
       />
       <main className="flex-1">
-        <HeroSection
-          onStartDashboard={onGoToDashboard}
-          onOpenGuestDemo={onOpenGuestDemo}
-        />
-        <ProblemSolution />
-        <InteractivePreview
-          onOpenGuestDemo={onOpenGuestDemo}
-          onGoToDashboard={onGoToDashboard}
-        />
-        <FeaturesSection />
-        <HowItWorksSection />
-        <PricingSection onStartDashboard={onGoToDashboard} />
-        <FAQSection />
+        <ScrollReveal>
+          <HeroSection onStartDashboard={handleStart} />
+        </ScrollReveal>
+        <ScrollReveal>
+          <HowItWorksSection />
+        </ScrollReveal>
+        <ScrollReveal>
+          <FeaturesSection />
+        </ScrollReveal>
+        <ScrollReveal>
+          <PricingSection onStartDashboard={handleStart} />
+        </ScrollReveal>
+        <ScrollReveal>
+          <FAQSection />
+        </ScrollReveal>
       </main>
-      <LandingFooter
-        onGoToDashboard={onGoToDashboard}
-        onOpenGuestDemo={onOpenGuestDemo}
-      />
+      <ScrollReveal>
+        <LandingFooter
+          onGoToDashboard={onGoToDashboard}
+          onOpenGuestDemo={onOpenGuestDemo}
+        />
+      </ScrollReveal>
     </div>
   );
 };

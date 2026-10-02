@@ -55,6 +55,11 @@ export const albumService = {
       method: "DELETE",
     }),
 
+  revealPasscode: (albumId: string) =>
+    apiRequest<{ password: string | null }>({
+      url: `/albums/${albumId}/password`,
+    }),
+
   setSelectionLocked: (albumId: string, locked: boolean) =>
     apiRequest<Album>({
       url: `/albums/${albumId}/selection-lock`,
