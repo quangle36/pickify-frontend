@@ -7,7 +7,7 @@ import { errorMessage } from "@/api/errors";
 import { authKeys } from "@/features/auth/queries/auth.key";
 import { photoKeys } from "@/features/photo/queries/photo.key";
 import { createAlbumSchema } from "../schemas/album.schema";
-import { albumService } from "../services/album.service";
+import { albumService, type UpdateAlbumInput } from "../services/album.service";
 import { useAlbumStore } from "../stores/album.store";
 import type { Album, PhotographerProfile } from "../types/album.types";
 import { albumKeys } from "./album.key";
@@ -56,6 +56,20 @@ export function useRetryAlbum() {
   return useMutation({
     mutationFn: albumService.retryAlbum,
     onSuccess: () => invalidateAlbumData(client),
+  });
+}
+
+export function useUpdateAlbum() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      albumId,
+      input,
+    }: {
+      albumId: string;
+      input: UpdateAlbumInput;
+    }) => albumService.updateAlbum(albumId, input),
+    onSuccess: () => invalidateAlbumData(client, false),
   });
 }
 

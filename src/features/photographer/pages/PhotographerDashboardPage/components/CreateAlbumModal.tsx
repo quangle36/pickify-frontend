@@ -6,6 +6,7 @@ import {
   HelpCircle,
   Images,
   Link2,
+  Pencil,
 } from "lucide-react";
 import { extractDriveFolderId } from "@/lib/utils";
 import { AppModal } from "@/components/ui/app-modal";
@@ -17,10 +18,12 @@ import {
   albumSlugSchema,
   normalizeAlbumSlug,
 } from "@/features/photographer/schemas/album.schema";
+import type { Album } from "@/features/photographer/types/album.types";
 
 interface CreateAlbumModalProps {
   isOpen: boolean;
   onClose: () => void;
+  album?: Album;
   onSubmit: (data: {
     name: string;
     slug: string;
@@ -37,13 +40,16 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  album,
 }) => {
   const [pending, setPending] = useState(false);
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [folderUrl, setFolderUrl] = useState("");
+  const [name, setName] = useState(album?.title ?? "");
+  const [slug, setSlug] = useState(album?.slug ?? "");
+  const [folderUrl, setFolderUrl] = useState(album?.folderUrl ?? "");
   const [passcode, setPasscode] = useState("");
-  const [selectionLimit, setSelectionLimit] = useState("");
+  const [selectionLimit, setSelectionLimit] = useState(
+    album ? String(album.selectionLimit ?? album.totalPhotos) : "",
+  );
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -76,7 +82,10 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       return;
     }
 
-    if (!passcode || passcode.length < 4) {
+    if (
+      (!album || passcode) &&
+      (passcode.length < 4 || passcode.length > 128)
+    ) {
       setError("Mật khẩu khách phải có ít nhất 4 ký tự");
       return;
     }
@@ -91,16 +100,28 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       return;
     }
 
-    setPending(true);
-    const res = await onSubmit({
-      name: name.trim(),
-      slug: slug.trim() ? normalizeAlbumSlug(slug) : "",
-      folderUrl: folderUrl.trim(),
-      passcode: passcode.trim(),
-      selectionLimit: parsedSelectionLimit,
-    });
+    if (album && parsedSelectionLimit < album.selectedPhotosCount) {
+      setError(
+        `Giới hạn không được thấp hơn ${album.selectedPhotosCount} ảnh đã chọn`,
+      );
+      return;
+    }
 
-    setPending(false);
+    setPending(true);
+    let res: { success: boolean; error?: string };
+    try {
+      res = await onSubmit({
+        name: name.trim(),
+        slug: slug.trim() ? normalizeAlbumSlug(slug) : "",
+        folderUrl: folderUrl.trim(),
+        passcode,
+        selectionLimit: parsedSelectionLimit,
+      });
+    } catch {
+      res = { success: false, error: "Không thể lưu album. Vui lòng thử lại." };
+    } finally {
+      setPending(false);
+    }
     if (res.success) {
       setName("");
       setSlug("");
@@ -109,7 +130,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       setSelectionLimit("50");
       onClose();
     } else {
-      setError(res.error || "Có lỗi xảy ra khi tạo album");
+      setError(res.error || "Có lỗi xảy ra khi lưu album");
     }
   };
 
@@ -120,9 +141,19 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       open={isOpen}
       onOpenChange={(open) => !open && onClose()}
       preventClose={pending}
-      title="Tạo Album Mới"
-      description="Nhập link Google Drive để hệ thống quét và tạo ảnh xem trước"
-      icon={<UploadCloud className="h-5 w-5" />}
+      title={album ? "Chỉnh sửa album" : "Tạo Album Mới"}
+      description={
+        album
+          ? "Cập nhật thông tin và thiết lập chọn ảnh của album."
+          : "Nhập link Google Drive để hệ thống quét và tạo ảnh xem trước"
+      }
+      icon={
+        album ? (
+          <Pencil className="h-5 w-5" />
+        ) : (
+          <UploadCloud className="h-5 w-5" />
+        )
+      }
       contentClassName="max-w-lg"
       bodyClassName="space-y-4"
       footer={
@@ -143,7 +174,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             variant="brand"
             className="rounded-xl font-bold shadow-md shadow-brand-600/25"
           >
-            Tạo
+            {pending ? "Đang lưu…" : album ? "Lưu thay đổi" : "Tạo"}
           </Button>
         </>
       }
@@ -175,6 +206,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             id="album-name"
             type="text"
             value={name}
+            maxLength={120}
             onChange={(e) => setName(e.target.value)}
             placeholder="VD: Tiệc cưới Tuấn & Trang — Đà Lạt"
             className="h-11 rounded-2xl"
@@ -215,7 +247,9 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             </p>
           ) : (
             <p className="text-[11px] text-stone-400">
-              Để trống để Pickify tạo ID album ngẫu nhiên như hiện tại.
+              {album
+                ? "Để trống để sử dụng link chia sẻ gốc của album."
+                : "Để trống để Pickify tạo ID album ngẫu nhiên như hiện tại."}
             </p>
           )}
         </div>
@@ -235,6 +269,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             id="drive-url"
             type="url"
             value={folderUrl}
+            readOnly={!!album}
             onChange={(e) => setFolderUrl(e.target.value)}
             placeholder="https://drive.google.com/drive/folders/1aBcDeFgHiJk..."
             className="h-11 rounded-2xl font-mono text-xs"
@@ -242,34 +277,44 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
           <p className="text-[11px] text-stone-400 mt-1 flex items-center gap-1">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>
-              Chỉ quét file ảnh JPEG trực tiếp trong folder, giới hạn 1.500 ảnh,
-              tối đa 50MB/ảnh.
+              {album
+                ? "Nguồn ảnh được giữ nguyên. Tạo album mới nếu muốn dùng thư mục khác."
+                : "Chỉ quét file ảnh JPEG trực tiếp trong folder, giới hạn 1.500 ảnh, tối đa 50MB/ảnh."}
             </span>
           </p>
         </div>
 
         {/* Guest Passcode */}
-        <p className="rounded-xl bg-blue-50 p-3 text-xs text-blue-900">
-          Folder và ảnh bên trong phải được chia sẻ:{" "}
-          <strong>Bất kỳ ai có đường liên kết — Người xem</strong>. Không cần
-          kết nối tài khoản Drive.
-        </p>
+        {!album && (
+          <p className="rounded-xl bg-blue-50 p-3 text-xs text-blue-900">
+            Folder và ảnh bên trong phải được chia sẻ:{" "}
+            <strong>Bất kỳ ai có đường liên kết — Người xem</strong>. Không cần
+            kết nối tài khoản Drive.
+          </p>
+        )}
         <div className="space-y-1.5">
           <Label
             htmlFor="guest-passcode"
             className="text-xs font-bold text-stone-700 uppercase tracking-wider"
           >
-            Mật khẩu truy cập cho Khách (Passcode){" "}
-            <span className="text-rose-500">*</span>
+            {album ? (
+              "Mật khẩu mới (không bắt buộc)"
+            ) : (
+              <>
+                Mật khẩu truy cập cho Khách (Passcode){" "}
+                <span className="text-rose-500">*</span>
+              </>
+            )}
           </Label>
           <div className="relative">
             <Input
               id="guest-passcode"
-              type="text"
+              type={album ? "password" : "text"}
               value={passcode}
               onChange={(e) => setPasscode(e.target.value)}
-              placeholder="1234"
-              maxLength={10}
+              placeholder={album ? "Để trống để giữ mật khẩu hiện tại" : "1234"}
+              maxLength={128}
+              autoComplete="new-password"
               className="h-11 rounded-2xl font-mono tracking-wider pr-10"
             />
             <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
@@ -277,8 +322,9 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             </div>
           </div>
           <p className="text-[11px] text-stone-400 mt-1">
-            Khách bắt buộc phải nhập đúng mật khẩu này mới có thể xem ảnh và thả
-            tim.
+            {album
+              ? "Đổi mật khẩu sẽ kết thúc các phiên truy cập của khách hiện tại."
+              : "Khách bắt buộc phải nhập đúng mật khẩu này mới có thể xem ảnh và thả tim."}
           </p>
         </div>
 

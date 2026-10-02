@@ -1,8 +1,12 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import type { Album } from "@/features/photographer/types/album.types";
 import { AlbumCard } from "./components/AlbumCard";
 import { CreateAlbumCard } from "./components/CreateAlbumCard";
 import { PhotographerDashboardSkeleton } from "./components/PhotographerDashboardSkeleton";
+import { CreateAlbumModal } from "./components/CreateAlbumModal";
+import { ShareAlbumModal } from "../AlbumDetailPage/components/ShareAlbumModal";
+import { useUpdateAlbum } from "@/features/photographer/queries/album.mutations";
+import { errorMessage } from "@/api/errors";
 
 interface PhotographerDashboardPageProps {
   albums: Album[];
@@ -21,6 +25,9 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
   onCreateAlbum,
   pending = false,
 }) => {
+  const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
+  const [sharingAlbum, setSharingAlbum] = useState<Album | null>(null);
+  const updateAlbum = useUpdateAlbum();
   if (pending) {
     return <PhotographerDashboardSkeleton onCreateAlbum={onCreateAlbum} />;
   }
@@ -36,10 +43,44 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
             onSelect={onSelectAlbum}
             onRetry={onRetryAlbum}
             onDelete={onDeleteAlbum}
+            onEdit={setEditingAlbum}
+            onShare={setSharingAlbum}
           />
         ))}
       </div>
 
+      {editingAlbum && (
+        <CreateAlbumModal
+          key={editingAlbum.id}
+          album={editingAlbum}
+          isOpen
+          onClose={() => setEditingAlbum(null)}
+          onSubmit={async (form) => {
+            try {
+              await updateAlbum.mutateAsync({
+                albumId: editingAlbum.id,
+                input: {
+                  name: form.name,
+                  slug: form.slug,
+                  selectionLimit: form.selectionLimit,
+                  ...(form.passcode ? { password: form.passcode } : {}),
+                },
+              });
+              return { success: true };
+            } catch (error) {
+              return { success: false, error: errorMessage(error) };
+            }
+          }}
+        />
+      )}
+      {sharingAlbum && (
+        <ShareAlbumModal
+          shareId={sharingAlbum.slug ?? sharingAlbum.shareId}
+          albumTitle={sharingAlbum.title}
+          open
+          onOpenChange={(open) => !open && setSharingAlbum(null)}
+        />
+      )}
     </div>
   );
 };

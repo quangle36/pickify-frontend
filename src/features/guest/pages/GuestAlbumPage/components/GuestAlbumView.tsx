@@ -18,6 +18,7 @@ import { GuestPhotoCard } from "./GuestPhotoCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "@/components/ui/use-toast";
 
 interface GuestAlbumViewProps {
   album: Album;
@@ -44,15 +45,13 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [gridCols, setGridCols] = useState<2 | 3>(2); // Mobile first: 2 or 3 cols
   const [failedSaves, setFailedSaves] = useState<Record<string, boolean>>({}); // photoId -> boolean
-  const [limitNotice, setLimitNotice] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-  const limitNoticeTimer = useRef<number>();
+  const limitToast = useRef<ReturnType<typeof toast>>();
 
   useEffect(
     () => () => {
-      if (limitNoticeTimer.current)
-        window.clearTimeout(limitNoticeTimer.current);
+      limitToast.current?.dismiss();
     },
     [],
   );
@@ -71,12 +70,11 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
     album.selectionLimit !== null && selectedCount >= album.selectionLimit;
 
   const showLimitNotice = () => {
-    setLimitNotice(true);
-    if (limitNoticeTimer.current) window.clearTimeout(limitNoticeTimer.current);
-    limitNoticeTimer.current = window.setTimeout(
-      () => setLimitNotice(false),
-      3000,
-    );
+    limitToast.current?.dismiss();
+    limitToast.current = toast({
+      description: `Album chỉ cho phép chọn tối đa ${album.selectionLimit} ảnh. Hãy bỏ chọn một ảnh trước khi chọn ảnh khác.`,
+      duration: 3000,
+    });
   };
 
   const handleToggleHeart = async (photo: Photo) => {
@@ -173,19 +171,6 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
             <Lock className="h-4 w-4 text-rose-400" />
             <AlertDescription className="text-xs text-stone-200">
               Album đã khóa lựa chọn. Bạn vẫn có thể xem lại những ảnh đã chọn.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {/* Selection limit notice */}
-      {!readOnly && limitNotice && (
-        <div className="max-w-4xl mx-auto w-full px-4 pt-3">
-          <Alert className="bg-rose-950/80 border-rose-600/60 rounded-2xl text-xs text-rose-100 p-3">
-            <AlertCircle className="w-4 h-4 text-rose-400" />
-            <AlertDescription className="text-xs text-rose-100">
-              Album chỉ cho phép chọn tối đa {album.selectionLimit} ảnh. Hãy bỏ
-              chọn một ảnh trước khi chọn ảnh khác.
             </AlertDescription>
           </Alert>
         </div>
@@ -302,15 +287,6 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
                 Đã chọn <strong>{selectedCount}</strong> / {selectionTarget} ảnh
               </span>
             </div>
-            <div className="h-4 w-px bg-stone-700" />
-            <Button
-              variant="link"
-              size="sm"
-              onClick={onExitGuestView}
-              className="text-xs text-stone-400 hover:text-white font-medium p-0 h-auto"
-            >
-              Đóng
-            </Button>
           </div>
         </div>
       )}

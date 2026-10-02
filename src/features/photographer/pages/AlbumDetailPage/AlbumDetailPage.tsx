@@ -298,6 +298,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       />
       <ShareAlbumModal
         shareId={album.slug ?? album.shareId}
+        albumTitle={album.title}
         open={shareModalOpen}
         onOpenChange={setShareModalOpen}
       />

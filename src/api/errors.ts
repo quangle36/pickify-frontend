@@ -24,6 +24,7 @@ export const apiMessages: Record<string, string> = {
   SLUG_ALREADY_EXISTS:
     "Đường dẫn album này đã được sử dụng. Hãy chọn slug khác.",
   SELECTION_LIMIT_REACHED: "Album đã đạt đủ số lượng ảnh được phép chọn.",
+  SELECTION_LIMIT_BELOW_SELECTED: "Giới hạn không được thấp hơn số ảnh khách đã chọn.",
   ALBUM_SELECTION_LOCKED:
     "Album đã khóa lựa chọn. Liên hệ nhiếp ảnh gia nếu bạn cần thay đổi.",
   ALBUM_UNAVAILABLE: "Album chưa sẵn sàng, đã hết hạn hoặc đã bị xóa.",

@@ -5,12 +5,12 @@ import {
   Eye,
   Heart,
   LockKeyhole,
+  Share2,
   ShieldCheck,
 } from "lucide-react";
 import { AppModal } from "@/components/ui/app-modal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 type ShareMode = "view" | "interactive";
 
@@ -18,12 +18,16 @@ interface ShareAlbumModalProps {
   shareId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  albumTitle?: string;
+  passcode?: string;
 }
 
 export function ShareAlbumModal({
   shareId,
   open,
   onOpenChange,
+  albumTitle,
+  passcode,
 }: ShareAlbumModalProps) {
   const [copied, setCopied] = useState<ShareMode | null>(null);
   const [copyError, setCopyError] = useState(false);
@@ -58,98 +62,113 @@ export function ShareAlbumModal({
     <AppModal
       open={open}
       onOpenChange={handleOpenChange}
+      icon={<Share2 className="h-5 w-5 text-stone-700" />}
       title="Chia sẻ album"
-      description="Chọn quyền phù hợp trước khi gửi link cho khách."
-      contentClassName="max-w-xl"
-      bodyClassName="space-y-4"
+      description={
+        albumTitle
+          ? `${albumTitle} — Chọn quyền trước khi gửi link`
+          : "Chọn quyền phù hợp trước khi gửi link cho khách."
+      }
+      contentClassName="max-w-lg"
+      headerClassName="px-4 py-4 sm:px-6 sm:py-5 border-b border-stone-100"
+      bodyClassName="space-y-3.5 bg-white px-4 py-4 sm:px-6 sm:py-5"
       onOpenAutoFocus={(event) => event.preventDefault()}
-    >
-      <section className="rounded-2xl border border-stone-200 bg-white p-4 shadow-xs">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-            <Eye className="h-5 w-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="font-extrabold text-stone-900">Link chỉ xem</h3>
-              <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-blue-700">
-                Không cần pass
-              </span>
-            </div>
-            <p className="mt-1 text-xs leading-relaxed text-stone-500">
-              Khách có thể xem toàn bộ ảnh nhưng không thấy và không thể sử dụng
-              nút thả tim.
-            </p>
-          </div>
+      footer={
+        <div className="flex w-full items-center justify-between text-xs text-stone-500">
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <span className="hidden sm:inline">Nhấn sao chép để gửi khách</span>
+            <span className="sm:hidden">1 chạm sao chép</span>
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleOpenChange(false)}
+            className="h-8 sm:h-9 rounded-xl px-4 text-xs font-semibold"
+          >
+            Đóng
+          </Button>
         </div>
-        <div className="mt-4 flex gap-2">
-          <Input
-            readOnly
-            value={viewOnlyLink}
-            aria-label="Link album chỉ xem"
-            className="h-10 min-w-0 rounded-xl bg-stone-50 font-mono text-xs"
-          />
+      }
+      footerClassName="border-t border-stone-100 bg-white px-4 py-3 sm:px-6"
+    >
+      {/* Item 1: Link chọn ảnh (Hành động chính) */}
+      <section className="rounded-2xl border border-stone-300 bg-stone-50/60 p-3 sm:p-4 shadow-xs transition-all hover:border-stone-400">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-white shadow-xs">
+              <Heart className="h-4 w-4 fill-white" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="truncate text-xs sm:text-sm font-bold text-stone-950">
+                Link khách chọn ảnh
+              </h3>
+            </div>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-stone-300 bg-stone-200 px-2.5 py-0.5 text-xs font-bold text-stone-800">
+            <LockKeyhole className="h-3 w-3" />
+            {passcode ? `Pass: ${passcode}` : "Có pass"}
+          </span>
+        </div>
+
+        {/* Thanh link + nút copy responsive */}
+        <div className="mt-2.5 flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white p-1 shadow-xs">
+          <span className="flex-1 select-all truncate px-2.5 font-mono text-xs text-stone-600">
+            {interactiveLink}
+          </span>
+          <Button
+            type="button"
+            onClick={() => void copyLink("interactive")}
+            className="h-8 sm:h-9 shrink-0 gap-1.5 rounded-lg bg-stone-900 px-3 sm:px-3.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-stone-800 active:scale-[0.98]"
+          >
+            {copied === "interactive" ? (
+              <Check className="h-3.5 w-3.5 text-emerald-400" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+            <span>{copied === "interactive" ? "Đã chép" : "Sao chép"}</span>
+          </Button>
+        </div>
+      </section>
+
+      {/* Item 2: Link chỉ xem (Người thân / Bạn bè) */}
+      <section className="rounded-2xl border border-stone-200 bg-white p-3 sm:p-4 shadow-xs transition-all hover:border-stone-300">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-700">
+              <Eye className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="truncate text-xs sm:text-sm font-bold text-stone-900">
+                Link người thân chỉ xem
+              </h3>
+            </div>
+          </div>
+          <span className="shrink-0 rounded-full border border-stone-200 bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600">
+            Công khai
+          </span>
+        </div>
+
+        {/* Thanh link + nút copy responsive */}
+        <div className="mt-2.5 flex items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 p-1">
+          <span className="flex-1 select-all truncate px-2.5 font-mono text-xs text-stone-600">
+            {viewOnlyLink}
+          </span>
           <Button
             type="button"
             variant="outline"
             onClick={() => void copyLink("view")}
-            className="shrink-0 gap-2"
+            className="h-8 sm:h-9 shrink-0 gap-1.5 rounded-lg border-stone-300 bg-white px-3 sm:px-3.5 text-xs font-semibold text-stone-800 transition-all hover:bg-stone-100 hover:text-stone-900 active:scale-[0.98]"
           >
             {copied === "view" ? (
-              <Check className="h-4 w-4 text-emerald-600" />
+              <Check className="h-3.5 w-3.5 text-emerald-600" />
             ) : (
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3.5 w-3.5 text-stone-500" />
             )}
-            {copied === "view" ? "Đã chép" : "Sao chép"}
+            <span>{copied === "view" ? "Đã chép" : "Sao chép"}</span>
           </Button>
         </div>
       </section>
-
-      <section className="rounded-2xl border border-rose-200 bg-white p-4 shadow-xs">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
-            <Heart className="h-5 w-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="font-extrabold text-stone-900">Link chọn ảnh</h3>
-              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-700">
-                <LockKeyhole className="h-3 w-3" /> Có pass
-              </span>
-            </div>
-            <p className="mt-1 text-xs leading-relaxed text-stone-500">
-              Khách nhập mật khẩu album để xem ảnh và thả tim những ảnh muốn
-              chọn.
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 flex gap-2">
-          <Input
-            readOnly
-            value={interactiveLink}
-            aria-label="Link album chọn ảnh"
-            className="h-10 min-w-0 rounded-xl bg-stone-50 font-mono text-xs"
-          />
-          <Button
-            type="button"
-            variant="brand"
-            onClick={() => void copyLink("interactive")}
-            className="shrink-0 gap-2"
-          >
-            {copied === "interactive" ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-            {copied === "interactive" ? "Đã chép" : "Sao chép"}
-          </Button>
-        </div>
-      </section>
-
-      <div className="flex items-center gap-2 text-[11px] text-stone-500">
-        <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-        Chỉ link chọn ảnh mới có quyền gửi thay đổi lên Pickify.
-      </div>
 
       {copyError && (
         <Alert variant="destructive">

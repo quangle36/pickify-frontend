@@ -1,23 +1,32 @@
-import { FC, useEffect, useState, MouseEvent } from "react";
+import { FC, useEffect, useState } from "react";
 import type { Album } from "@/features/photographer/types/album.types";
 import {
   RefreshCw,
   AlertTriangle,
   Heart,
   Trash2,
-  ChevronRight,
-  Lock,
+  MoreHorizontal,
+  Pencil,
+  Share2,
   ImageIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 interface AlbumCardProps {
   album: Album;
   onSelect: (id: string) => void;
   onRetry: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (album: Album) => void;
+  onShare: (album: Album) => void;
 }
 
 export const AlbumCard: FC<AlbumCardProps> = ({
@@ -25,15 +34,17 @@ export const AlbumCard: FC<AlbumCardProps> = ({
   onSelect,
   onRetry,
   onDelete,
+  onEdit,
+  onShare,
 }) => {
   const [coverFailed, setCoverFailed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     setCoverFailed(false);
   }, [album.coverUrl]);
 
-  const handleDelete = (e: MouseEvent) => {
-    e.stopPropagation();
+  const handleDelete = () => {
     if (
       window.confirm(
         `Bạn có chắc chắn muốn xóa album "${album.title}" không? Khách hàng sẽ không thể truy cập nữa.`,
@@ -54,7 +65,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
           <img
             src={album.coverUrl}
             alt={album.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+            className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04] ${menuOpen ? "scale-[1.04]" : ""}`}
             loading="lazy"
             onError={() => setCoverFailed(true)}
           />
@@ -114,87 +125,102 @@ export const AlbumCard: FC<AlbumCardProps> = ({
         )}
 
         {/* Title and bottom info over image */}
-        <div className="absolute bottom-3 left-3 right-3 text-white">
-          <h3 className="font-extrabold text-base sm:text-lg line-clamp-1 group-hover:text-amber-200 transition-colors">
-            {album.title}
-          </h3>
-          <div className="flex items-center gap-3 text-xs text-stone-300 mt-1 font-medium">
-            <span>{album.totalPhotos} ảnh</span>
-            <span>•</span>
-            <span className="flex items-center gap-1 text-rose-400 font-bold">
-              <Heart className="w-3.5 h-3.5 fill-rose-400" />
-              {album.selectedPhotosCount}/
-              {album.selectionLimit ?? album.totalPhotos} đã chọn
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1 text-stone-300 font-mono text-[11px]">
-              <Lock className="w-3 h-3 text-stone-400" />
-              {"••••"}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Body Content */}
-      <div className="border-t border-stone-100 px-4 py-2.5 flex flex-col gap-2.5">
-        {/* Progress bar if importing */}
-        {album.status === "importing" && (
-          <div className="space-y-1.5 bg-blue-50/70 p-3 rounded-2xl border border-blue-100">
-            <div className="flex justify-between text-xs font-semibold text-blue-900">
-              <span className="flex items-center gap-1.5">
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-600" />
-                Đang tối ưu & lưu ảnh vào hệ thống
+        <div className="absolute bottom-3 left-3 right-3 z-10 flex items-end justify-between gap-3 text-white">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-extrabold text-base sm:text-lg line-clamp-1 group-hover:text-amber-200 transition-colors">
+              {album.title}
+            </h3>
+            <div className="flex items-center gap-3 text-xs text-stone-300 mt-1 font-medium">
+              <span>{album.totalPhotos} ảnh</span>
+              <span>•</span>
+              <span className="flex items-center gap-1 text-rose-400 font-bold">
+                <Heart className="w-3.5 h-3.5 fill-rose-400" />
+                {album.selectedPhotosCount}/
+                {album.selectionLimit ?? album.totalPhotos} đã chọn
               </span>
             </div>
-            <div className="h-1.5 w-full bg-blue-200/70 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-600 animate-pulse w-full rounded-full" />
-            </div>
-            <p className="text-[11px] text-blue-700">
-              Ảnh được xử lý ngầm, bấm vào album để xem các ảnh đã hoàn thành.
-            </p>
           </div>
-        )}
 
-        {/* Error message if needs attention */}
-        {album.status === "needs_attention" && (
-          <div className="space-y-2 bg-rose-50 p-3.5 rounded-2xl border border-rose-200 text-xs">
-            <p className="text-rose-800 font-medium leading-relaxed">
-              {album.errorMessage ||
-                "Phát hiện ảnh lỗi hoặc vượt quá giới hạn 50MB."}
-            </p>
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRetry(album.id);
-              }}
-              className="gap-1.5 rounded-xl font-bold"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Thử lại phần chưa hoàn thành</span>
-            </Button>
-          </div>
-        )}
-
-        {/* Card Footer Actions */}
-        <div className="flex items-center justify-end gap-2">
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={handleDelete}
-              className="text-stone-400 hover:text-rose-600 hover:bg-rose-50"
-              title="Xóa album"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-            <div className="p-1.5 text-stone-400 group-hover:text-stone-900 group-hover:translate-x-0.5 transition-all">
-              <ChevronRight className="w-4 h-4" />
-            </div>
+          <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Thao tác với album ${album.title}`}
+                  className="h-8 w-8 rounded-xl bg-black/40 text-white hover:bg-black/60 hover:text-white backdrop-blur-xs"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <DropdownMenuItem onSelect={() => onEdit(album)}>
+                  <Pencil />
+                  Chỉnh sửa
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => onShare(album)}>
+                  <Share2 />
+                  Chia sẻ
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={handleDelete}
+                  className="text-rose-700 focus:bg-rose-50 focus:text-rose-700"
+                >
+                  <Trash2 />
+                  Xóa
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
+
+      {(album.status === "importing" || album.status === "needs_attention") && (
+        <div className="border-t border-stone-100 px-4 py-2.5 flex flex-col gap-2.5">
+          {/* Progress bar if importing */}
+          {album.status === "importing" && (
+            <div className="space-y-1.5 bg-blue-50/70 p-3 rounded-2xl border border-blue-100">
+              <div className="flex justify-between text-xs font-semibold text-blue-900">
+                <span className="flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                  Đang tối ưu & lưu ảnh vào hệ thống
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-blue-200/70 rounded-full overflow-hidden">
+                <div className="h-full bg-blue-600 animate-pulse w-full rounded-full" />
+              </div>
+              <p className="text-[11px] text-blue-700">
+                Ảnh được xử lý ngầm, bấm vào album để xem các ảnh đã hoàn thành.
+              </p>
+            </div>
+          )}
+
+          {/* Error message if needs attention */}
+          {album.status === "needs_attention" && (
+            <div className="space-y-2 bg-rose-50 p-3.5 rounded-2xl border border-rose-200 text-xs">
+              <p className="text-rose-800 font-medium leading-relaxed">
+                {album.errorMessage ||
+                  "Phát hiện ảnh lỗi hoặc vượt quá giới hạn 50MB."}
+              </p>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRetry(album.id);
+                }}
+                className="gap-1.5 rounded-xl font-bold"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Thử lại phần chưa hoàn thành</span>
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
     </Card>
   );
 };

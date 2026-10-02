@@ -14,6 +14,13 @@ export interface SelectedFileManifest {
   files: Array<{ name: string }>;
 }
 
+export interface UpdateAlbumInput {
+  name: string;
+  slug: string;
+  selectionLimit: number;
+  password?: string;
+}
+
 export const albumService = {
   getAlbums: async (signal?: AbortSignal) => {
     const result = await apiRequest<{ albums: Album[] }>({
@@ -32,6 +39,13 @@ export const albumService = {
 
   createAlbum: (input: CreateAlbumInput) =>
     apiRequest<Album>({ url: "/albums", method: "POST", data: input }),
+
+  updateAlbum: (albumId: string, input: UpdateAlbumInput) =>
+    apiRequest<Album>({
+      url: `/albums/${albumId}`,
+      method: "PUT",
+      data: input,
+    }),
 
   retryAlbum: (albumId: string) =>
     apiRequest<Album>({ url: `/albums/${albumId}/retry`, method: "POST" }),
