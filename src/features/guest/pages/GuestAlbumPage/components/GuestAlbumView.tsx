@@ -4,7 +4,6 @@ import type { Photo } from "@/features/photo/types/photo.types";
 import type { Album } from "@/features/photographer/types/album.types";
 import {
   Heart,
-  Search,
   ArrowLeft,
   AlertCircle,
   Lock,
@@ -15,6 +14,7 @@ import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
 import { usePhotoSelection } from "@/features/photo/queries/photo.mutations";
 import { LightboxModal } from "@/features/photo/components/LightboxModal";
 import { GuestPhotoCard } from "./GuestPhotoCard";
+import { GuestAlbumCover } from "./GuestAlbumCover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -47,6 +47,10 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   const [failedSaves, setFailedSaves] = useState<Record<string, boolean>>({}); // photoId -> boolean
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const coverFallback = useRef<{ albumId: string; url?: string }>({ albumId: album.id });
+  if (coverFallback.current.albumId !== album.id) coverFallback.current = { albumId: album.id };
+  if (!coverFallback.current.url) coverFallback.current.url = photos.find((photo) => photo.status === "ready")?.displayUrl;
+  const galleryRef = useRef<HTMLDivElement>(null);
   const limitToast = useRef<ReturnType<typeof toast>>();
 
   useEffect(
@@ -107,193 +111,112 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
     return true;
   });
 
-  return (
-    <div
-      className={`min-h-screen bg-stone-900 text-stone-100 flex flex-col font-sans ${readOnly ? "pb-8" : "pb-24"}`}
-    >
-      {/* Sticky Mobile-First Header */}
-      <header className="sticky top-0 z-30 bg-stone-900/90 backdrop-blur-md border-b border-stone-800 px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={onExitGuestView}
-              className="text-stone-400 hover:text-white hover:bg-stone-800 rounded-xl"
-              title="Thoát chế độ xem của khách"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div className="min-w-0">
-              <h1 className="text-sm sm:text-base font-extrabold text-white truncate">
-                {album.title}
-              </h1>
-              <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>
-                  {readOnly ? "Chế độ chỉ xem" : "Lựa chọn được lưu tự động"}
-                </span>
-              </div>
-            </div>
-          </div>
+  const showSelectedPhotos = () => {
+    setSearchTerm("");
+    setFilterOnlyHearts(true);
+    galleryRef.current?.scrollIntoView({ block: "start" });
+  };
 
-          {/* Hearts Count Pill */}
-          {!readOnly && (
-            <Button
-              size="sm"
-              onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
-              variant={filterOnlyHearts ? "default" : "secondary"}
-              className={`rounded-2xl text-xs font-bold gap-1.5 shrink-0 ${
-                filterOnlyHearts
-                  ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/30"
-                  : "bg-stone-800 text-stone-300 hover:text-white border-stone-700 hover:bg-stone-700"
-              }`}
-            >
-              <Heart
-                className={`w-4 h-4 ${
-                  filterOnlyHearts
-                    ? "fill-white text-white"
-                    : "fill-rose-500 text-rose-500"
-                }`}
-              />
-              <span>
-                {selectedCount}/{selectionTarget}
-              </span>
-            </Button>
-          )}
+  return (
+    <div className={`guest-album min-h-screen bg-background text-foreground flex flex-col ${readOnly ? "pb-8" : "pb-28"}`}>
+      <header className="border-b border-border bg-card px-4 py-3 md:px-6 md:py-4">
+        <div className="mx-auto flex max-w-[1392px] items-center justify-between gap-3">
+          <span className="flex items-center gap-2 text-sm font-semibold"><Heart className="h-5 w-5 text-primary" />Pickify</span>
+          <span className="hidden text-xs text-muted-foreground sm:block">Album chọn ảnh cho khách</span>
+          <Button variant="ghost" size="icon" onClick={onExitGuestView} className="h-10 w-10 text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Rời album" title="Rời album">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
         </div>
       </header>
 
-      {/* Locked selection notice */}
-      {!readOnly && selectionLocked && (
-        <div className="max-w-4xl mx-auto w-full px-4 pt-3">
-          <Alert className="rounded-2xl border-stone-700 bg-stone-800/90 p-3 text-stone-200">
-            <Lock className="h-4 w-4 text-rose-400" />
-            <AlertDescription className="text-xs text-stone-200">
-              Album đã khóa lựa chọn. Bạn vẫn có thể xem lại những ảnh đã chọn.
-            </AlertDescription>
+      <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 pt-5 md:px-6 md:pt-6">
+        <GuestAlbumCover album={album} fallbackUrl={coverFallback.current.url} readOnly={readOnly} />
+        {!readOnly && selectionLocked && (
+          <Alert className="mb-4 rounded-xl border-border bg-muted text-foreground">
+            <Lock className="h-4 w-4 text-muted-foreground" />
+            <AlertDescription>Album đã khóa lựa chọn. Bạn vẫn có thể xem lại những ảnh đã chọn.</AlertDescription>
           </Alert>
-        </div>
-      )}
-
-      {/* Network Error Alert Notice if any */}
-      {!readOnly && Object.values(failedSaves).some(Boolean) && (
-        <div className="max-w-4xl mx-auto w-full px-4 pt-3">
-          <Alert className="bg-amber-950/80 border-amber-600/60 rounded-2xl text-xs text-amber-200 flex items-center justify-between gap-2 p-3">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-              <AlertDescription className="text-xs text-amber-200">
-                Kết nối mạng gián đoạn. Có ảnh chưa lưu vào máy chủ.
-              </AlertDescription>
-            </div>
-            <span className="text-[11px] font-bold underline cursor-pointer">
-              Bấm vào ảnh để thử lại
-            </span>
-          </Alert>
-        </div>
-      )}
-
-      {/* Filters and Controls */}
-      <div className="max-w-4xl mx-auto w-full px-4 py-3 flex items-center justify-between gap-3">
-        {/* Search */}
-        <div className="relative flex-1">
-          <Input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm mã ảnh (VD: 0012)..."
-            className="pl-8 pr-3 h-9 rounded-xl bg-stone-800 border-stone-700 text-stone-100 placeholder:text-stone-500 text-xs font-mono focus:border-brand-500"
-          />
-          <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
-
-        {/* Filter & Grid Cols */}
-        <div className="flex items-center gap-2">
-          {!readOnly && (
-            <Button
-              size="sm"
-              variant={filterOnlyHearts ? "default" : "outline"}
-              onClick={() => setFilterOnlyHearts(!filterOnlyHearts)}
-              className={`rounded-xl text-xs font-semibold gap-1.5 h-9 ${
-                filterOnlyHearts
-                  ? "bg-rose-600 hover:bg-rose-700 text-white"
-                  : "bg-stone-800 text-stone-400 hover:text-white border-stone-700 hover:bg-stone-700"
-              }`}
-            >
-              <span>Đã tim</span>
-            </Button>
-          )}
-
-          <Button
-            size="icon-sm"
-            variant="outline"
-            onClick={() => setGridCols(gridCols === 2 ? 3 : 2)}
-            className="h-9 w-9 rounded-xl bg-stone-800 border-stone-700 text-stone-400 hover:text-white hover:bg-stone-700"
-            title="Đổi số cột hiển thị"
-          >
-            {gridCols === 2 ? (
-              <Grid className="w-4 h-4" />
-            ) : (
-              <Columns className="w-4 h-4" />
-            )}
-          </Button>
-        </div>
-      </div>
-
-      {/* Photo Grid */}
-      <main className="max-w-4xl mx-auto w-full px-3 sm:px-4 flex-1">
-        {filteredPhotos.length > 0 ? (
-          <div
-            className={`grid gap-2 sm:gap-3 ${
-              gridCols === 2 ? "grid-cols-2" : "grid-cols-3"
-            }`}
-          >
-            {filteredPhotos.map((photo, index) => (
-              <GuestPhotoCard
-                key={photo.id}
-                photo={photo}
-                isFailed={photoSelection.isFailed(photo.id)}
-                isPending={photoSelection.isPending(photo.id)}
-                onClick={() => {
-                  setLightboxIndex(index);
-                  setLightboxOpen(true);
-                }}
-                onToggleHeart={handleToggleHeart}
-                onRetrySave={handleRetrySave}
-                selectionEnabled={!readOnly && !selectionLocked}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="py-20 text-center text-stone-500 space-y-3">
-            <Heart className="w-12 h-12 mx-auto stroke-1 text-stone-600" />
-            <p className="text-sm">Không tìm thấy ảnh nào.</p>
-          </div>
         )}
-        <InfinitePhotoLoader
-          hasMore={hasMorePhotos}
-          loading={loadingMorePhotos}
-          onLoadMore={onLoadMorePhotos}
-        />
+        {!readOnly && Object.values(failedSaves).some(Boolean) && (
+          <Alert className="mb-4 rounded-xl border-amber-800 bg-amber-950 text-amber-200">
+            <AlertCircle className="h-4 w-4 text-amber-400" />
+            <AlertDescription>Kết nối mạng gián đoạn. Có ảnh chưa lưu vào máy chủ. Bấm “Thử lại” trên ảnh để lưu lại.</AlertDescription>
+          </Alert>
+        )}
+
+        <div id="guest-gallery" ref={galleryRef} className="scroll-mt-4">
+          <div className="sticky top-0 z-20 flex flex-wrap items-center gap-2 border-t border-border bg-background py-4 md:gap-3">
+            <Input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              aria-label="Tìm mã ảnh"
+              placeholder="Tìm mã ảnh"
+              className="h-11 min-w-0 basis-full rounded-xl border-border bg-card text-base text-foreground placeholder:text-muted-foreground md:h-10 md:max-w-[360px] md:flex-1 md:basis-auto md:text-sm"
+            />
+            <div className="flex min-w-0 items-center gap-1" role="group" aria-label="Lọc ảnh">
+              <Button variant="ghost" aria-pressed={!filterOnlyHearts} onClick={() => setFilterOnlyHearts(false)} className={`min-h-10 gap-2 px-3 hover:bg-muted hover:text-foreground ${!filterOnlyHearts ? "bg-muted text-foreground" : "text-muted-foreground"}`}>
+                Tất cả <span className="text-xs font-normal tabular-nums text-muted-foreground">{album.totalPhotos}</span>
+              </Button>
+              {!readOnly && (
+                <Button variant="ghost" aria-pressed={filterOnlyHearts} onClick={() => setFilterOnlyHearts(true)} className={`min-h-10 gap-2 px-3 hover:bg-muted hover:text-foreground ${filterOnlyHearts ? "bg-muted text-foreground" : "text-muted-foreground"}`}>
+                  Đã chọn <span className="text-xs font-normal tabular-nums text-muted-foreground">{selectedCount}</span>
+                </Button>
+              )}
+            </div>
+            <Button size="icon" variant="outline" onClick={() => setGridCols(gridCols === 2 ? 3 : 2)} className="ml-auto h-10 w-10 shrink-0 border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Đổi số cột ảnh" title="Đổi số cột ảnh">
+              {gridCols === 2 ? <Grid className="h-5 w-5" /> : <Columns className="h-5 w-5" />}
+            </Button>
+          </div>
+
+          {filteredPhotos.length > 0 ? (
+            <div className={`grid gap-3 ${gridCols === 2 ? "grid-cols-2 md:grid-cols-3" : "grid-cols-3 md:grid-cols-4"}`}>
+              {filteredPhotos.map((photo, index) => (
+                <GuestPhotoCard
+                  key={photo.id}
+                  photo={photo}
+                  isFailed={photoSelection.isFailed(photo.id)}
+                  isPending={photoSelection.isPending(photo.id)}
+                  onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }}
+                  onToggleHeart={handleToggleHeart}
+                  onRetrySave={handleRetrySave}
+                  selectionEnabled={!readOnly && !selectionLocked}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-border bg-card px-5 py-16 text-center">
+              <h2 className="text-lg font-semibold">{searchTerm ? "Không tìm thấy ảnh" : filterOnlyHearts ? "Chưa có ảnh đã chọn" : "Album chưa có ảnh"}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">{searchTerm ? `Không có ảnh khớp với mã “${searchTerm}”.` : filterOnlyHearts ? "Thả tim trên ảnh để thêm vào lựa chọn của bạn." : "Ảnh sẽ xuất hiện ở đây khi album sẵn sàng."}</p>
+              {(searchTerm || filterOnlyHearts) && <Button variant="outline" className="mt-5 border-border bg-muted text-foreground hover:bg-card hover:text-foreground" onClick={() => { setSearchTerm(""); setFilterOnlyHearts(false); }}>Xem tất cả ảnh</Button>}
+            </div>
+          )}
+          <InfinitePhotoLoader hasMore={hasMorePhotos} loading={loadingMorePhotos} onLoadMore={onLoadMorePhotos} />
+        </div>
       </main>
 
-      {/* Floating Bottom Bar on Mobile */}
       {!readOnly && (
-        <div className="fixed bottom-3 inset-x-0 z-20 flex justify-center px-4 pointer-events-none">
-          <div className="bg-stone-800/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-stone-700/80 flex items-center gap-4 backdrop-blur-md pointer-events-auto">
-            <div className="flex items-center gap-2 text-xs">
-              <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
-              <span>
-                Đã chọn <strong>{selectedCount}</strong> / {selectionTarget} ảnh
-              </span>
+        <div className="pointer-events-none fixed inset-x-0 bottom-[max(12px,env(safe-area-inset-bottom))] z-30 flex justify-center px-4 md:bottom-4 md:px-6">
+          <div className="pointer-events-auto flex w-full max-w-[520px] items-center justify-between gap-3 rounded-2xl border border-border bg-muted p-3 md:gap-6 md:px-4">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold tabular-nums">Đã chọn <span className="text-primary">{selectedCount}</span> / {selectionTarget}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{selectionLocked ? "Lựa chọn đã khóa" : "Tự động lưu"}</p>
             </div>
+            <Button variant={selectionLocked ? "outline" : "default"} onClick={showSelectedPhotos} className={`shrink-0 gap-2 px-3 md:px-4 ${selectionLocked ? "border-border bg-card text-foreground hover:bg-background hover:text-foreground" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}>
+              <Heart className="h-4 w-4" />Xem {selectedCount} ảnh
+            </Button>
           </div>
         </div>
       )}
 
       {/* Lightbox for Guest View */}
       <LightboxModal
+        commentsBasePath={readOnly ? undefined : `/public/albums/${album.shareId}`}
+        canComment={!readOnly}
         photos={filteredPhotos}
+        hasMorePhotos={hasMorePhotos}
+        loadingMorePhotos={loadingMorePhotos}
+        onLoadMorePhotos={onLoadMorePhotos}
         totalPhotos={album.totalPhotos}
         currentIndex={lightboxIndex}
         isOpen={lightboxOpen}

@@ -102,3 +102,29 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* Approved guest album B: scoped dark palette, including the lighter rose accent. */
+.guest-album {
+  color-scheme: dark;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --background: 20 14% 8%;
+  --foreground: 40 20% 98%;
+  --card: 20 14% 10%;
+  --card-foreground: 40 20% 98%;
+  --muted: 20 10% 16%;
+  --muted-foreground: 25 5% 65%;
+  --border: 20 10% 20%;
+  --input: 20 10% 20%;
+  --primary: 347 89% 70%;
+  --primary-foreground: 20 14% 12%;
+}
+
+html:has(.guest-album) {
+  color-scheme: dark;
+}
+
+body:has(.guest-album),
+.app-shell:has(.guest-album) {
+  background: hsl(20 14% 8%);
+  color-scheme: dark;
+}

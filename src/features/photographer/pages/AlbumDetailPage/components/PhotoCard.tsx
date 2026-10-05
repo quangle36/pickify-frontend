@@ -1,6 +1,6 @@
 import { FC } from "react";
 import type { Photo } from "@/features/photo/types/photo.types";
-import { Heart } from "lucide-react";
+import { MessageSquare, Heart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { preloadImage } from "@/features/photo/utils/imagePreloader";
 
@@ -9,10 +9,7 @@ interface PhotoCardProps {
   onClick: () => void;
 }
 
-export const PhotoCard: FC<PhotoCardProps> = ({
-  photo,
-  onClick,
-}) => {
+export const PhotoCard: FC<PhotoCardProps> = ({ photo, onClick }) => {
   return (
     <Card
       onClick={photo.status === "ready" ? onClick : undefined}
@@ -79,6 +76,16 @@ export const PhotoCard: FC<PhotoCardProps> = ({
           {photo.errorReason}
         </span>
       )}
+      {!!photo.commentCount && (
+        <div
+          className="absolute bottom-7 left-2 flex items-center gap-1 rounded-lg bg-black/70 px-2 py-1 text-xs text-white"
+          aria-label={`${photo.commentCount} bình luận`}
+        >
+          <MessageSquare className="h-3.5 w-3.5" />
+          {photo.commentCount}
+        </div>
+      )}
+
       {/* Bottom Label */}
       <div
         className={`absolute bottom-2 left-2.5 right-2.5 text-[11px] font-mono pointer-events-none ${photo.status === "ready" ? "text-stone-200" : "text-stone-600"}`}

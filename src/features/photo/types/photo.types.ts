@@ -10,6 +10,12 @@ export interface Photo {
   originalUrl: string;
   isSelected: boolean;
   selectedAt?: string;
+  commentCount?: number;
+  sourceId?: string | null;
+  sourceLabel?: string;
+  capturedAt?: string | null;
+  correctedCapturedAt?: string | null;
+  captureTimeOverridden?: boolean;
   sizeBytes: number;
   dimensions: {
     width: number;
@@ -28,4 +34,15 @@ export interface PhotoPage {
 export interface PhotoFilters {
   selected: boolean;
   search: string;
+}
+
+export interface PhotoComment {
+  id: string;
+  photoId: string;
+  content: string;
+  createdAt: string;
+}
+export interface CommentPage {
+  comments: PhotoComment[];
+  nextCursor: string | null;
 }

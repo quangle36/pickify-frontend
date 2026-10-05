@@ -28,7 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col font-sans">
+    <div className="app-shell min-h-screen bg-stone-50 flex flex-col font-sans">
       {children}
       <Toaster />
     </div>

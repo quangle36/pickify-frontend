@@ -8,9 +8,11 @@ import {
   Loader2,
   Square,
 } from "lucide-react";
+import type { AlbumSource } from "@/features/photographer/types/album.types";
 import { albumService } from "@/features/photographer/services/album.service";
 import {
   PHOTO_FORMATS,
+  cameraDestinationName,
   copyMatches,
   createMatchPlan,
   listTopLevelFiles,
@@ -34,6 +36,7 @@ import {
 
 interface LocalPhotoFilterModalProps {
   albumId: string;
+  sources?: AlbumSource[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -53,9 +56,12 @@ function readableError(error: unknown) {
 
 export function LocalPhotoFilterModal({
   albumId,
+  sources = [],
   open,
   onOpenChange,
 }: LocalPhotoFilterModalProps) {
+  const [cameraSourceId, setCameraSourceId] = useState("");
+  const multipleCameras = sources.length > 1;
   const [format, setFormat] = useState<PhotoFormat | "">("");
   const [source, setSource] = useState<FileSystemDirectoryHandle | null>(null);
   const [destination, setDestination] =
@@ -79,6 +85,7 @@ export function LocalPhotoFilterModal({
 
   const closeModal = () => {
     if (running) return;
+    setCameraSourceId("");
     setFormat("");
     setSource(null);
     setDestination(null);
@@ -109,7 +116,12 @@ export function LocalPhotoFilterModal({
   };
 
   const startFiltering = async () => {
-    if (!format || !source || !destination) {
+    if (
+      !format ||
+      !source ||
+      !destination ||
+      (multipleCameras && !cameraSourceId)
+    ) {
       setError("Hãy chọn định dạng, thư mục nguồn và thư mục đích.");
       return;
     }
@@ -120,9 +132,15 @@ export function LocalPhotoFilterModal({
       if (await source.isSameEntry(destination)) {
         throw new Error("Thư mục nguồn và thư mục đích phải khác nhau.");
       }
-      const manifest = await albumService.getSelectedFiles(albumId);
+      const manifest = await albumService.getSelectedFiles(
+        albumId,
+        undefined,
+        multipleCameras ? cameraSourceId : undefined,
+      );
       if (manifest.files.length === 0) {
-        throw new Error("Album hiện không có ảnh nào được khách thả tim.");
+        throw new Error(
+          "Máy đã chọn hiện không có ảnh nào được khách thả tim.",
+        );
       }
       const sourceFiles = await listTopLevelFiles(source);
       const plan = createMatchPlan(
@@ -131,7 +149,15 @@ export function LocalPhotoFilterModal({
         format,
       );
       setTotal(plan.matches.length);
-      const copy = await copyMatches(plan.matches, destination, {
+      const camera = sources.find((item) => item.id === cameraSourceId);
+      const targetDirectory =
+        multipleCameras && camera
+          ? await destination.getDirectoryHandle(
+              cameraDestinationName(camera.label, camera.id),
+              { create: true },
+            )
+          : destination;
+      const copy = await copyMatches(plan.matches, targetDirectory, {
         shouldStop: () => stopRequested.current,
         onProgress: (nextCompleted, name) => {
           setCompleted(nextCompleted);
@@ -177,7 +203,12 @@ export function LocalPhotoFilterModal({
             {supported && (
               <Button
                 variant="dark"
-                disabled={!format || !source || !destination}
+                disabled={
+                  !format ||
+                  !source ||
+                  !destination ||
+                  (multipleCameras && !cameraSourceId)
+                }
                 onClick={() => void startFiltering()}
                 className="gap-2"
               >
@@ -200,6 +231,36 @@ export function LocalPhotoFilterModal({
         </Alert>
       ) : (
         <>
+          {multipleCameras && (
+            <div className="space-y-2">
+              <Label htmlFor="local-camera-source">Máy ảnh cần lấy file</Label>
+              <Select
+                value={cameraSourceId}
+                disabled={running}
+                onValueChange={(value) => {
+                  setCameraSourceId(value);
+                  setSource(null);
+                  setDestination(null);
+                  resetRun();
+                }}
+              >
+                <SelectTrigger id="local-camera-source">
+                  <SelectValue placeholder="Chọn máy ảnh" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sources.map((camera) => (
+                    <SelectItem key={camera.id} value={camera.id}>
+                      {camera.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-stone-500">
+                Chọn thư mục ảnh gốc của máy này. Ảnh được lưu trong thư mục con
+                riêng cho từng máy để tránh trùng tên.
+              </p>
+            </div>
+          )}
           <div className="space-y-2">
             <Label
               htmlFor="local-photo-format"

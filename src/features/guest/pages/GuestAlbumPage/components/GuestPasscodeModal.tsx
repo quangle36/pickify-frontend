@@ -1,13 +1,11 @@
-import { FC, useState, FormEvent } from 'react';
-import { errorMessage } from "@/api/errors";
-import { useGuestVerificationMutation } from "@/features/guest/queries/guest.mutations";
+import { FC, useId, useState, FormEvent } from 'react';
+import { Eye, EyeOff, Heart } from 'lucide-react';
+import { errorMessage } from '@/api/errors';
+import { useGuestVerificationMutation } from '@/features/guest/queries/guest.mutations';
 import type { Album } from '@/features/photographer/types/album.types';
-import { Lock, ArrowRight, AlertCircle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
 
 interface GuestPasscodeModalProps {
   album: Album;
@@ -19,90 +17,109 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
   onVerified,
 }) => {
   const verification = useGuestVerificationMutation(album.shareId);
+  const passwordId = useId();
+  const errorId = `${passwordId}-error`;
   const [inputPasscode, setInputPasscode] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (pending) return;
-    setPending(true); setError(null);
+    setPending(true);
+    setError(null);
     try {
       await verification.mutateAsync({
         share: album.shareId,
         password: inputPasscode,
       });
       onVerified();
+    } catch (error) {
+      setError(errorMessage(error));
+    } finally {
+      setPending(false);
     }
-    catch (error) { setError(errorMessage(error)); }
-    finally { setPending(false); }
   };
 
   return (
-    <div className="min-h-screen bg-stone-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Image Blurred */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <img
-          src={album.coverUrl}
-          alt={album.title}
-          className="w-full h-full object-cover blur-2xl scale-110"
-        />
-      </div>
-
-      <Card className="max-w-md w-full bg-white/95 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-2xl border-stone-200/80 relative z-10 space-y-6 text-center animate-fade-in">
-        {/* Heart icon header */}
-        <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-brand-500 to-rose-400 text-white flex items-center justify-center mx-auto shadow-lg shadow-brand-500/30">
-          <Lock className="w-8 h-8" />
+    <main
+      className="flex min-h-dvh items-center justify-center bg-background px-8 py-12 text-foreground md:px-6 md:py-14"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+    >
+      <div className="w-full max-w-[360px] md:max-w-[400px]">
+        <div className="mb-8 flex items-center gap-2 text-lg font-extrabold md:mb-10">
+          <span className="grid size-7 place-items-center rounded-full bg-neutral-900 text-white">
+            <Heart className="size-[18px] fill-current" aria-hidden="true" />
+          </span>
+          <span>Pickify</span>
         </div>
 
-        <div>
-          <Badge variant="secondary" className="font-bold mb-2">
-            Album bảo mật
-          </Badge>
-          <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
-            {album.title}
-          </h2>
-          <p className="text-xs text-stone-500 mt-2 leading-relaxed">
-            Vui lòng nhập mật khẩu do nhiếp ảnh gia cung cấp để mở xem ảnh và thả tim.
+        <div className="mb-8">
+          <h1 className="break-words text-2xl font-bold leading-[1.3] tracking-[-0.6px] md:text-[28px]">
+            {album.title || 'Album của bạn'}
+          </h1>
+          <p className="mt-3 max-w-[38ch] text-pretty text-sm leading-[1.7] text-stone-500">
+            Nhập mật khẩu do nhiếp ảnh gia cung cấp để xem ảnh và thả tim.
           </p>
         </div>
 
-        {/* Error Alert */}
-        {error && (
-          <Alert variant="destructive" className="p-3.5 rounded-2xl text-left">
-            <AlertCircle className="w-4 h-4" />
-            <AlertDescription className="ml-2 text-xs font-medium">{error}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Passcode Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+        <form onSubmit={handleSubmit}>
+          {!album.title && (
+            <p className="mb-4 text-xs leading-[1.7] text-stone-500">
+              Album chưa có tên. Bạn vẫn có thể mở bằng mật khẩu.
+            </p>
+          )}
+          <Label htmlFor={passwordId} className="mb-2 block w-fit cursor-pointer text-sm font-medium leading-[1.6]">
+            Mật khẩu album
+          </Label>
+          <div className="relative">
             <Input
-              type="password"
+              id={passwordId}
+              type={passwordVisible ? 'text' : 'password'}
               value={inputPasscode}
               onChange={(e) => setInputPasscode(e.target.value)}
-              placeholder="Nhập mật khẩu (VD: 1234)"
+              placeholder="Nhập mật khẩu"
               maxLength={128}
-              disabled={pending}
+              autoComplete="current-password"
+              readOnly={pending}
               autoFocus
-              className="h-16 text-center text-2xl tracking-widest font-mono font-black py-4 px-4 rounded-2xl border-2 border-stone-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 placeholder:text-stone-300 placeholder:tracking-normal placeholder:font-sans placeholder:text-base"
+              aria-invalid={Boolean(error)}
+              aria-describedby={errorId}
+              className={`h-12 rounded-xl border-stone-300 bg-white py-3 pl-4 pr-12 text-base leading-[1.6] placeholder:text-stone-500 focus-visible:border-brand-600 focus-visible:ring-brand-600/10 md:text-sm ${
+                error ? 'border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/10' : ''
+              }`}
             />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setPasswordVisible((visible) => !visible)}
+              aria-label={passwordVisible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              aria-pressed={passwordVisible}
+              className="absolute inset-y-0 right-1 my-auto size-10 border-0 bg-transparent p-0 text-stone-500 hover:bg-transparent hover:text-foreground"
+            >
+              {passwordVisible ? <EyeOff className="size-4" aria-hidden="true" /> : <Eye className="size-4" aria-hidden="true" />}
+            </Button>
           </div>
-
+          <p id={errorId} role="status" aria-live="polite" className="mb-3 mt-2 min-h-9 text-xs leading-4 text-red-600">
+            {error}
+          </p>
           <Button
             type="submit"
-            disabled={pending}
             variant="brand"
-            size="lg"
-            className="w-full h-12 py-4 rounded-2xl font-bold text-sm shadow-xl shadow-brand-600/25 gap-2"
+            isLoading={pending}
+            className="min-h-12 w-full rounded-xl px-4 py-3 text-sm font-semibold"
           >
-            <span>Mở Xem Album & Thả Tim</span>
-            <ArrowRight className="w-4 h-4" />
+            Mở album
           </Button>
         </form>
 
-      </Card>
-    </div>
+        <p className="mt-5 text-pretty text-xs leading-[1.7] text-stone-500">
+          Chưa có mật khẩu? Hỏi nhiếp ảnh gia.
+        </p>
+      </div>
+    </main>
   );
 };
 export default GuestPasscodeModal;

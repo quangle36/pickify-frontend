@@ -1,7 +1,8 @@
-import { FC, MouseEvent } from "react";
+import { FC, useState } from "react";
 import type { Photo } from "@/features/photo/types/photo.types";
-import { Heart, RefreshCw } from "lucide-react";
+import { MessageSquare, Heart, RefreshCw, ImageOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { preloadImage } from "@/features/photo/utils/imagePreloader";
 
 interface GuestPhotoCardProps {
@@ -15,97 +16,57 @@ interface GuestPhotoCardProps {
 }
 
 export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
-  photo,
-  isFailed,
-  isPending,
-  onClick,
-  onToggleHeart,
-  onRetrySave,
-  selectionEnabled = true,
+  photo, isFailed, isPending, onClick, onToggleHeart, onRetrySave, selectionEnabled = true,
 }) => {
-  const handleHeartClick = (e: MouseEvent) => {
-    e.stopPropagation();
-    onToggleHeart(photo);
-  };
-
-  const handleRetryClick = (e: MouseEvent) => {
-    e.stopPropagation();
-    onRetrySave(photo);
+  const [failedImageUrl, setFailedImageUrl] = useState<string>();
+  const preload = () => {
+    if (photo.status === "ready") void preloadImage(photo.displayUrl, "high").catch(() => undefined);
   };
 
   return (
-    <Card
-      onClick={photo.status === "ready" ? onClick : undefined}
-      onPointerEnter={() => {
-        if (photo.status === "ready") {
-          void preloadImage(photo.displayUrl, "high").catch(() => undefined);
-        }
-      }}
-      onTouchStart={() => {
-        if (photo.status === "ready") {
-          void preloadImage(photo.displayUrl, "high").catch(() => undefined);
-        }
-      }}
-      className={`group relative aspect-[4/3] overflow-hidden rounded-2xl border border-stone-800 bg-stone-800 transition-all select-none ${photo.status === "ready" ? "cursor-pointer hover:border-brand-500" : "cursor-default"}`}
-    >
-      {photo.status === "processing" && (
-        <div
-          role="status"
-          aria-label={`Đang xử lý ${photo.name}`}
-          className="absolute inset-0 origin-center animate-skeleton-breathe bg-linear-to-br from-stone-800 via-stone-700 to-stone-800 motion-reduce:animate-none"
-        />
-      )}
-      {photo.status === "ready" && (
-        <img
-          src={photo.displayUrl}
-          alt={photo.name}
-          className="absolute inset-0 h-full w-full object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-      )}
-
-      {/* Dark gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
-
-      {/* Heart Button Overlay (Tap target >= 44px) */}
-      {photo.status === "ready" && selectionEnabled && (
-        <div className="absolute top-1.5 right-1.5 z-10">
-          <button
-            type="button"
-            onClick={handleHeartClick}
-            disabled={isPending}
-            aria-pressed={photo.isSelected}
-            className={`min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center backdrop-blur-md transition-transform active:scale-85 ${
-              photo.isSelected
-                ? "bg-rose-500 text-white animate-heart-pop shadow-lg shadow-rose-500/40"
-                : "bg-black/45 text-white/80 hover:bg-black/60"
-            }`}
-            aria-label={photo.isSelected ? "Bỏ tim" : "Thả tim"}
-          >
-            <Heart
-              className={`w-5 h-5 ${photo.isSelected ? "fill-white" : ""}`}
-            />
-          </button>
-        </div>
-      )}
-
-      {/* Unsaved warning badge per plan.md */}
-      {selectionEnabled && isFailed && (
-        <div
-          onClick={handleRetryClick}
-          className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-bold flex items-center gap-1 shadow-md cursor-pointer animate-pulse"
+    <figure className="min-w-0">
+      <Card
+        onPointerEnter={preload}
+        onTouchStart={preload}
+        className={`relative aspect-[3/4] overflow-hidden rounded-xl border-0 bg-muted shadow-none md:aspect-[3/2] ${photo.isSelected ? "ring-2 ring-inset ring-primary" : ""}`}
+      >
+        <Button
+          variant="ghost"
+          onClick={onClick}
+          disabled={photo.status !== "ready"}
+          aria-label={`Xem ảnh ${photo.name}`}
+          className="absolute inset-0 h-full w-full rounded-xl border-0 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground disabled:opacity-100"
         >
-          <RefreshCw className="w-3 h-3" />
-          <span>Chưa lưu • Bấm thử lại</span>
-        </div>
-      )}
-
-      {/* Bottom name label */}
-      <div className="pointer-events-none absolute right-2 bottom-1.5 left-2 text-[11px] font-mono text-stone-300">
-        <span className="truncate">{photo.name}</span>
-      </div>
-    </Card>
+          {photo.status === "ready" && failedImageUrl !== photo.displayUrl ? (
+            <img src={photo.displayUrl} alt={photo.name} onError={() => setFailedImageUrl(photo.displayUrl)} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+          ) : photo.status === "processing" ? (
+            <span role="status" aria-label={`Đang xử lý ${photo.name}`} className="absolute inset-0 animate-skeleton-breathe bg-muted motion-reduce:animate-none" />
+          ) : (
+            <span className="flex flex-col items-center gap-2 p-3 text-xs"><ImageOff className="h-5 w-5" />Chưa tải được ảnh</span>
+          )}
+        </Button>
+        {photo.isSelected && <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-xl ring-2 ring-inset ring-primary" />}
+        {photo.status === "ready" && (selectionEnabled || photo.isSelected) && (
+          selectionEnabled ? (
+            <Button
+              size="icon" variant="ghost" onClick={() => onToggleHeart(photo)} disabled={isPending} aria-busy={isPending}
+              aria-pressed={photo.isSelected} aria-label={`${photo.isSelected ? "Bỏ tim" : "Thả tim"} ${photo.name}`}
+              className={`absolute right-2 top-2 h-10 w-10 rounded-full md:right-3 md:top-3 ${photo.isSelected ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border border-white/20 bg-stone-800/90 text-stone-50 hover:bg-stone-700 hover:text-white"}`}
+            ><Heart className={`h-5 w-5 ${photo.isSelected ? "fill-current" : ""}`} /></Button>
+          ) : (
+            <span role="img" aria-label="Đã chọn" className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground md:right-3 md:top-3"><Heart className="h-5 w-5 fill-current" /></span>
+          )
+        )}
+        {selectionEnabled && isFailed && (
+          <Button onClick={() => onRetrySave(photo)} size="sm" className="absolute bottom-2 left-2 gap-1 rounded-lg bg-amber-200 px-2 text-xs text-amber-950 hover:bg-amber-100" aria-label={`Thử lưu lại ${photo.name}`}><RefreshCw className="h-3 w-3" />Thử lại</Button>
+        )}
+      </Card>
+      <figcaption className="mt-2 flex min-h-6 items-center justify-between gap-2 text-xs text-muted-foreground">
+        <span className="min-w-0 truncate" title={photo.name}>{photo.name}</span>
+        {photo.isSelected && <span className="hidden shrink-0 text-primary md:inline">Đã chọn</span>}
+        {!!photo.commentCount && <span className="flex shrink-0 items-center gap-1" aria-label={`${photo.commentCount} bình luận`}><MessageSquare className="h-3.5 w-3.5" />{photo.commentCount}</span>}
+      </figcaption>
+    </figure>
   );
 };
 export default GuestPhotoCard;

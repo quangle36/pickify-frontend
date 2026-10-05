@@ -9,13 +9,19 @@ import { photoKeys } from "@/features/photo/queries/photo.key";
 import { createAlbumSchema } from "../schemas/album.schema";
 import { albumService, type UpdateAlbumInput } from "../services/album.service";
 import { useAlbumStore } from "../stores/album.store";
-import type { Album, PhotographerProfile } from "../types/album.types";
+import type {
+  Album,
+  AlbumSourceInput,
+  PhotoSortMode,
+  PhotographerProfile,
+} from "../types/album.types";
 import { albumKeys } from "./album.key";
 
 export interface CreateAlbumFormInput {
   name: string;
   slug: string;
-  folderUrl: string;
+  sources: AlbumSourceInput[];
+  sortMode: PhotoSortMode;
   passcode: string;
   selectionLimit: number;
 }
@@ -41,11 +47,12 @@ export function useCreateAlbum() {
       const input = createAlbumSchema.parse({
         name: form.name,
         slug: form.slug,
-        folderUrl: form.folderUrl,
+        sources: form.sources,
+        sortMode: form.sortMode,
         password: form.passcode,
         selectionLimit: form.selectionLimit,
       });
-      return albumService.createAlbum(input);
+      return albumService.createAlbum({ ...input, sources: input.sources! });
     },
     onSuccess: () => invalidateAlbumData(client),
   });
@@ -217,4 +224,61 @@ export async function createAlbumResult(
   } catch (error) {
     return { success: false as const, error: errorMessage(error) };
   }
+}
+
+export function useSetPhotoOrder() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { albumId: string; sortMode: PhotoSortMode }) =>
+      albumService.setPhotoOrder(input.albumId, input.sortMode),
+    onSuccess: () => invalidateAlbumData(client),
+  });
+}
+export function useSetSourceClock() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: {
+      albumId: string;
+      sourceId: string;
+      correction:
+        | { offsetSeconds: number }
+        | { referencePhotoId: string; correctedCapturedAt: string };
+    }) =>
+      albumService.setSourceClock(
+        input.albumId,
+        input.sourceId,
+        input.correction,
+      ),
+    onSuccess: async (_, input) => {
+      await Promise.all([
+        client.invalidateQueries({
+          queryKey: albumKeys.timePrefix(input.albumId),
+        }),
+        invalidateAlbumData(client),
+      ]);
+    },
+  });
+}
+export function useSetPhotoCaptureTime() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: {
+      albumId: string;
+      photoId: string;
+      capturedAt: string | null;
+    }) =>
+      albumService.setPhotoCaptureTime(
+        input.albumId,
+        input.photoId,
+        input.capturedAt,
+      ),
+    onSuccess: async (_, input) => {
+      await Promise.all([
+        client.invalidateQueries({
+          queryKey: albumKeys.timePrefix(input.albumId),
+        }),
+        invalidateAlbumData(client),
+      ]);
+    },
+  });
 }

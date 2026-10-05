@@ -1,11 +1,17 @@
 import { apiRequest } from "@/api/apiClient";
 import { apiMessages } from "@/api/errors";
-import type { Album } from "../types/album.types";
+import type {
+  Album,
+  AlbumSourceInput,
+  PhotoSortMode,
+  TimePhoto,
+} from "../types/album.types";
 
 export interface CreateAlbumInput {
   name: string;
   slug?: string;
-  folderUrl: string;
+  sources: AlbumSourceInput[];
+  sortMode?: PhotoSortMode;
   password: string;
   selectionLimit: number;
 }
@@ -23,6 +29,40 @@ export interface UpdateAlbumInput {
 }
 
 export const albumService = {
+  setPhotoOrder: (albumId: string, sortMode: PhotoSortMode) =>
+    apiRequest<Album>({
+      url: `/albums/${albumId}/photo-order`,
+      method: "PUT",
+      data: { sortMode },
+    }),
+  getTimePhotos: (albumId: string, sourceId: string, signal?: AbortSignal) =>
+    apiRequest<{ photos: TimePhoto[] }>({
+      url: `/albums/${albumId}/sources/${sourceId}/time-photos`,
+      signal,
+    }),
+  setSourceClock: (
+    albumId: string,
+    sourceId: string,
+    correction:
+      | { offsetSeconds: number }
+      | { referencePhotoId: string; correctedCapturedAt: string },
+  ) =>
+    apiRequest<Album>({
+      url: `/albums/${albumId}/sources/${sourceId}/clock`,
+      method: "PUT",
+      data: correction,
+    }),
+  setPhotoCaptureTime: (
+    albumId: string,
+    photoId: string,
+    capturedAt: string | null,
+  ) =>
+    apiRequest<Album>({
+      url: `/albums/${albumId}/photos/${photoId}/capture-time`,
+      method: "PUT",
+      data: { capturedAt },
+    }),
+
   getAlbums: async (signal?: AbortSignal) => {
     const result = await apiRequest<{ albums: Album[] }>({
       url: "/albums",
@@ -82,9 +122,14 @@ export const albumService = {
       data: { locked },
     }),
 
-  getSelectedFiles: (albumId: string, signal?: AbortSignal) =>
+  getSelectedFiles: (
+    albumId: string,
+    signal?: AbortSignal,
+    sourceId?: string,
+  ) =>
     apiRequest<SelectedFileManifest>({
       url: `/albums/${albumId}/selected-files`,
+      params: sourceId ? { sourceId } : undefined,
       signal,
     }),
 };

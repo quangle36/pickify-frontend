@@ -1,6 +1,13 @@
 import { FC, useState, FormEvent } from "react";
 import { AlertCircle } from "lucide-react";
-import { extractDriveFolderId } from "@/lib/utils";
+import { AlbumSourceFields } from "./AlbumSourceFields";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AppModal } from "@/components/ui/app-modal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,9 +15,14 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   albumSlugSchema,
+  createAlbumSchema,
   normalizeAlbumSlug,
 } from "@/features/photographer/schemas/album.schema";
-import type { Album } from "@/features/photographer/types/album.types";
+import type {
+  Album,
+  AlbumSourceInput,
+  PhotoSortMode,
+} from "@/features/photographer/types/album.types";
 
 interface CreateAlbumModalProps {
   isOpen: boolean;
@@ -19,7 +31,8 @@ interface CreateAlbumModalProps {
   onSubmit: (data: {
     name: string;
     slug: string;
-    folderUrl: string;
+    sources: AlbumSourceInput[];
+    sortMode: PhotoSortMode;
     passcode: string;
     selectionLimit: number;
   }) => Promise<{
@@ -37,7 +50,14 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
   const [pending, setPending] = useState(false);
   const [name, setName] = useState(album?.title ?? "");
   const [slug, setSlug] = useState(album?.slug ?? "");
-  const [folderUrl, setFolderUrl] = useState(album?.folderUrl ?? "");
+  const [sources, setSources] = useState<AlbumSourceInput[]>(
+    album?.sources?.length
+      ? album.sources.map(({ label, folderUrl }) => ({ label, folderUrl }))
+      : [{ label: "Máy 1", folderUrl: album?.folderUrl ?? "" }],
+  );
+  const [sortMode, setSortMode] = useState<PhotoSortMode>(
+    album?.sortMode ?? "capture_time",
+  );
   const [passcode, setPasscode] = useState("");
   const [selectionLimit, setSelectionLimit] = useState(
     album ? String(album.selectionLimit ?? album.totalPhotos) : "50",
@@ -57,19 +77,6 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
     if (slug.trim() && !albumSlugSchema.safeParse(slug).success) {
       setError(
         "Slug sau khi chuẩn hóa phải có 3–80 ký tự và gồm chữ thường, số hoặc dấu gạch ngang",
-      );
-      return;
-    }
-
-    if (!folderUrl.trim()) {
-      setError("Vui lòng dán đường dẫn thư mục Google Drive chứa ảnh");
-      return;
-    }
-
-    const folderId = extractDriveFolderId(folderUrl);
-    if (!folderId) {
-      setError(
-        "Link Google Drive không hợp lệ. Vui lòng dán link dạng: https://drive.google.com/drive/folders/...",
       );
       return;
     }
@@ -99,13 +106,31 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       return;
     }
 
+    if (!album) {
+      const result = createAlbumSchema.safeParse({
+        name,
+        slug,
+        sources,
+        sortMode,
+        password: passcode,
+        selectionLimit: parsedSelectionLimit,
+      });
+      if (!result.success) {
+        setError(result.error.issues[0].message);
+        return;
+      }
+    }
     setPending(true);
     let res: { success: boolean; error?: string };
     try {
       res = await onSubmit({
         name: name.trim(),
         slug: slug.trim() ? normalizeAlbumSlug(slug) : "",
-        folderUrl: folderUrl.trim(),
+        sources: sources.map(({ label, folderUrl }) => ({
+          label: label.trim(),
+          folderUrl: folderUrl.trim(),
+        })),
+        sortMode,
         passcode,
         selectionLimit: parsedSelectionLimit,
       });
@@ -117,7 +142,8 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
     if (res.success) {
       setName("");
       setSlug("");
-      setFolderUrl("");
+      setSources([{ label: "Máy 1", folderUrl: "" }]);
+      setSortMode("capture_time");
       setPasscode("");
       setSelectionLimit("50");
       onClose();
@@ -137,7 +163,7 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       description={
         album
           ? "Cập nhật thông tin và thiết lập chọn ảnh của album."
-          : "Thêm ảnh từ thư mục Google Drive của bạn."
+          : "Gộp ảnh từ nhiều máy ảnh vào cùng một album."
       }
       contentClassName="w-[calc(100%-2rem)] max-w-lg rounded-2xl border-stone-200 sm:rounded-2xl [&>button]:flex [&>button]:h-8 [&>button]:w-8 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-lg [&>button>svg]:h-4 [&>button>svg]:w-4"
       headerClassName="border-stone-200 px-5 py-5 sm:px-6 sm:py-6 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:leading-[1.35] [&_p]:text-xs [&_p]:leading-relaxed"
@@ -166,7 +192,10 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
       }
     >
       {error && (
-        <Alert variant="destructive" className="rounded-lg border-0 bg-rose-50 px-3 py-3 text-rose-700">
+        <Alert
+          variant="destructive"
+          className="rounded-lg border-0 bg-rose-50 px-3 py-3 text-rose-700"
+        >
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="text-xs leading-relaxed">
             {error}
@@ -180,8 +209,14 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
         className="space-y-[18px]"
       >
         <div className="space-y-2">
-          <Label htmlFor="album-name" className="text-[13px] font-medium text-stone-900">
-            Tên album <span aria-hidden="true" className="text-rose-700">*</span>
+          <Label
+            htmlFor="album-name"
+            className="text-[13px] font-medium text-stone-900"
+          >
+            Tên album{" "}
+            <span aria-hidden="true" className="text-rose-700">
+              *
+            </span>
           </Label>
           <Input
             id="album-name"
@@ -194,29 +229,53 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
           />
         </div>
 
+        <AlbumSourceFields
+          sources={sources}
+          onChange={setSources}
+          disabled={pending || !!album}
+        />
         <div className="space-y-2">
-          <Label htmlFor="drive-url" className="text-[13px] font-medium text-stone-900">
-            Thư mục Google Drive <span aria-hidden="true" className="text-rose-700">*</span>
-          </Label>
-          <Input
-            id="drive-url"
-            type="url"
-            value={folderUrl}
-            readOnly={!!album}
-            onChange={(e) => setFolderUrl(e.target.value)}
-            placeholder="Dán liên kết thư mục Google Drive"
-            className={`h-11 rounded-xl border-stone-200 text-[13px] transition-colors placeholder:text-stone-500 sm:h-10 ${
-              album ? "cursor-not-allowed bg-stone-100 text-stone-500" : "bg-white text-stone-900"
-            }`}
-          />
+          <Label htmlFor="album-sort-mode">Sắp xếp ảnh</Label>
+          <Select
+            value={sortMode}
+            onValueChange={(value) => setSortMode(value as PhotoSortMode)}
+            disabled={pending || !!album}
+          >
+            <SelectTrigger
+              id="album-sort-mode"
+              className="h-11 rounded-xl bg-white"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="capture_time">
+                Thời gian chụp · trộn ảnh các máy
+              </SelectItem>
+              <SelectItem value="source">
+                Theo từng máy · thứ tự tên file
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-stone-500">
+            Giờ máy bị sai có thể đồng bộ sau khi import. Ảnh thiếu giờ chụp nằm
+            cuối album.
+          </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="album-slug" className="text-[13px] font-medium text-stone-900">
-            Đường dẫn tùy chỉnh <span className="text-xs font-normal text-stone-500">· không bắt buộc</span>
+          <Label
+            htmlFor="album-slug"
+            className="text-[13px] font-medium text-stone-900"
+          >
+            Đường dẫn tùy chỉnh{" "}
+            <span className="text-xs font-normal text-stone-500">
+              · không bắt buộc
+            </span>
           </Label>
           <div className="flex h-11 items-center overflow-hidden rounded-xl border border-stone-200 bg-white transition-colors focus-within:border-stone-400 focus-within:ring-2 focus-within:ring-stone-200/50 sm:h-10">
-            <span className="shrink-0 select-none pl-3 text-xs text-stone-500">/album/</span>
+            <span className="shrink-0 select-none pl-3 text-xs text-stone-500">
+              /album/
+            </span>
             <Input
               id="album-slug"
               type="text"
@@ -235,12 +294,19 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="guest-passcode" className="text-[13px] font-medium text-stone-900">
+            <Label
+              htmlFor="guest-passcode"
+              className="text-[13px] font-medium text-stone-900"
+            >
               {album ? "Mật khẩu mới" : "Mật khẩu khách"}
               {album ? (
-                <span className="ml-1 text-xs font-normal text-stone-500">· tùy chọn</span>
+                <span className="ml-1 text-xs font-normal text-stone-500">
+                  · tùy chọn
+                </span>
               ) : (
-                <span aria-hidden="true" className="ml-1 text-rose-700">*</span>
+                <span aria-hidden="true" className="ml-1 text-rose-700">
+                  *
+                </span>
               )}
             </Label>
             <Input
@@ -255,8 +321,14 @@ export const CreateAlbumModal: FC<CreateAlbumModalProps> = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="selection-limit" className="text-[13px] font-medium text-stone-900">
-              Số ảnh chọn tối đa <span aria-hidden="true" className="text-rose-700">*</span>
+            <Label
+              htmlFor="selection-limit"
+              className="text-[13px] font-medium text-stone-900"
+            >
+              Số ảnh chọn tối đa{" "}
+              <span aria-hidden="true" className="text-rose-700">
+                *
+              </span>
             </Label>
             <Input
               id="selection-limit"

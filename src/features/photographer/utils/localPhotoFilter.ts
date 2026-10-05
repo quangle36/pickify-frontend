@@ -207,3 +207,13 @@ export function supportsLocalPhotoFiltering() {
     window.isSecureContext && typeof window.showDirectoryPicker === "function"
   );
 }
+
+export function cameraDestinationName(label: string, sourceId: string) {
+  const name =
+    label
+      .normalize("NFC")
+      .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")
+      .replace(/[. ]+$/, "")
+      .trim() || "Máy ảnh";
+  return `${name}__${sourceId}`;
+}

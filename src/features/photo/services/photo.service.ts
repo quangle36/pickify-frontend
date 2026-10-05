@@ -1,5 +1,10 @@
 import { apiRequest } from "@/api/apiClient";
-import type { PhotoFilters, PhotoPage } from "../types/photo.types";
+import type {
+  PhotoFilters,
+  PhotoPage,
+  PhotoComment,
+  CommentPage,
+} from "../types/photo.types";
 
 interface SelectionInput {
   selected: boolean;
@@ -25,6 +30,29 @@ function photoParams(
 }
 
 export const photoService = {
+  getComments: (
+    basePath: string,
+    photoId: string,
+    cursor: string | null,
+    signal?: AbortSignal,
+  ) =>
+    apiRequest<CommentPage>({
+      url: `${basePath}/photos/${photoId}/comments`,
+      params: cursor ? { cursor } : undefined,
+      signal,
+    }),
+  addComment: (
+    basePath: string,
+    photoId: string,
+    content: string,
+    clientMutationId: string,
+  ) =>
+    apiRequest<PhotoComment>({
+      url: `${basePath}/photos/${photoId}/comments`,
+      method: "POST",
+      data: { content, clientMutationId },
+    }),
+
   getOwnerPhotos: (
     albumId: string,
     cursor: string | null,

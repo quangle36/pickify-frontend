@@ -11,7 +11,7 @@ export const HeroSection: FC<HeroSectionProps> = ({ onStartDashboard }) => {
     <section className="px-6 py-24 sm:py-36 lg:py-44">
       <div className="mx-auto max-w-4xl text-center">
         <h1 className="text-[clamp(2.5rem,6vw,4.5rem)] font-medium tracking-[-0.055em] leading-[1.16]">
-          Khách chọn ảnh.
+          Khách chọn ảnh JPEG.
           <span className="mt-3 block text-neutral-400">
             Bạn xuất file.
           </span>

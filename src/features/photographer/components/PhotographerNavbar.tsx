@@ -34,7 +34,7 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
             className="flex items-center gap-2.5 group focus:outline-hidden"
             title="Quay về Trang chủ Landing Page"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white">
+            <div className="w-8 h-8 rounded-full bg-neutral-900 grid place-items-center text-white">
               <Heart className="w-4 h-4 fill-white" />
             </div>
             <span className="text-left text-base font-semibold leading-tight text-stone-900">

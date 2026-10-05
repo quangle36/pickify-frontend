@@ -1,10 +1,20 @@
-import { FC, useEffect, useCallback } from "react";
+import { FC, useEffect, useCallback, useState, useRef } from "react";
 import { usePhotoStore } from "../stores/photo.store";
 import { Photo } from "../types/photo.types";
-import { X, ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/components/ui/use-toast";
 import { preloadImage } from "../utils/imagePreloader";
+
+import { formatShotTime } from "@/features/photographer/utils/photoTime";
+import { PhotoCommentsPanel } from "./PhotoCommentsPanel";
 
 interface LightboxModalProps {
   photos: Photo[];
@@ -15,6 +25,11 @@ interface LightboxModalProps {
   onNavigate: (newIndex: number) => void;
   onToggleSelection: (photoId: string, currentSelected: boolean) => void;
   selectionEnabled?: boolean;
+  commentsBasePath?: string;
+  canComment?: boolean;
+  hasMorePhotos?: boolean;
+  loadingMorePhotos?: boolean;
+  onLoadMorePhotos?: () => Promise<unknown>;
 }
 
 export const LightboxModal: FC<LightboxModalProps> = ({
@@ -26,19 +41,100 @@ export const LightboxModal: FC<LightboxModalProps> = ({
   onNavigate,
   onToggleSelection,
   selectionEnabled = true,
+  commentsBasePath,
+  canComment = false,
+  hasMorePhotos = false,
+  loadingMorePhotos = false,
+  onLoadMorePhotos,
 }) => {
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [requestedIndex, setRequestedIndex] = useState<number | null>(null);
+  const loadInFlight = useRef(false);
+  const prefetchedTail = useRef<string | null>(null);
   const savingPhotos = usePhotoStore((state) => state.saving);
   const currentPhoto = photos[currentIndex];
+  const canGoNext = currentIndex < photos.length - 1 || hasMorePhotos;
+  const loadMore = useCallback(async () => {
+    if (!onLoadMorePhotos || loadingMorePhotos || loadInFlight.current) return;
+    loadInFlight.current = true;
+    try {
+      await onLoadMorePhotos();
+    } catch {
+      setRequestedIndex(null);
+      toast({
+        description: "Chưa tải được ảnh tiếp theo. Bấm mũi tên để thử lại.",
+        variant: "destructive",
+      });
+    } finally {
+      loadInFlight.current = false;
+    }
+  }, [onLoadMorePhotos, loadingMorePhotos]);
+
+  const goPrevious = useCallback(() => {
+    setRequestedIndex(null);
+    if (currentIndex > 0) onNavigate(currentIndex - 1);
+  }, [currentIndex, onNavigate]);
+
+  const goNext = useCallback(() => {
+    if (currentIndex < photos.length - 1) {
+      setRequestedIndex(null);
+      onNavigate(currentIndex + 1);
+    } else if (hasMorePhotos) {
+      setRequestedIndex(currentIndex + 1);
+      void loadMore();
+    }
+  }, [currentIndex, photos.length, hasMorePhotos, onNavigate, loadMore]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setRequestedIndex(null);
+      prefetchedTail.current = null;
+      return;
+    }
+    if (requestedIndex !== null && photos[requestedIndex]) {
+      setRequestedIndex(null);
+      onNavigate(requestedIndex);
+    } else if (!hasMorePhotos && !loadingMorePhotos) {
+      setRequestedIndex(null);
+    }
+  }, [
+    isOpen,
+    requestedIndex,
+    photos,
+    hasMorePhotos,
+    loadingMorePhotos,
+    onNavigate,
+  ]);
+
+  useEffect(() => {
+    const tail = photos.at(-1)?.id;
+    if (
+      !isOpen ||
+      !tail ||
+      !hasMorePhotos ||
+      loadingMorePhotos ||
+      currentIndex < photos.length - 5 ||
+      prefetchedTail.current === tail
+    )
+      return;
+    prefetchedTail.current = tail;
+    void loadMore();
+  }, [isOpen, photos, currentIndex, hasMorePhotos, loadingMorePhotos, loadMore]);
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!isOpen || !currentPhoto) return;
+      if (
+        e.target instanceof HTMLElement &&
+        e.target.closest("input, textarea, [contenteditable]")
+      )
+        return;
 
       if (e.key === "Escape") {
         onClose();
       } else if (e.key === "ArrowLeft") {
-        if (currentIndex > 0) onNavigate(currentIndex - 1);
+        goPrevious();
       } else if (e.key === "ArrowRight") {
-        if (currentIndex < photos.length - 1) onNavigate(currentIndex + 1);
+        goNext();
       } else if (
         selectionEnabled &&
         (e.key === " " ||
@@ -47,6 +143,8 @@ export const LightboxModal: FC<LightboxModalProps> = ({
           e.key === "h" ||
           e.key === "H")
       ) {
+        if (e.target instanceof HTMLElement && e.target.closest("button"))
+          return;
         e.preventDefault();
         if (savingPhotos[currentPhoto.id]) return;
         onToggleSelection(currentPhoto.id, currentPhoto.isSelected);
@@ -62,6 +160,8 @@ export const LightboxModal: FC<LightboxModalProps> = ({
       onToggleSelection,
       selectionEnabled,
       savingPhotos,
+      goPrevious,
+      goNext,
     ],
   );
 
@@ -91,8 +191,8 @@ export const LightboxModal: FC<LightboxModalProps> = ({
     <div className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between select-none">
       {/* Top Header Bar */}
       <div className="p-4 flex items-center justify-between text-white bg-gradient-to-b from-black/80 to-transparent z-10">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-xs sm:text-sm font-bold tracking-wider">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="truncate max-w-[40vw] font-mono text-xs sm:text-sm font-bold tracking-wider">
             {currentPhoto.name}
           </span>
           <Badge
@@ -104,7 +204,25 @@ export const LightboxModal: FC<LightboxModalProps> = ({
           </Badge>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
+          {commentsBasePath && (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Bình luận"
+              title="Bình luận / yêu cầu cho ảnh"
+              aria-expanded={commentsOpen}
+              onClick={() => setCommentsOpen((value) => !value)}
+              className="relative rounded-full text-stone-200 hover:bg-stone-800 hover:text-white"
+            >
+              <MessageSquare className="h-5 w-5" />
+              {!!currentPhoto.commentCount && (
+                <span className="absolute -right-1 -top-1 rounded-full bg-stone-700 px-1 text-xs">
+                  {currentPhoto.commentCount}
+                </span>
+              )}
+            </Button>
+          )}
           {selectionEnabled ? (
             <Button
               size="icon"
@@ -134,9 +252,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
                   : "Khách chưa thả tim"
               }
               title={
-                currentPhoto.isSelected
-                  ? "Khách đã thả tim"
-                  : "Chưa được chọn"
+                currentPhoto.isSelected ? "Khách đã thả tim" : "Chưa được chọn"
               }
               className={`flex h-10 w-10 items-center justify-center rounded-full ${
                 currentPhoto.isSelected
@@ -163,7 +279,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
       </div>
 
       {/* Main Image Stage */}
-      <div className="relative flex-1 flex items-center justify-center p-2 sm:p-6 overflow-hidden">
+      <div className="relative min-h-0 flex-1 flex items-center justify-center p-2 sm:p-6 overflow-hidden">
         <img
           src={currentPhoto.displayUrl}
           alt={currentPhoto.name}
@@ -178,8 +294,8 @@ export const LightboxModal: FC<LightboxModalProps> = ({
           <Button
             size="icon"
             variant="ghost"
-            onClick={() => onNavigate(currentIndex - 1)}
-            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-xs"
+            onClick={goPrevious}
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-stone-200 hover:bg-white text-stone-700 hover:text-stone-700"
             title="Ảnh trước (Phím ←)"
           >
             <ChevronLeft className="w-6 h-6" />
@@ -187,12 +303,13 @@ export const LightboxModal: FC<LightboxModalProps> = ({
         )}
 
         {/* Next Button */}
-        {currentIndex < photos.length - 1 && (
+        {canGoNext && (
           <Button
             size="icon"
             variant="ghost"
-            onClick={() => onNavigate(currentIndex + 1)}
-            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-xs"
+            onClick={goNext}
+            isLoading={currentIndex >= photos.length - 1 && loadingMorePhotos}
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-stone-200 hover:bg-white text-stone-700 hover:text-stone-700"
             title="Ảnh tiếp theo (Phím →)"
           >
             <ChevronRight className="w-6 h-6" />
@@ -200,9 +317,22 @@ export const LightboxModal: FC<LightboxModalProps> = ({
         )}
       </div>
 
+      {commentsBasePath && (
+        <PhotoCommentsPanel
+          basePath={commentsBasePath}
+          photoId={currentPhoto.id}
+          canComment={canComment}
+          open={commentsOpen}
+        />
+      )}
+
       {/* Bottom Footer Info & Keyboard Hints */}
       <div className="p-4 bg-gradient-to-t from-black/80 to-transparent flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span>
+            {currentPhoto.sourceLabel ?? "Máy 1"} ·{" "}
+            {formatShotTime(currentPhoto.correctedCapturedAt)}
+          </span>
           <span>
             Kích thước: {currentPhoto.dimensions.width} ×{" "}
             {currentPhoto.dimensions.height} px

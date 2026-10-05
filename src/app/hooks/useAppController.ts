@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { ApiError } from "@/api/errors";
+import { mergeOwnerAlbumSnapshot } from "@/features/photographer/utils/mergeOwnerAlbumSnapshot";
 import { useAlbums } from "@/features/photographer/queries/album.queries";
 import { albumKeys } from "@/features/photographer/queries/album.key";
 import { useOwnerQuery } from "@/features/auth/queries/auth.queries";
@@ -100,11 +101,7 @@ export function useAppController(route: AppRoute) {
         .filter((album) => !hiddenAlbumIds.includes(album.id))
         .map((album) =>
           album.id === albumId && photoAlbum
-            ? {
-                ...album,
-                ...photoAlbum,
-                selectionLocked: album.selectionLocked,
-              }
+            ? mergeOwnerAlbumSnapshot(album, photoAlbum)
             : album,
         );
   const selectedAlbum = albums.find(

@@ -20,6 +20,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlbumSettingsModal } from "./components/AlbumSettingsModal";
+import { PhotoTimeSettingsModal } from "./components/PhotoTimeSettingsModal";
 import { LocalPhotoFilterModal } from "./components/LocalPhotoFilterModal";
 import { ShareAlbumModal } from "./components/ShareAlbumModal";
 
@@ -53,6 +54,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
     return () => clearTimeout(timer);
   }, [filterMode, filterPhotos, searchTerm]);
 
+  const [timeSettingsOpen, setTimeSettingsOpen] = useState(false);
   const selectedCount = album.selectedPhotosCount;
 
   // Filtered photos
@@ -121,7 +123,15 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-end sm:self-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!["ready", "needs_attention"].includes(album.status)}
+            onClick={() => setTimeSettingsOpen(true)}
+          >
+            Sắp xếp & đồng bộ giờ
+          </Button>
           <Button
             type="button"
             variant="outline"
@@ -291,8 +301,8 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
                 Đang quét ảnh từ Google Drive...
               </h3>
               <p className="text-xs text-stone-500">
-                Đã nhập {album.importedPhotos}/{album.totalPhotos} ảnh. Ảnh sẵn sàng
-                sẽ tự động xuất hiện tại đây.
+                Đã nhập {album.importedPhotos}/{album.totalPhotos} ảnh. Ảnh sẵn
+                sàng sẽ tự động xuất hiện tại đây.
               </p>
             </>
           ) : (
@@ -311,8 +321,15 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
         </Card>
       )}
 
+      <PhotoTimeSettingsModal
+        key={album.id}
+        album={album}
+        open={timeSettingsOpen}
+        onOpenChange={setTimeSettingsOpen}
+      />
       <LocalPhotoFilterModal
         albumId={album.id}
+        sources={album.sources}
         open={localFilterOpen}
         onOpenChange={setLocalFilterOpen}
       />

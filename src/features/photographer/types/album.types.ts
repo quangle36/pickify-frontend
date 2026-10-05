@@ -1,3 +1,27 @@
+export type PhotoSortMode = "source" | "capture_time";
+export interface AlbumSourceInput {
+  label: string;
+  folderUrl: string;
+}
+export interface AlbumSource extends AlbumSourceInput {
+  id: string;
+  folderId: string;
+  position: number;
+  clockOffsetSeconds: number;
+  photoCount: number;
+  missingTimeCount: number;
+  firstCapturedAt: string | null;
+  lastCapturedAt: string | null;
+  suspectClock: boolean;
+}
+export interface TimePhoto {
+  id: string;
+  name: string;
+  capturedAt: string | null;
+  correctedCapturedAt: string | null;
+  captureTimeOverridden: boolean;
+}
+
 export type AlbumStatus =
   | "scanning"
   | "importing"
@@ -12,6 +36,8 @@ export interface Album {
   title: string;
   folderUrl: string;
   folderId: string;
+  sources?: AlbumSource[];
+  sortMode?: PhotoSortMode;
   shareId: string;
   slug: string | null;
   status: AlbumStatus;

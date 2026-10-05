@@ -67,7 +67,11 @@ export function PhotographerView({
       )}
       <CreateAlbumModal {...actions.createModal} />
       <PublicDriveHelpModal {...actions.driveModal} />
-      <LightboxModal {...lightbox.props} selectionEnabled={false} />
+      <LightboxModal
+        {...lightbox.props}
+        selectionEnabled={false}
+        commentsBasePath={album ? `/albums/${album.id}` : undefined}
+      />
     </>
   );
 }

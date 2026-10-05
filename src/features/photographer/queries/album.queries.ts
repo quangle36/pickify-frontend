@@ -16,3 +16,16 @@ export function useAlbums(ownerId?: string) {
         : false,
   });
 }
+
+export function useSourceTimePhotos(
+  albumId: string,
+  sourceId: string,
+  enabled: boolean,
+) {
+  return useQuery({
+    queryKey: albumKeys.sourceTime(albumId, sourceId),
+    queryFn: ({ signal }) =>
+      albumService.getTimePhotos(albumId, sourceId, signal),
+    enabled: enabled && !!sourceId,
+  });
+}

@@ -1,6 +1,10 @@
 import axios from "axios";
 
 export const apiMessages: Record<string, string> = {
+  SOURCE_REQUIRED: "Hãy chọn máy ảnh cần lọc file.",
+  CAPTURE_TIME_MISSING: "Ảnh này thiếu giờ gốc. Hãy đặt giờ riêng cho ảnh thay vì bù giờ cả máy.",
+  ALBUM_NOT_READY_FOR_TIME_EDIT: "Hãy chờ import hoàn tất trước khi chỉnh giờ hoặc thứ tự ảnh.",
+
   ALBUM_PASSWORD_REVEAL_UNAVAILABLE:
     "Không thể hiển thị mật khẩu này. Hãy đổi mật khẩu album để sử dụng tính năng hiển thị.",
   EMAIL_INVALID_CREDENTIALS: "Email hoặc mật khẩu không đúng.",
