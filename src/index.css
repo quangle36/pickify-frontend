@@ -128,3 +128,8 @@ body:has(.guest-album),
   background: hsl(20 14% 8%);
   color-scheme: dark;
 }
+
+/* Keep album controls in place when a filter removes the page scrollbar. */
+html:has(.album-detail) {
+  scrollbar-gutter: stable;
+}

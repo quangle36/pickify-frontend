@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, FC } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Photo } from "@/features/photo/types/photo.types";
 import type { Album } from "@/features/photographer/types/album.types";
@@ -13,11 +13,10 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
-import { PhotoCard } from "./components/PhotoCard";
+import { AlbumPhotoGrid } from "./components/AlbumPhotoGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlbumSettingsModal } from "./components/AlbumSettingsModal";
 import { PhotoTimeSettingsModal } from "./components/PhotoTimeSettingsModal";
@@ -27,14 +26,12 @@ import { ShareAlbumModal } from "./components/ShareAlbumModal";
 interface AlbumDetailPageProps {
   album: Album;
   photos: Photo[];
-  photosPending: boolean;
   onOpenLightbox: (photos: Photo[], index: number) => void;
 }
 
 const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   album,
   photos,
-  photosPending,
   onOpenLightbox,
 }) => {
   const filterPhotos = usePhotoFilters(album.id);
@@ -56,6 +53,49 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
 
   const [timeSettingsOpen, setTimeSettingsOpen] = useState(false);
   const selectedCount = album.selectedPhotosCount;
+  const tabsListRef = useRef<HTMLDivElement>(null);
+  const photoContentRef = useRef<HTMLDivElement>(null);
+  const previousFilterRef = useRef(filterMode);
+  const [tabIndicator, setTabIndicator] = useState<{
+    left: number;
+    width: number;
+    height: number;
+  } | null>(null);
+
+  useLayoutEffect(() => {
+    const list = tabsListRef.current;
+    if (!list) return;
+    const activeTab = list.querySelector<HTMLElement>('[data-state="active"]');
+    if (!activeTab) return;
+    const measure = () => {
+      setTabIndicator({
+        left: activeTab.offsetLeft,
+        width: activeTab.offsetWidth,
+        height: activeTab.offsetHeight,
+      });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    Array.from(list.querySelectorAll('[role="tab"]')).forEach((tab) =>
+      observer.observe(tab),
+    );
+    return () => observer.disconnect();
+  }, [filterMode, album.totalPhotos, selectedCount, album.selectionLimit]);
+
+  useLayoutEffect(() => {
+    if (previousFilterRef.current === filterMode) return;
+    previousFilterRef.current = filterMode;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const animation = photoContentRef.current?.animate(
+      [
+        { opacity: 0.55, transform: "translateY(4px)" },
+        { opacity: 1, transform: "translateY(0)" },
+      ],
+      { duration: 180, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+    );
+    return () => animation?.cancel();
+  }, [filterMode]);
 
   // Filtered photos
   const filteredPhotos = photos.filter((p) => {
@@ -82,18 +122,8 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
         : "grid-cols-2 sm:grid-cols-4 lg:grid-cols-6"
   }`;
 
-  const skeletonVisibility = (index: number) => {
-    if (index < 2) return "";
-    if (gridColumns === 3) return index === 2 ? "hidden sm:block" : "hidden";
-    if (gridColumns === 4) {
-      if (index === 2) return "hidden sm:block";
-      return index === 3 ? "hidden lg:block" : "hidden";
-    }
-    return index < 4 ? "hidden sm:block" : "hidden lg:block";
-  };
-
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6 animate-fade-in">
+    <div className="album-detail mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6 animate-fade-in">
       {/* Unified Minimalist Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-stone-200">
         <div className="flex items-center gap-3 min-w-0">
@@ -185,10 +215,21 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
           onValueChange={(val) => setFilterMode(val as typeof filterMode)}
           className="w-full sm:w-auto"
         >
-          <TabsList className="bg-stone-200/70 p-1 rounded-xl h-auto">
+          <TabsList ref={tabsListRef} className="relative isolate bg-stone-200/70 p-1 rounded-xl h-auto">
+            {tabIndicator && (
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 top-1 -z-10 rounded-lg bg-white shadow-xs transition-[transform,width] [transition-duration:220ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+                style={{
+                  transform: `translateX(${tabIndicator.left}px)`,
+                  width: tabIndicator.width,
+                  height: tabIndicator.height,
+                }}
+              />
+            )}
             <TabsTrigger
               value="all"
-              className="gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-stone-950 data-[state=active]:shadow-xs"
+              className="gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 motion-reduce:transition-none data-[state=active]:bg-transparent data-[state=active]:text-stone-950 data-[state=active]:shadow-none"
               aria-label={`Tất cả ảnh (${album.totalPhotos})`}
             >
               <Images className="w-3.5 h-3.5" />
@@ -196,7 +237,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             </TabsTrigger>
             <TabsTrigger
               value="selected"
-              className="gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-stone-950 data-[state=active]:shadow-xs"
+              className="gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 motion-reduce:transition-none data-[state=active]:bg-transparent data-[state=active]:text-stone-950 data-[state=active]:shadow-none"
               aria-label={`Ảnh đã tim (${selectedCount})`}
             >
               <Heart
@@ -266,60 +307,45 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
       </div>
 
       {/* Photos Grid */}
-      {photosPending ? (
-        <div
-          role="status"
-          aria-label="Đang tải ảnh"
-          aria-busy="true"
-          className={photoGridClassName}
-        >
-          {Array.from({ length: 6 }, (_, index) => (
-            <Skeleton
-              key={index}
-              className={`aspect-[9/16] rounded-2xl ${skeletonVisibility(index)}`}
-            />
-          ))}
-        </div>
-      ) : filteredPhotos.length > 0 ? (
-        <div className={photoGridClassName}>
-          {filteredPhotos.map((photo, index) => (
-            <PhotoCard
-              key={photo.id}
-              photo={photo}
-              onClick={() => onOpenLightbox(filteredPhotos, index)}
-            />
-          ))}
-        </div>
-      ) : (
-        <Card className="rounded-2xl p-12 text-center border border-stone-200 shadow-xs space-y-3 bg-white max-w-md mx-auto my-8">
-          {album.status === "importing" ? (
-            <>
-              <div className="w-12 h-12 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-900">
-                <RefreshCw className="w-6 h-6 animate-spin" />
-              </div>
-              <h3 className="text-sm font-bold text-stone-900">
-                Đang quét ảnh từ Google Drive...
-              </h3>
-              <p className="text-xs text-stone-500">
-                Đã nhập {album.importedPhotos}/{album.totalPhotos} ảnh. Ảnh sẵn
-                sàng sẽ tự động xuất hiện tại đây.
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="w-12 h-12 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-400">
-                <Images className="w-6 h-6" />
-              </div>
-              <h3 className="text-sm font-bold text-stone-900">
-                Không có ảnh nào phù hợp
-              </h3>
-              <p className="text-xs text-stone-500">
-                Thử thay đổi bộ lọc ảnh hoặc từ khóa tìm kiếm của bạn.
-              </p>
-            </>
-          )}
-        </Card>
-      )}
+      <div ref={photoContentRef} className="flow-root">
+        {filteredPhotos.length > 0 ? (
+          <AlbumPhotoGrid
+            key={`${album.id}:${filterMode}:${searchTerm}`}
+            photos={filteredPhotos}
+            className={photoGridClassName}
+            onOpenLightbox={onOpenLightbox}
+          />
+        ) : (
+          <Card className="rounded-2xl p-12 text-center border border-stone-200 shadow-xs space-y-3 bg-white max-w-md mx-auto my-8">
+            {album.status === "importing" ? (
+              <>
+                <div className="w-12 h-12 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-900">
+                  <RefreshCw className="w-6 h-6 animate-spin" />
+                </div>
+                <h3 className="text-sm font-bold text-stone-900">
+                  Đang quét ảnh từ Google Drive...
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Đã nhập {album.importedPhotos}/{album.totalPhotos} ảnh. Ảnh sẵn
+                  sàng sẽ tự động xuất hiện tại đây.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="w-12 h-12 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-400">
+                  <Images className="w-6 h-6" />
+                </div>
+                <h3 className="text-sm font-bold text-stone-900">
+                  Không có ảnh nào phù hợp
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Thử thay đổi bộ lọc ảnh hoặc từ khóa tìm kiếm của bạn.
+                </p>
+              </>
+            )}
+          </Card>
+        )}
+      </div>
 
       <PhotoTimeSettingsModal
         key={album.id}

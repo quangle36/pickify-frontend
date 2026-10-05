@@ -46,7 +46,6 @@ export interface Album {
   selectedPhotosCount: number;
   selectionLimit: number | null;
   selectionLocked: boolean;
-  sharePreviewEnabled?: boolean;
   createdAt: string;
   expiresAt: string | null;
   readyAt?: string;

@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import type { ViewRole } from "./app.types";
 import { AppShell } from "./components/AppShell";
-import { GuestAlbumSkeleton } from "./components/GuestAlbumSkeleton";
+import { GlobalLoadingIndicator } from "./components/GlobalLoadingIndicator";
 import { useAppController } from "./hooks/useAppController";
 
 const LandingPage = lazy(() => import("@/features/landing/pages/LandingPage"));
@@ -36,46 +36,58 @@ export function App({
     isDetailView,
   });
 
+  const pagePending =
+    currentRole === "guest"
+      ? app.pending.guest
+      : currentRole === "photographer" &&
+        (app.pending.owner ||
+          app.pending.albums ||
+          (!!app.profile.id && !!app.album && app.pending.photos));
+
   return (
     <AppShell>
-      <Suspense fallback={<GuestAlbumSkeleton />}>
-        {currentRole === "landing" ? (
-          <LandingPage
-            onGoToDashboard={app.actions.dashboard}
-            onOpenGuestDemo={app.actions.dashboard}
-            onLogin={app.actions.loginHome}
-            onLogout={app.actions.logout}
-            onCreateAlbum={app.actions.loginHome}
-            isAuthenticated={Boolean(app.profile.id)}
-            isAuthPending={app.pending.owner}
-            userName={app.profile.name || undefined}
-            userEmail={app.profile.email || undefined}
-            avatarUrl={app.profile.avatarUrl || undefined}
-          />
-        ) : currentRole === "guest" ? (
-          app.pending.guest ? (
-            <GuestAlbumSkeleton />
-          ) : app.album ? (
-            <GuestAlbumPage
-              album={app.album}
-              photos={app.photos}
-              hasMorePhotos={app.hasMorePhotos}
-              loadingMorePhotos={app.loadingMorePhotos}
-              onLoadMorePhotos={app.loadMorePhotos}
-              guestVerified={app.verified}
-              readOnly={app.guestReadOnly}
-              onVerified={() => {}}
-              onExitGuestView={app.actions.exitGuest}
+      <Suspense fallback={<GlobalLoadingIndicator />}>
+        {pagePending && <GlobalLoadingIndicator />}
+        {/* Keep pages mounted so loading a new photo filter preserves their state. */}
+        <div className={pagePending ? "hidden" : "contents"}>
+          {currentRole === "landing" ? (
+            <LandingPage
+              onGoToDashboard={app.actions.dashboard}
+              onOpenGuestDemo={app.actions.dashboard}
+              onLogin={app.actions.loginHome}
+              onLogout={app.actions.logout}
+              onCreateAlbum={app.actions.loginHome}
+              isAuthenticated={Boolean(app.profile.id)}
+              isAuthPending={app.pending.owner}
+              userName={app.profile.name || undefined}
+              userEmail={app.profile.email || undefined}
+              avatarUrl={app.profile.avatarUrl || undefined}
             />
+          ) : currentRole === "guest" ? (
+            app.pending.guest ? (
+              null
+            ) : app.album ? (
+              <GuestAlbumPage
+                album={app.album}
+                photos={app.photos}
+                hasMorePhotos={app.hasMorePhotos}
+                loadingMorePhotos={app.loadingMorePhotos}
+                onLoadMorePhotos={app.loadMorePhotos}
+                guestVerified={app.verified}
+                readOnly={app.guestReadOnly}
+                onVerified={() => {}}
+                onExitGuestView={app.actions.exitGuest}
+              />
+            ) : (
+              <p className="p-12 text-center">
+                Không thể mở album. Kiểm tra lại liên kết hoặc liên hệ nhiếp ảnh
+                gia.
+              </p>
+            )
           ) : (
-            <p className="p-12 text-center">
-              Không thể mở album. Kiểm tra lại liên kết hoặc liên hệ nhiếp ảnh
-              gia.
-            </p>
-          )
-        ) : (
-          <PhotographerView app={app} isDetailView={isDetailView} />
-        )}
+            <PhotographerView app={app} isDetailView={isDetailView} />
+          )}
+        </div>
       </Suspense>
     </AppShell>
   );

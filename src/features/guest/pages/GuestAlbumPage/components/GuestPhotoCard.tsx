@@ -51,10 +51,10 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
             <Button
               size="icon" variant="ghost" onClick={() => onToggleHeart(photo)} disabled={isPending} aria-busy={isPending}
               aria-pressed={photo.isSelected} aria-label={`${photo.isSelected ? "Bỏ tim" : "Thả tim"} ${photo.name}`}
-              className={`absolute right-2 top-2 h-10 w-10 rounded-full md:right-3 md:top-3 ${photo.isSelected ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border border-white/20 bg-stone-800/90 text-stone-50 hover:bg-stone-700 hover:text-white"}`}
+              className={`absolute right-2 top-2 h-10 w-10 rounded-full text-white hover:text-white md:right-3 md:top-3 ${photo.isSelected ? "bg-primary hover:bg-primary/90" : "bg-neutral-500/90 hover:bg-neutral-600/90"}`}
             ><Heart className={`h-5 w-5 ${photo.isSelected ? "fill-current" : ""}`} /></Button>
           ) : (
-            <span role="img" aria-label="Đã chọn" className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground md:right-3 md:top-3"><Heart className="h-5 w-5 fill-current" /></span>
+            <span role="img" aria-label="Đã chọn" className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white md:right-3 md:top-3"><Heart className="h-5 w-5 fill-current" /></span>
           )
         )}
         {selectionEnabled && isFailed && (

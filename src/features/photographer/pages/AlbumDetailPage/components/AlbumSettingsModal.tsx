@@ -500,37 +500,6 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
         </div>
       </section>
 
-      <section className="rounded-xl border border-stone-200 p-3.5">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <Label htmlFor={`share-preview-${album.id}`}>Hiển thị tên và ảnh bìa khi chia sẻ</Label>
-            <p className="mt-1 text-[11px] text-stone-500">
-              Messenger và Zalo có thể lưu tên và ảnh đầu tiên của album để xem trước.
-              Tắt để dùng ảnh Pickify và tiêu đề trung tính. Preview đã gửi có thể vẫn được lưu.
-            </p>
-          </div>
-          <Switch
-            id={`share-preview-${album.id}`}
-            checked={album.sharePreviewEnabled ?? false}
-            disabled={updateAlbum.isPending}
-            onCheckedChange={async (enabled) => {
-              try {
-                await updateAlbum.mutateAsync({
-                  albumId: album.id,
-                  input: {
-                    name: album.title,
-                    slug: album.slug ?? "",
-                    selectionLimit: album.selectionLimit ?? 50,
-                    sharePreviewEnabled: enabled,
-                  },
-                });
-                toast({ variant: "dark", title: "Đã cập nhật xem trước link chia sẻ." });
-              } catch (error) { report(error); }
-            }}
-          />
-        </div>
-      </section>
-
       {/* Danger Zone: Delete Album */}
       <section className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-rose-200 bg-rose-50/40 p-3.5">
         <div className="flex items-center gap-2.5 min-w-0">

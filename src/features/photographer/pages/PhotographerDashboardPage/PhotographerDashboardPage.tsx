@@ -3,7 +3,6 @@ import { FC, useState } from "react";
 import type { Album } from "@/features/photographer/types/album.types";
 import { AlbumCard } from "./components/AlbumCard";
 import { CreateAlbumCard } from "./components/CreateAlbumCard";
-import { PhotographerDashboardSkeleton } from "./components/PhotographerDashboardSkeleton";
 import { CreateAlbumModal } from "./components/CreateAlbumModal";
 import { ShareAlbumModal } from "../AlbumDetailPage/components/ShareAlbumModal";
 import { useUpdateAlbum } from "@/features/photographer/queries/album.mutations";
@@ -15,7 +14,6 @@ interface PhotographerDashboardPageProps {
   onRetryAlbum: (albumId: string) => void;
   onDeleteAlbum: (albumId: string) => void;
   onCreateAlbum: () => void;
-  pending?: boolean;
 }
 
 const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
@@ -24,14 +22,10 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
   onRetryAlbum,
   onDeleteAlbum,
   onCreateAlbum,
-  pending = false,
 }) => {
   const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
   const [sharingAlbum, setSharingAlbum] = useState<Album | null>(null);
   const updateAlbum = useUpdateAlbum();
-  if (pending) {
-    return <PhotographerDashboardSkeleton onCreateAlbum={onCreateAlbum} />;
-  }
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-8 sm:py-8">

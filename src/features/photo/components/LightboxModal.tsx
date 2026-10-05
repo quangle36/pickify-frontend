@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/components/ui/use-toast";
 import { preloadImage } from "../utils/imagePreloader";
 
@@ -87,6 +88,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) {
+      setCommentsOpen(false);
       setRequestedIndex(null);
       prefetchedTail.current = null;
       return;
@@ -123,6 +125,8 @@ export const LightboxModal: FC<LightboxModalProps> = ({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!isOpen || !currentPhoto) return;
+      if (e.defaultPrevented) return;
+      if (commentsOpen) return;
       if (
         e.target instanceof HTMLElement &&
         e.target.closest("input, textarea, [contenteditable]")
@@ -152,6 +156,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
     },
     [
       isOpen,
+      commentsOpen,
       currentPhoto,
       currentIndex,
       photos.length,
@@ -206,22 +211,33 @@ export const LightboxModal: FC<LightboxModalProps> = ({
 
         <div className="flex shrink-0 items-center gap-2">
           {commentsBasePath && (
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Bình luận"
-              title="Bình luận / yêu cầu cho ảnh"
-              aria-expanded={commentsOpen}
-              onClick={() => setCommentsOpen((value) => !value)}
-              className="relative rounded-full text-stone-200 hover:bg-stone-800 hover:text-white"
-            >
-              <MessageSquare className="h-5 w-5" />
-              {!!currentPhoto.commentCount && (
-                <span className="absolute -right-1 -top-1 rounded-full bg-stone-700 px-1 text-xs">
-                  {currentPhoto.commentCount}
-                </span>
-              )}
-            </Button>
+            <Popover open={commentsOpen} onOpenChange={setCommentsOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Bình luận"
+                  title="Bình luận / yêu cầu cho ảnh"
+                  aria-expanded={commentsOpen}
+                  className={`relative rounded-xl text-stone-200 hover:bg-stone-800 hover:text-white ${commentsOpen ? "bg-stone-800 text-white" : ""}`}
+                >
+                  <MessageSquare className="h-5 w-5" />
+                  {!!currentPhoto.commentCount && (
+                    <span className="absolute -right-1 -top-1 rounded-full bg-stone-700 px-1 text-xs">
+                      {currentPhoto.commentCount}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PhotoCommentsPanel
+                basePath={commentsBasePath}
+                photoId={currentPhoto.id}
+                photoName={currentPhoto.name}
+                canComment={canComment}
+                open={commentsOpen}
+                onClose={() => setCommentsOpen(false)}
+              />
+            </Popover>
           )}
           {selectionEnabled ? (
             <Button
@@ -316,15 +332,6 @@ export const LightboxModal: FC<LightboxModalProps> = ({
           </Button>
         )}
       </div>
-
-      {commentsBasePath && (
-        <PhotoCommentsPanel
-          basePath={commentsBasePath}
-          photoId={currentPhoto.id}
-          canComment={canComment}
-          open={commentsOpen}
-        />
-      )}
 
       {/* Bottom Footer Info & Keyboard Hints */}
       <div className="p-4 bg-gradient-to-t from-black/80 to-transparent flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">

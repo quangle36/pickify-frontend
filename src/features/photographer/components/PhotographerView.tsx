@@ -1,10 +1,7 @@
 import type { AppController } from "@/app/hooks/useAppController";
-import PhotographerDashboardPage, {
-  PhotographerDashboardSkeleton,
-} from "@/features/photographer/pages/PhotographerDashboardPage";
+import PhotographerDashboardPage from "@/features/photographer/pages/PhotographerDashboardPage";
 import AlbumDetailPage from "@/features/photographer/pages/AlbumDetailPage";
 import { PhotographerNavbar } from "@/features/photographer/components/PhotographerNavbar";
-import { PhotographerNavbarSkeleton } from "@/features/photographer/components/PhotographerNavbarSkeleton";
 import { CreateAlbumModal } from "@/features/photographer/pages/PhotographerDashboardPage/components/CreateAlbumModal";
 import { PublicDriveHelpModal } from "@/features/photographer/pages/PhotographerDashboardPage/components/PublicDriveHelpModal";
 import { InfinitePhotoLoader } from "@/features/photo/components/InfinitePhotoLoader";
@@ -18,14 +15,7 @@ export function PhotographerView({
   isDetailView: boolean;
 }) {
   const { profile, albums, album, photos, actions, lightbox } = app;
-  if (app.pending.owner) {
-    return (
-      <>
-        <PhotographerNavbarSkeleton />
-        <PhotographerDashboardSkeleton />
-      </>
-    );
-  }
+  if (app.pending.owner) return null;
   if (!profile.id) {
     return (
       <div className="p-12 text-center">
@@ -46,7 +36,6 @@ export function PhotographerView({
           <AlbumDetailPage
             album={album}
             photos={photos}
-            photosPending={app.pending.photos}
             onOpenLightbox={lightbox.open}
           />
           <InfinitePhotoLoader
@@ -58,7 +47,6 @@ export function PhotographerView({
       ) : (
         <PhotographerDashboardPage
           albums={albums}
-          pending={app.pending.albums}
           onSelectAlbum={actions.selectAlbum}
           onRetryAlbum={actions.retryAlbum}
           onDeleteAlbum={actions.deleteAlbum}

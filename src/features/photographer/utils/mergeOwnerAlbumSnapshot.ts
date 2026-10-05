@@ -9,6 +9,5 @@ export function mergeOwnerAlbumSnapshot(
     ...photoAlbum,
     // Settings mutations refresh the album query independently of paginated photos.
     selectionLocked: album.selectionLocked,
-    sharePreviewEnabled: album.sharePreviewEnabled,
   };
 }
