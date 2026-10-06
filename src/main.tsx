@@ -1,14 +1,14 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { RouterProvider } from "@tanstack/react-router";
-import { ApiQueryProvider } from "./app/providers/ApiQueryProvider";
-import { router } from "./app/router";
+import { initAnalytics } from "./lib/analytics/analytics";
 import "./index.css";
+import "./features/landing/pages/LandingPage/LandingPage.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <ApiQueryProvider>
-      <RouterProvider router={router} />
-    </ApiQueryProvider>
-  </React.StrictMode>,
-);
+const root = document.getElementById("root")!;
+const pathname = root.dataset.prerenderPath;
+if (pathname) {
+  void import("./app/mountPublic").then(({ mountPublic }) => mountPublic(root, pathname));
+} else {
+  void import("./app/mountApp").then(({ mountApp }) => mountApp(root));
+}
+
+if (document.readyState === "complete") initAnalytics();
+else window.addEventListener("load", initAnalytics, { once: true });

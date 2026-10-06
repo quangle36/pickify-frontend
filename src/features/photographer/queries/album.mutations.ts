@@ -1,3 +1,4 @@
+import { trackAlbumCreated } from "@/lib/analytics/analytics";
 import {
   useMutation,
   useQueryClient,
@@ -54,7 +55,10 @@ export function useCreateAlbum() {
       });
       return albumService.createAlbum({ ...input, sources: input.sources! });
     },
-    onSuccess: () => invalidateAlbumData(client),
+    onSuccess: () => {
+      trackAlbumCreated();
+      return invalidateAlbumData(client);
+    },
   });
 }
 

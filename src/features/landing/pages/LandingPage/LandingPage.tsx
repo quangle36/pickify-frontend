@@ -10,39 +10,28 @@ import { ScrollReveal } from './components/ScrollReveal';
 import './LandingPage.css';
 
 interface LandingPageProps {
-  onGoToDashboard: () => void;
-  onLogin: () => void;
   onLogout: () => void;
-  onCreateAlbum: () => void;
   isAuthenticated: boolean;
   isAuthPending?: boolean;
   userName?: string;
   userEmail?: string;
   avatarUrl?: string;
-  onOpenGuestDemo: () => void;
 }
 
 const LandingPage: FC<LandingPageProps> = ({
-  onGoToDashboard,
-  onOpenGuestDemo,
-  onLogin,
   onLogout,
-  onCreateAlbum,
   isAuthenticated,
   isAuthPending,
   userName,
   userEmail,
   avatarUrl,
 }) => {
-  const handleStart = isAuthenticated ? onGoToDashboard : onLogin;
+  const startHref = isAuthenticated ? "/dashboard" : "/dashboard/sign-in";
 
   return (
     <div className="landing-page flex-1 flex flex-col bg-white text-neutral-900">
       <LandingNavbar
-        onGoToDashboard={onGoToDashboard}
-        onLogin={onLogin}
         onLogout={onLogout}
-        onCreateAlbum={onCreateAlbum}
         isAuthenticated={isAuthenticated}
         isAuthPending={isAuthPending}
         userName={userName}
@@ -51,7 +40,7 @@ const LandingPage: FC<LandingPageProps> = ({
       />
       <main className="flex-1">
         <ScrollReveal>
-          <HeroSection onStartDashboard={handleStart} />
+          <HeroSection startHref={startHref} />
         </ScrollReveal>
         <ScrollReveal>
           <HowItWorksSection />
@@ -60,17 +49,14 @@ const LandingPage: FC<LandingPageProps> = ({
           <FeaturesSection />
         </ScrollReveal>
         <ScrollReveal>
-          <PricingSection onStartDashboard={handleStart} />
+          <PricingSection startHref={startHref} />
         </ScrollReveal>
         <ScrollReveal>
           <FAQSection />
         </ScrollReveal>
       </main>
       <ScrollReveal>
-        <LandingFooter
-          onGoToDashboard={onGoToDashboard}
-          onOpenGuestDemo={onOpenGuestDemo}
-        />
+        <LandingFooter />
       </ScrollReveal>
     </div>
   );

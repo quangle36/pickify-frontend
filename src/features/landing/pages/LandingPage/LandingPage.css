@@ -27,3 +27,7 @@
     transition: none;
   }
 }
+
+#faq [role='region'][data-state='closed'] {
+  display: none;
+}

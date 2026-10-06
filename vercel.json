@@ -1,7 +1,52 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
+  "headers": [
+    {
+      "source": "/dashboard/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/album/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/",
+      "destination": "/home.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/huong-dan/gui-anh-google-drive",
+      "destination": "/gui-anh-google-drive.html"
+    },
     {
       "source": "/album/:shareId",
       "destination": "https://p01--pickify-api--cx5nvhfxlc2k.code.run/album/:shareId"
@@ -11,8 +56,43 @@
       "destination": "https://p01--pickify-api--cx5nvhfxlc2k.code.run/api/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/dashboard",
       "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard/sign-in",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard/sign-up",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard/album/:albumId",
+      "destination": "/index.html"
+    }
+  ],
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/home.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/privacy.html",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/terms.html",
+      "destination": "/terms",
+      "permanent": true
+    },
+    {
+      "source": "/gui-anh-google-drive.html",
+      "destination": "/huong-dan/gui-anh-google-drive",
+      "permanent": true
     }
   ]
 }

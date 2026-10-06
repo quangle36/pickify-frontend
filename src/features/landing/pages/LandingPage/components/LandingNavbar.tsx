@@ -19,10 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface LandingNavbarProps {
-  onGoToDashboard: () => void;
-  onLogin: () => void;
   onLogout: () => void;
-  onCreateAlbum: () => void;
   isAuthenticated: boolean;
   isAuthPending?: boolean;
   userName?: string;
@@ -31,10 +28,7 @@ interface LandingNavbarProps {
 }
 
 export function LandingNavbar({
-  onGoToDashboard,
-  onLogin,
   onLogout,
-  onCreateAlbum,
   isAuthenticated,
   isAuthPending = false,
   userName,
@@ -47,41 +41,36 @@ export function LandingNavbar({
     { id: "features", label: "Tính năng" },
     { id: "pricing", label: "Bảng giá" },
   ];
-  const navigate = (id: string) => {
-    setMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-    });
-  };
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-8 h-[72px] flex items-center justify-between gap-4">
         <Button
           variant="ghost"
-          aria-label="Lumipic — về đầu trang"
-          onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}
+          aria-label="Lumipic — về trang chủ"
+          asChild
           className="flex items-center gap-2.5 shrink-0 px-0 hover:bg-transparent"
         >
-          <span className="w-8 h-8 rounded-full bg-neutral-900 grid place-items-center text-white">
+          <a href="/" aria-label="Lumipic — về trang chủ"><span className="w-8 h-8 rounded-full bg-neutral-900 grid place-items-center text-white">
             <Heart className="w-4 h-4 fill-white" />
           </span>
           <span className="text-xl font-medium tracking-tight text-neutral-900">
             Lumipic
-          </span>
+          </span></a>
         </Button>
 
         <nav
           aria-label="Điều hướng chính"
           className="hidden md:flex items-center gap-1 text-sm text-neutral-600"
         >
+          <a href="/huong-dan/gui-anh-google-drive" className="rounded-full px-4 py-2 hover:bg-neutral-100 hover:text-neutral-900">Hướng dẫn</a>
           {links.map((link) => (
             <Button
               variant="ghost"
               key={link.id}
-              onClick={() => navigate(link.id)}
+              asChild
               className="rounded-full px-4 font-normal text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
             >
-              {link.label}
+              <a href={`#${link.id}`} onClick={() => setMenuOpen(false)}>{link.label}</a>
             </Button>
           ))}
         </nav>
@@ -99,14 +88,14 @@ export function LandingNavbar({
           ) : isAuthenticated ? (
             <>
               <Button
-                onClick={onGoToDashboard}
+                asChild
                 variant="secondary"
                 size="sm"
                 className="rounded-full gap-1.5 text-xs"
-              >
+              ><a href="/dashboard">
                 <LayoutDashboard className="w-3.5 h-3.5" />
                 <span>Dashboard</span>
-              </Button>
+              </a></Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -162,22 +151,22 @@ export function LandingNavbar({
           ) : (
             <>
               <Button
-                onClick={onLogin}
+                asChild
                 variant="ghost"
                 size="sm"
                 className="rounded-full text-xs text-neutral-700 hover:bg-neutral-100"
-              >
+              ><a href="/dashboard/sign-in">
                 <LogIn className="hidden sm:block w-3.5 h-3.5 mr-1.5" />
                 Đăng nhập
-              </Button>
+              </a></Button>
               <Button
-                onClick={onCreateAlbum}
+                asChild
                 size="sm"
                 className="rounded-full text-xs bg-neutral-900 text-white shadow-none hover:bg-neutral-700 gap-1.5"
-              >
+              ><a href="/dashboard/sign-in">
                 <Plus className="hidden sm:block w-3.5 h-3.5" />
                 Tạo album
-              </Button>
+              </a></Button>
             </>
           )}
           <Button
@@ -202,14 +191,15 @@ export function LandingNavbar({
           aria-label="Điều hướng di động"
           className="md:hidden border-t border-stone-100 p-3 flex flex-col text-sm"
         >
+          <a href="/huong-dan/gui-anh-google-drive" className="rounded-lg px-3 py-2.5 text-neutral-600 hover:bg-neutral-100">Hướng dẫn gửi ảnh</a>
           {links.map((link) => (
             <Button
               variant="ghost"
               key={link.id}
-              onClick={() => navigate(link.id)}
+              asChild
               className="justify-start rounded-lg px-3 py-2.5 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 font-normal"
             >
-              {link.label}
+              <a href={`#${link.id}`} onClick={() => setMenuOpen(false)}>{link.label}</a>
             </Button>
           ))}
         </nav>

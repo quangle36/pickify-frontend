@@ -3,11 +3,11 @@ import { Check, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PricingSectionProps {
-  onStartDashboard: () => void;
+  startHref: string;
 }
 
 export const PricingSection: FC<PricingSectionProps> = ({
-  onStartDashboard,
+  startHref,
 }) => {
   const included = [
     "Không giới hạn album",
@@ -51,11 +51,12 @@ export const PricingSection: FC<PricingSectionProps> = ({
 
           <Button
             size="lg"
-            onClick={onStartDashboard}
+            asChild
             className="w-full mt-8 h-12 rounded-full font-medium text-sm bg-neutral-900 hover:bg-neutral-700 text-white shadow-none gap-2"
           >
-            <span>Bắt đầu ngay</span>
+            <a href={startHref}><span>Bắt đầu ngay</span>
             <ArrowRight className="w-4 h-4" />
+            </a>
           </Button>
         </div>
       </div>

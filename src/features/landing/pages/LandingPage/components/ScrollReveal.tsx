@@ -6,7 +6,7 @@ interface ScrollRevealProps {
 
 export const ScrollReveal = ({ children }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const element = ref.current;

@@ -1,15 +1,20 @@
 import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
+import DriveSelectionGuidePage from "@/features/landing/pages/DriveSelectionGuidePage";
 import SignInPage from "@/features/auth/pages/SignInPage";
 import SignUpPage from "@/features/auth/pages/SignUpPage";
 import PrivacyPage from "@/features/landing/pages/PrivacyPage";
 import TermsPage from "@/features/landing/pages/TermsPage";
+import NotFoundPage from "@/features/landing/pages/NotFoundPage";
 import { DashboardAlbumRoute } from "./routes/DashboardAlbumRoute";
 import { DashboardRoute } from "./routes/DashboardRoute";
 import { GuestAlbumRoute } from "./routes/GuestAlbumRoute";
 import { LandingRoute } from "./routes/LandingRoute";
 import { RootLayout } from "./routes/RootLayout";
 
-const rootRoute = createRootRoute({ component: RootLayout });
+const rootRoute = createRootRoute({
+  component: RootLayout,
+  notFoundComponent: NotFoundPage,
+});
 
 const landingRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -47,6 +52,12 @@ const guestAlbumRoute = createRoute({
   component: GuestAlbumRoute,
 });
 
+const guideRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/huong-dan/gui-anh-google-drive",
+  component: DriveSelectionGuidePage,
+});
+
 const privacyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/privacy",
@@ -66,6 +77,7 @@ const routeTree = rootRoute.addChildren([
   signInRoute,
   signUpRoute,
   guestAlbumRoute,
+  guideRoute,
   privacyRoute,
   termsRoute,
 ]);

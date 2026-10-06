@@ -50,11 +50,7 @@ export function App({
         <div className={pagePending ? "hidden" : "contents"}>
           {currentRole === "landing" ? (
             <LandingPage
-              onGoToDashboard={app.actions.dashboard}
-              onOpenGuestDemo={app.actions.dashboard}
-              onLogin={app.actions.loginHome}
               onLogout={app.actions.logout}
-              onCreateAlbum={app.actions.loginHome}
               isAuthenticated={Boolean(app.profile.id)}
               isAuthPending={app.pending.owner}
               userName={app.profile.name || undefined}

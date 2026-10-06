@@ -1,5 +1,6 @@
 node_modules
 dist
+.prerender
 .pnpm-store
 .DS_Store
 *.local

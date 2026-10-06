@@ -25,23 +25,10 @@ export function useAppEffects({ pathname, currentRole, isDetailView, album, clos
     }
   }, [navigate]);
   useEffect(() => {
-    let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
-    if (!robots) {
-      robots = document.createElement("meta");
-      robots.name = "robots";
-      document.head.append(robots);
+    if (currentRole !== "landing" && album && (isDetailView || currentRole === "guest")) {
+      document.title = `${album.title} — Lumipic`;
     }
-    const isPrivateRoute = currentRole !== "landing";
-    robots.content = isPrivateRoute ? "noindex,nofollow" : "index,follow";
-    document.title =
-      currentRole === "landing"
-        ? "Lumipic — Chọn ảnh từ Google Drive"
-        : isDetailView && album
-          ? `${album.title} — Lumipic`
-          : currentRole === "guest" && album
-            ? `${album.title} — Lumipic`
-            : "Dashboard — Lumipic";
-  }, [currentRole, isDetailView, album]);
+  }, [pathname, currentRole, isDetailView, album]);
   useEffect(() => {
     const authError = new URLSearchParams(location.search).get("authError");
     if (authError) {
