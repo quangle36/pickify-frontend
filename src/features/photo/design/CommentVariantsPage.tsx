@@ -16,7 +16,7 @@ export function CommentVariantsPage() {
   return (
     <main className="guest-album variants-page">
       <header className="variants-header">
-        <div><p className="eyebrow">PICKIFY · THIẾT KẾ BÌNH LUẬN</p><h1>5 phương án dropdown</h1><p>Khung mở dưới nút bình luận; giữ nguyên ảnh trong lightbox.</p></div>
+        <div><p className="eyebrow">LUMIPIC · THIẾT KẾ BÌNH LUẬN</p><h1>5 phương án dropdown</h1><p>Khung mở dưới nút bình luận; giữ nguyên ảnh trong lightbox.</p></div>
         <span className="preview-label">Bản xem thiết kế · Không gửi dữ liệu</span>
       </header>
       <nav className="variants-nav" aria-label="Chọn phương án">

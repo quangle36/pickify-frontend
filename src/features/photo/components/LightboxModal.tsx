@@ -18,6 +18,7 @@ import { formatShotTime } from "@/features/photographer/utils/photoTime";
 import { PhotoCommentsPanel } from "./PhotoCommentsPanel";
 
 interface LightboxModalProps {
+  theme?: "light" | "dark";
   photos: Photo[];
   totalPhotos: number;
   currentIndex: number;
@@ -34,6 +35,7 @@ interface LightboxModalProps {
 }
 
 export const LightboxModal: FC<LightboxModalProps> = ({
+  theme = "dark",
   photos,
   totalPhotos,
   currentIndex,
@@ -193,16 +195,16 @@ export const LightboxModal: FC<LightboxModalProps> = ({
   if (!isOpen || !currentPhoto) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between select-none">
+    <div className={`fixed inset-0 z-50 flex flex-col justify-between select-none ${theme === "light" ? "guest-album bg-background text-foreground" : "bg-black/95"}`}>
       {/* Top Header Bar */}
-      <div className="p-4 flex items-center justify-between text-white bg-gradient-to-b from-black/80 to-transparent z-10">
+      <div className={`p-4 flex items-center justify-between z-10 ${theme === "light" ? "border-b border-border bg-card text-foreground" : "text-white bg-gradient-to-b from-black/80 to-transparent"}`}>
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <span className="truncate max-w-[40vw] font-mono text-xs sm:text-sm font-bold tracking-wider">
             {currentPhoto.name}
           </span>
           <Badge
             variant="outline"
-            className="text-stone-400 border-stone-700 bg-stone-900/50"
+            className={`${theme === "light" ? "text-muted-foreground border-border bg-muted" : "text-stone-400 border-stone-700 bg-stone-900/50"}`}
             aria-label={`Ảnh ${currentPhoto.position} trên tổng ${totalPhotos} ảnh`}
           >
             Ảnh {currentPhoto.position} / {totalPhotos}
@@ -219,17 +221,18 @@ export const LightboxModal: FC<LightboxModalProps> = ({
                   aria-label="Bình luận"
                   title="Bình luận / yêu cầu cho ảnh"
                   aria-expanded={commentsOpen}
-                  className={`relative rounded-xl text-stone-200 hover:bg-stone-800 hover:text-white ${commentsOpen ? "bg-stone-800 text-white" : ""}`}
+                  className={`relative rounded-xl ${theme === "light" ? `text-muted-foreground hover:bg-muted hover:text-foreground ${commentsOpen ? "bg-muted text-foreground" : ""}` : `text-stone-200 hover:bg-stone-800 hover:text-white ${commentsOpen ? "bg-stone-800 text-white" : ""}`}`}
                 >
                   <MessageSquare className="h-5 w-5" />
                   {!!currentPhoto.commentCount && (
-                    <span className="absolute -right-1 -top-1 rounded-full bg-stone-700 px-1 text-xs">
+                    <span className={`absolute -right-1 -top-1 rounded-full px-1 text-xs ${theme === "light" ? "bg-muted text-foreground" : "bg-stone-700"}`}>
                       {currentPhoto.commentCount}
                     </span>
                   )}
                 </Button>
               </PopoverTrigger>
               <PhotoCommentsPanel
+                theme={theme}
                 basePath={commentsBasePath}
                 photoId={currentPhoto.id}
                 photoName={currentPhoto.name}
@@ -251,8 +254,8 @@ export const LightboxModal: FC<LightboxModalProps> = ({
               variant={currentPhoto.isSelected ? "default" : "secondary"}
               className={`rounded-full transition-all ${
                 currentPhoto.isSelected
-                  ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/40 animate-heart-pop"
-                  : "bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 border-stone-700"
+                  ? theme === "light" ? "bg-primary hover:bg-primary/90 text-primary-foreground animate-heart-pop" : "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/40 animate-heart-pop"
+                  : theme === "light" ? "bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary border-border" : "bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 border-stone-700"
               }`}
             >
               <Heart
@@ -272,8 +275,8 @@ export const LightboxModal: FC<LightboxModalProps> = ({
               }
               className={`flex h-10 w-10 items-center justify-center rounded-full ${
                 currentPhoto.isSelected
-                  ? "bg-rose-500 text-white shadow-lg shadow-rose-500/40"
-                  : "bg-stone-800 text-stone-400"
+                  ? theme === "light" ? "bg-primary text-primary-foreground" : "bg-rose-500 text-white shadow-lg shadow-rose-500/40"
+                  : theme === "light" ? "bg-muted text-muted-foreground" : "bg-stone-800 text-stone-400"
               }`}
             >
               <Heart
@@ -286,7 +289,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
             size="icon"
             variant="ghost"
             onClick={onClose}
-            className="rounded-full text-stone-400 hover:text-white hover:bg-stone-800"
+            className={`rounded-full ${theme === "light" ? "text-muted-foreground hover:text-foreground hover:bg-muted" : "text-stone-400 hover:text-white hover:bg-stone-800"}`}
             title="Đóng (Esc)"
           >
             <X className="w-6 h-6" />
@@ -334,7 +337,7 @@ export const LightboxModal: FC<LightboxModalProps> = ({
       </div>
 
       {/* Bottom Footer Info & Keyboard Hints */}
-      <div className="p-4 bg-gradient-to-t from-black/80 to-transparent flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">
+      <div className={`p-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs ${theme === "light" ? "border-t border-border bg-card text-muted-foreground" : "bg-gradient-to-t from-black/80 to-transparent text-stone-400"}`}>
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <span>
             {currentPhoto.sourceLabel ?? "Máy 1"} ·{" "}
@@ -346,25 +349,25 @@ export const LightboxModal: FC<LightboxModalProps> = ({
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-2 text-[11px] text-stone-400">
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+        <div className={`hidden md:flex items-center gap-2 text-[11px] ${theme === "light" ? "text-muted-foreground" : "text-stone-400"}`}>
+          <kbd className={`px-1.5 py-0.5 rounded border ${theme === "light" ? "bg-muted text-foreground border-border" : "bg-stone-800 text-stone-200 border-stone-700"}`}>
             ←
           </kbd>
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+          <kbd className={`px-1.5 py-0.5 rounded border ${theme === "light" ? "bg-muted text-foreground border-border" : "bg-stone-800 text-stone-200 border-stone-700"}`}>
             →
           </kbd>
           <span>Chuyển ảnh</span>
           {selectionEnabled ? (
             <>
               <span className="mx-1">•</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+              <kbd className={`px-1.5 py-0.5 rounded border ${theme === "light" ? "bg-muted text-foreground border-border" : "bg-stone-800 text-stone-200 border-stone-700"}`}>
                 Space
               </kbd>
               <span>Thả tim</span>
             </>
           ) : null}
           <span className="mx-1">•</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-stone-800 text-stone-200 border border-stone-700">
+          <kbd className={`px-1.5 py-0.5 rounded border ${theme === "light" ? "bg-muted text-foreground border-border" : "bg-stone-800 text-stone-200 border-stone-700"}`}>
             Esc
           </kbd>
           <span>Đóng</span>

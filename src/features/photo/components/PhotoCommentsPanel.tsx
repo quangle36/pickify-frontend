@@ -15,6 +15,7 @@ interface Props {
   basePath: string;
   canComment: boolean;
   open: boolean;
+  theme?: "light" | "dark";
 }
 
 export function PhotoCommentsPanel({
@@ -24,6 +25,7 @@ export function PhotoCommentsPanel({
   basePath,
   canComment,
   open,
+  theme = "dark",
 }: Props) {
   const inputId = useId();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -71,7 +73,7 @@ export function PhotoCommentsPanel({
       sideOffset={12}
       collisionPadding={16}
       aria-label="Bình luận ảnh"
-      className="guest-album z-[60] w-[360px] max-w-[calc(100vw-32px)] max-h-[min(70dvh,var(--radix-popover-content-available-height))] overflow-y-auto rounded-2xl border-stone-700 bg-[#262220] p-0 text-stone-100 shadow-xl shadow-black/40 select-text"
+      className={`${theme === "light" ? "guest-album" : "photo-comments-dark"} z-[60] w-[360px] max-w-[calc(100vw-32px)] max-h-[min(70dvh,var(--radix-popover-content-available-height))] overflow-y-auto rounded-2xl border-border bg-popover p-0 text-foreground shadow-xl shadow-black/10 select-text`}
       onOpenAutoFocus={(event) => {
         event.preventDefault();
         if (canComment) textareaRef.current?.focus();
@@ -87,7 +89,7 @@ export function PhotoCommentsPanel({
           size="icon"
           aria-label="Đóng bình luận"
           onClick={onClose}
-          className="-mr-1 h-8 w-8 rounded-lg text-stone-400 hover:bg-stone-700 hover:text-stone-100"
+          className="-mr-1 h-8 w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </Button>
@@ -105,7 +107,7 @@ export function PhotoCommentsPanel({
               maxLength={2000}
               disabled={addComment.isPending}
               placeholder="Ví dụ: Làm sáng gương mặt, giữ màu áo tự nhiên…"
-              className="h-[106px] min-h-[106px] resize-none rounded-xl border-stone-600 bg-stone-900 p-3 text-base leading-relaxed text-stone-100 placeholder:text-stone-400 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 focus-visible:ring-offset-0 md:text-sm"
+              className="h-[106px] min-h-[106px] resize-none rounded-xl border-input bg-background p-3 text-base leading-relaxed text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/20 focus-visible:ring-offset-0 md:text-sm"
               onChange={(event) => {
                 const value = event.target.value;
                 setDrafts((previous) => ({
@@ -120,18 +122,18 @@ export function PhotoCommentsPanel({
             />
           </div>
           {errors[photoId] && (
-            <p role="alert" className="text-xs text-red-400">
+            <p role="alert" className="text-xs text-destructive">
               {errors[photoId]}
             </p>
           )}
           <div className="flex min-w-0 items-center justify-between gap-3">
-            <span className="truncate font-mono text-[11px] text-stone-400" title={photoName}>
+            <span className="truncate font-mono text-[11px] text-muted-foreground" title={photoName}>
               {photoName}
             </span>
             <Button
               type="submit"
               disabled={!content.trim() || addComment.isPending}
-              className="h-10 shrink-0 rounded-xl bg-rose-300 px-3.5 text-[13px] font-semibold text-stone-900 shadow-none hover:bg-rose-200"
+              className="h-10 shrink-0 rounded-xl bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-none hover:bg-primary/90"
             >
               {addComment.isPending ? "Đang gửi…" : "Gửi bình luận"}
             </Button>
@@ -139,27 +141,27 @@ export function PhotoCommentsPanel({
         </form>
       )}
       {(comments.isPending || comments.isError || list.length > 0 || !canComment) && (
-        <div className="space-y-3 border-t border-stone-700 px-4 py-3">
+        <div className="space-y-3 border-t border-border px-4 py-3">
           {comments.isPending && (
-            <p role="status" className="text-xs text-stone-400">Đang tải bình luận…</p>
+            <p role="status" className="text-xs text-muted-foreground">Đang tải bình luận…</p>
           )}
           {comments.isError && (
-            <div role="alert" className="flex items-center justify-between gap-3 text-xs text-red-400">
+            <div role="alert" className="flex items-center justify-between gap-3 text-xs text-destructive">
               Không tải được bình luận.
-              <Button variant="outline" className="shrink-0 border-stone-600 bg-stone-800 text-stone-100 hover:bg-stone-700 hover:text-white" onClick={() => void comments.refetch()}>
+              <Button variant="outline" className="shrink-0 border-input bg-muted text-foreground hover:bg-muted hover:text-foreground" onClick={() => void comments.refetch()}>
                 Thử lại
               </Button>
             </div>
           )}
           {!comments.isPending && !comments.isError && list.length === 0 && (
-            <p className="text-xs text-stone-400">Chưa có bình luận nào.</p>
+            <p className="text-xs text-muted-foreground">Chưa có bình luận nào.</p>
           )}
           <div className="space-y-3" aria-live="polite">
             {list.map((comment) => (
-              <article key={comment.id} className="space-y-1 border-b border-stone-700 pb-3 last:border-0 last:pb-0">
+              <article key={comment.id} className="space-y-1 border-b border-border pb-3 last:border-0 last:pb-0">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-medium">Khách hàng</span>
-                  <time dateTime={comment.createdAt} title={new Date(comment.createdAt).toLocaleString("vi-VN")} className="text-xs text-stone-400">
+                  <time dateTime={comment.createdAt} title={new Date(comment.createdAt).toLocaleString("vi-VN")} className="text-xs text-muted-foreground">
                     {new Date(comment.createdAt).toLocaleString("vi-VN")}
                   </time>
                 </div>
@@ -168,7 +170,7 @@ export function PhotoCommentsPanel({
             ))}
           </div>
           {comments.hasNextPage && (
-            <Button variant="outline" className="border-stone-600 bg-stone-800 text-stone-100 hover:bg-stone-700 hover:text-white" disabled={comments.isFetchingNextPage} onClick={() => void comments.fetchNextPage()}>
+            <Button variant="outline" className="border-input bg-muted text-foreground hover:bg-muted hover:text-foreground" disabled={comments.isFetchingNextPage} onClick={() => void comments.fetchNextPage()}>
               Xem thêm bình luận
             </Button>
           )}

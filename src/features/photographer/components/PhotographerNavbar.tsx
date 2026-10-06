@@ -38,7 +38,7 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
               <Heart className="w-4 h-4 fill-white" />
             </div>
             <span className="text-left text-base font-semibold leading-tight text-stone-900">
-              Pickify
+              Lumipic
             </span>
           </Link>
 

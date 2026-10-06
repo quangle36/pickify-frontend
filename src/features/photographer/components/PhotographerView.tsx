@@ -36,6 +36,7 @@ export function PhotographerView({
           <AlbumDetailPage
             album={album}
             photos={photos}
+            loadingPhotos={app.pending.photos}
             onOpenLightbox={lightbox.open}
           />
           <InfinitePhotoLoader

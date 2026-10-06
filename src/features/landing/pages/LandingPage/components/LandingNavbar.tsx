@@ -58,7 +58,7 @@ export function LandingNavbar({
       <div className="max-w-6xl mx-auto px-4 sm:px-8 h-[72px] flex items-center justify-between gap-4">
         <Button
           variant="ghost"
-          aria-label="Pickify — về đầu trang"
+          aria-label="Lumipic — về đầu trang"
           onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}
           className="flex items-center gap-2.5 shrink-0 px-0 hover:bg-transparent"
         >
@@ -66,7 +66,7 @@ export function LandingNavbar({
             <Heart className="w-4 h-4 fill-white" />
           </span>
           <span className="text-xl font-medium tracking-tight text-neutral-900">
-            Pickify
+            Lumipic
           </span>
         </Button>
 
@@ -139,7 +139,7 @@ export function LandingNavbar({
                   <DropdownMenuLabel className="px-2.5 py-2 font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="truncate text-xs font-bold leading-none text-stone-900">
-                        {userName || "Tài khoản Pickify"}
+                        {userName || "Tài khoản Lumipic"}
                       </p>
                       {userEmail && (
                         <p className="truncate text-[11px] leading-none text-stone-500">

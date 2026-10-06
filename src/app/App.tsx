@@ -40,9 +40,7 @@ export function App({
     currentRole === "guest"
       ? app.pending.guest
       : currentRole === "photographer" &&
-        (app.pending.owner ||
-          app.pending.albums ||
-          (!!app.profile.id && !!app.album && app.pending.photos));
+        (app.pending.owner || app.pending.albums);
 
   return (
     <AppShell>

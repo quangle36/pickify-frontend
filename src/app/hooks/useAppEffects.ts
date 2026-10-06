@@ -35,12 +35,12 @@ export function useAppEffects({ pathname, currentRole, isDetailView, album, clos
     robots.content = isPrivateRoute ? "noindex,nofollow" : "index,follow";
     document.title =
       currentRole === "landing"
-        ? "Pickify — Chọn ảnh từ Google Drive"
+        ? "Lumipic — Chọn ảnh từ Google Drive"
         : isDetailView && album
-          ? `${album.title} — Pickify`
+          ? `${album.title} — Lumipic`
           : currentRole === "guest" && album
-            ? `${album.title} — Pickify`
-            : "Dashboard — Pickify";
+            ? `${album.title} — Lumipic`
+            : "Dashboard — Lumipic";
   }, [currentRole, isDetailView, album]);
   useEffect(() => {
     const authError = new URLSearchParams(location.search).get("authError");

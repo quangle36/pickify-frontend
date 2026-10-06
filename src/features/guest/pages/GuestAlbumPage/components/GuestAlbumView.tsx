@@ -122,7 +122,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
         <div className="mx-auto flex max-w-[1392px] items-center justify-between gap-3">
           <span className="flex items-center gap-2 text-sm font-semibold">
             <Heart className="h-5 w-5 text-primary" />
-            Pickify
+            Lumipic
           </span>
           <Button
             variant="ghost"
@@ -152,8 +152,8 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
           </Alert>
         )}
         {!readOnly && Object.values(failedSaves).some(Boolean) && (
-          <Alert className="mb-4 rounded-xl border-amber-800 bg-amber-950 text-amber-200">
-            <AlertCircle className="h-4 w-4 text-amber-400" />
+          <Alert className="mb-4 rounded-xl border-amber-200 bg-amber-50 text-amber-900">
+            <AlertCircle className="h-4 w-4 text-amber-700" />
             <AlertDescription>
               Kết nối mạng gián đoạn. Có ảnh chưa lưu vào máy chủ. Bấm “Thử lại”
               trên ảnh để lưu lại.
@@ -172,7 +172,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
                 variant="ghost"
                 aria-pressed={!filterOnlyHearts}
                 onClick={() => setFilterOnlyHearts(false)}
-                className={`min-h-10 gap-2 px-3 hover:bg-muted hover:text-foreground ${!filterOnlyHearts ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+                className={`min-h-10 gap-2 px-3 hover:text-foreground ${!filterOnlyHearts ? "bg-muted text-foreground hover:bg-foreground/10" : "text-muted-foreground hover:bg-foreground/5"}`}
               >
                 Tất cả{" "}
                 <span className="text-xs font-normal tabular-nums text-muted-foreground">
@@ -184,7 +184,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
                   variant="ghost"
                   aria-pressed={filterOnlyHearts}
                   onClick={() => setFilterOnlyHearts(true)}
-                  className={`min-h-10 gap-2 px-3 hover:bg-muted hover:text-foreground ${filterOnlyHearts ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+                  className={`min-h-10 gap-2 px-3 hover:text-foreground ${filterOnlyHearts ? "bg-muted text-foreground hover:bg-foreground/10" : "text-muted-foreground hover:bg-foreground/5"}`}
                 >
                   Đã chọn{" "}
                   <span className="text-xs font-normal tabular-nums text-muted-foreground">
@@ -286,6 +286,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
 
       {/* Lightbox for Guest View */}
       <LightboxModal
+        theme="light"
         commentsBasePath={
           readOnly ? undefined : `/public/albums/${album.shareId}`
         }

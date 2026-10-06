@@ -5,10 +5,10 @@ export default function TermsPage() {
     <LegalPage title="Điều khoản sử dụng">
       <p>
         Người dùng chịu trách nhiệm về quyền sử dụng và chia sẻ nội dung được
-        đưa vào Pickify.
+        đưa vào Lumipic.
       </p>
       <p>
-        Dịch vụ được cung cấp theo khả năng hiện có. Pickify có thể giới hạn
+        Dịch vụ được cung cấp theo khả năng hiện có. Lumipic có thể giới hạn
         hoặc ngừng quyền truy cập khi phát hiện hành vi lạm dụng hay vi phạm
         pháp luật.
       </p>

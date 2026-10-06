@@ -103,30 +103,57 @@
   }
 }
 
-/* Approved guest album B: scoped dark palette, including the lighter rose accent. */
+/* Guest surfaces define their full palette, including portaled comments. */
 .guest-album {
+  color-scheme: light;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --background: 40 20% 98%;
+  --foreground: 20 14% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 14% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14% 12%;
+  --secondary: 30 10% 95%;
+  --secondary-foreground: 20 14% 15%;
+  --muted: 30 10% 94%;
+  --muted-foreground: 25 5% 40%;
+  --accent: 347 100% 97%;
+  --accent-foreground: 347 77% 40%;
+  --border: 24 6% 88%;
+  --input: 24 6% 88%;
+  --primary: 347 77% 45%;
+  --primary-foreground: 0 0% 100%;
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 347 77% 45%;
+}
+
+/* Shared owner lightboxes retain their dark comment surfaces. */
+.photo-comments-dark {
   color-scheme: dark;
   font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   --background: 20 14% 8%;
   --foreground: 40 20% 98%;
-  --card: 20 14% 10%;
-  --card-foreground: 40 20% 98%;
+  --popover: 20 10% 14%;
+  --popover-foreground: 40 20% 98%;
   --muted: 20 10% 16%;
   --muted-foreground: 25 5% 65%;
-  --border: 20 10% 20%;
-  --input: 20 10% 20%;
+  --border: 20 10% 30%;
+  --input: 20 10% 35%;
   --primary: 347 89% 70%;
   --primary-foreground: 20 14% 12%;
+  --destructive: 0 90% 75%;
+  --ring: 25 5% 65%;
 }
 
 html:has(.guest-album) {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body:has(.guest-album),
 .app-shell:has(.guest-album) {
-  background: hsl(20 14% 8%);
-  color-scheme: dark;
+  background: hsl(40 20% 98%);
+  color-scheme: light;
 }
 
 /* Keep album controls in place when a filter removes the page scrollbar. */

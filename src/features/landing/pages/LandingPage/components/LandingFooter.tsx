@@ -18,7 +18,7 @@ export const LandingFooter: FC<LandingFooterProps> = ({
           <div className="w-6 h-6 rounded-full bg-neutral-900 grid place-items-center text-white">
             <Heart className="w-3 h-3 fill-white" />
           </div>
-          <span className="text-sm font-bold text-stone-900">Pickify</span>
+          <span className="text-sm font-bold text-stone-900">Lumipic</span>
           <span className="text-xs text-stone-400">© 2026</span>
         </div>
 

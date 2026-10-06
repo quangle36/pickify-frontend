@@ -225,7 +225,7 @@ export function LocalPhotoFilterModal({
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Trình duyệt chưa được hỗ trợ</AlertTitle>
           <AlertDescription>
-            Hãy mở Pickify bằng phiên bản Chrome hoặc Edge mới nhất qua kết nối
+            Hãy mở Lumipic bằng phiên bản Chrome hoặc Edge mới nhất qua kết nối
             HTTPS để chọn và ghi trực tiếp vào thư mục trên máy.
           </AlertDescription>
         </Alert>

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
 import { AlbumPhotoGrid } from "./components/AlbumPhotoGrid";
+import { AlbumPhotoGridSkeleton } from "./components/AlbumPhotoGridSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -26,12 +27,14 @@ import { ShareAlbumModal } from "./components/ShareAlbumModal";
 interface AlbumDetailPageProps {
   album: Album;
   photos: Photo[];
+  loadingPhotos: boolean;
   onOpenLightbox: (photos: Photo[], index: number) => void;
 }
 
 const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
   album,
   photos,
+  loadingPhotos,
   onOpenLightbox,
 }) => {
   const filterPhotos = usePhotoFilters(album.id);
@@ -308,7 +311,9 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
 
       {/* Photos Grid */}
       <div ref={photoContentRef} className="flow-root">
-        {filteredPhotos.length > 0 ? (
+        {loadingPhotos ? (
+          <AlbumPhotoGridSkeleton className={photoGridClassName} />
+        ) : filteredPhotos.length > 0 ? (
           <AlbumPhotoGrid
             key={`${album.id}:${filterMode}:${searchTerm}`}
             photos={filteredPhotos}

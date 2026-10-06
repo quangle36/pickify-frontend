@@ -44,7 +44,7 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
 
   return (
     <main
-      className="flex min-h-dvh items-center justify-center bg-background px-8 py-12 text-foreground md:px-6 md:py-14"
+      className="guest-album flex min-h-dvh items-center justify-center bg-background px-8 py-12 text-foreground md:px-6 md:py-14"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       <div className="w-full max-w-[360px] md:max-w-[400px]">
@@ -52,7 +52,7 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
           <span className="grid size-7 place-items-center rounded-full bg-neutral-900 text-white">
             <Heart className="size-[18px] fill-current" aria-hidden="true" />
           </span>
-          <span>Pickify</span>
+          <span>Lumipic</span>
         </div>
 
         <div className="mb-8">

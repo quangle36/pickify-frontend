@@ -29,7 +29,7 @@ const content = {
     alternateTo: "/dashboard/sign-up" as const,
   },
   "sign-up": {
-    eyebrow: "Bắt đầu với Pickify",
+    eyebrow: "Bắt đầu với Lumipic",
     title: "Trao ảnh tinh tế. Chốt lựa chọn nhanh hơn.",
     description:
       "Tạo không gian làm việc cho studio và biến mỗi album Drive thành trải nghiệm chọn ảnh thật dễ chịu.",
@@ -66,7 +66,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-    document.title = `${mode === "sign-in" ? "Đăng nhập" : "Đăng ký"} — Pickify`;
+    document.title = `${mode === "sign-in" ? "Đăng nhập" : "Đăng ký"} — Lumipic`;
     let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
     if (!robots) {
       robots = document.createElement("meta");
@@ -108,14 +108,14 @@ export function AuthScreen({ mode }: AuthScreenProps) {
         <header className="flex h-20 items-center justify-between sm:h-24">
           <Link
             to="/"
-            aria-label="Pickify — về trang chủ"
+            aria-label="Lumipic — về trang chủ"
             className="group flex items-center gap-2.5"
           >
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-stone-900 text-white shadow-lg shadow-stone-900/15 transition-all duration-200 group-hover:-rotate-6">
               <Heart className="h-[18px] w-[18px] fill-white" />
             </span>
             <span className="text-xl font-extrabold tracking-[-0.04em]">
-              Pickify
+              Lumipic
             </span>
           </Link>
           <Link
@@ -214,14 +214,14 @@ export function AuthScreen({ mode }: AuthScreenProps) {
                 >
                   Chính sách quyền riêng tư
                 </Link>{" "}
-                của Pickify.
+                của Lumipic.
               </p>
             </div>
           </div>
         </div>
 
         <footer className="pb-6 text-center text-xs text-stone-600">
-          Pickify &copy; 2026. Nền tảng chọn ảnh số 1 cho photographer.
+          Lumipic &copy; 2026. Nền tảng chọn ảnh số 1 cho photographer.
         </footer>
       </div>
     </main>

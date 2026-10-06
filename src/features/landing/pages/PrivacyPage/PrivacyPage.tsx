@@ -4,7 +4,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage title="Chính sách quyền riêng tư">
       <p>
-        Pickify dùng thông tin tài khoản Google để xác thực người dùng và chỉ
+        Lumipic dùng thông tin tài khoản Google để xác thực người dùng và chỉ
         truy cập các thư mục Google Drive mà người dùng chủ động kết nối.
       </p>
       <p>

@@ -9,9 +9,9 @@ import {
 export const FAQSection: FC = () => {
   const faqs = [
     {
-      question: "Pickify có thể can thiệp file trên Google Drive không?",
+      question: "Lumipic có thể can thiệp file trên Google Drive không?",
       answer:
-        "Không. Pickify chỉ đọc folder được chia sẻ công khai, không sửa hoặc xóa ảnh gốc.",
+        "Không. Lumipic chỉ đọc folder được chia sẻ công khai, không sửa hoặc xóa ảnh gốc.",
     },
     {
       question: "Khách có cần đăng nhập hay cài app không?",

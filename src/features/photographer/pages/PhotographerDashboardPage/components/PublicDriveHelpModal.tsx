@@ -29,8 +29,8 @@ export function PublicDriveHelpModal({
         </li>
       </ol>
       <p className="text-sm text-stone-600">
-        Người có link Drive public có thể xem ảnh gốc. Mật khẩu Pickify chỉ bảo
-        vệ album trên Pickify.
+        Người có link Drive public có thể xem ảnh gốc. Mật khẩu Lumipic chỉ bảo
+        vệ album trên Lumipic.
       </p>
     </AppModal>
   );
