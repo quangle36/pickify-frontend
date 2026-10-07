@@ -1,6 +1,20 @@
 import axios from "axios";
 
 export const apiMessages: Record<string, string> = {
+  ADMIN_REQUIRED: 'Trang này chỉ dành cho quản trị viên.',
+  ADMIN_PERMISSION_PROTECTED: 'Không thể thu hồi quyền của quản trị viên tại đây.',
+  USER_NOT_FOUND: 'Không tìm thấy tài khoản đã đăng ký.',
+  EMAIL_VERIFICATION_REQUIRED: 'Hãy đăng nhập bằng Google với cùng email để xác minh tài khoản.',
+  ACCOUNT_LINK_REQUIRED: 'Email này có nhiều tài khoản liên kết. Vui lòng liên hệ quản trị viên.',
+  ALBUM_CREATION_NOT_ALLOWED: 'Tài khoản chưa được quản trị viên cấp quyền tạo album.',
+  ALBUM_LIMIT_REACHED: 'Bạn đã đạt giới hạn album. Hãy xoá album không còn dùng và chờ dọn xong.',
+  USER_STORAGE_LIMIT_REACHED: 'Tài khoản đã đạt hạn mức dung lượng. Hãy xoá album không còn dùng.',
+  GLOBAL_STORAGE_LIMIT_REACHED: 'Hệ thống tạm dừng import vì đã đạt hạn mức dung lượng.',
+  STORAGE_RECONCILIATION_REQUIRED: 'Hệ thống đang đối soát dung lượng. Vui lòng thử lại sau.',
+  DAILY_IMPORT_LIMIT_REACHED: 'Bạn đã đạt giới hạn tạo hoặc thử lại album trong ngày.',
+  DISPLAY_FILE_TOO_LARGE: 'Ảnh sau xử lý vượt giới hạn dung lượng cho phép.',
+  IMPORT_RETENTION_EXPIRED: 'Album import đã hết hạn lưu trữ. Hãy xoá album này và tạo album mới.',
+  SELECTION_FILTER_NOT_ALLOWED: 'Chế độ chỉ xem không hỗ trợ lọc ảnh đã chọn.',
   SOURCE_REQUIRED: "Hãy chọn máy ảnh cần lọc file.",
   CAPTURE_TIME_MISSING: "Ảnh này thiếu giờ gốc. Hãy đặt giờ riêng cho ảnh thay vì bù giờ cả máy.",
   ALBUM_NOT_READY_FOR_TIME_EDIT: "Hãy chờ import hoàn tất trước khi chỉnh giờ hoặc thứ tự ảnh.",

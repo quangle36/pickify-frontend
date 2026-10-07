@@ -63,11 +63,15 @@ export const albumService = {
     }),
 
   getAlbums: async (signal?: AbortSignal) => {
-    const result = await apiRequest<{ albums: Album[] }>({
-      url: "/albums",
-      signal,
-    });
-    return result.albums
+    // Fetch bounded pages sequentially for legacy accounts above the new cap.
+    const albums: Album[] = [];
+    let cursor: string | null = null;
+    do {
+      const result: { albums: Album[]; nextCursor: string | null } = await apiRequest({ url: '/albums', params: { limit: 50, ...(cursor ? { cursor } : {}) }, signal });
+      albums.push(...result.albums);
+      cursor = result.nextCursor;
+    } while (cursor);
+    return albums
       .filter((album) => !["deleting", "deleted"].includes(album.status))
       .map((album) => ({
         ...album,

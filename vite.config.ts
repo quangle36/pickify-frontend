@@ -27,7 +27,7 @@ export default defineConfig(({ mode, command }) => {
           }
           const page = publicPages[pathname as keyof typeof publicPages];
           if (page) req.url = `/${page.file}${url.search}`;
-          else if (/^\/dashboard(?:\/(?:sign-in|sign-up|album\/[^/]+))?$/.test(pathname) || /^\/album\/[^/]+$/.test(pathname) || pathname === "/app.html") {
+          else if (/^\/dashboard(?:\/(?:sign-in|sign-up|admin|album\/[^/]+))?$/.test(pathname) || /^\/album\/[^/]+$/.test(pathname) || pathname === "/app.html") {
             res.setHeader("X-Robots-Tag", "noindex, nofollow");
             req.url = "/app.html";
           } else if (!pathname.startsWith("/assets/") && !pathname.startsWith("/images/") && !["/robots.txt", "/sitemap.xml", "/404.html", "/favicon.png", "/favicon.ico", "/apple-touch-icon.png"].includes(pathname)) {

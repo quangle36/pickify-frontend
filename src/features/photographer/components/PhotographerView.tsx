@@ -6,6 +6,8 @@ import { CreateAlbumModal } from "@/features/photographer/pages/PhotographerDash
 import { PublicDriveHelpModal } from "@/features/photographer/pages/PhotographerDashboardPage/components/PublicDriveHelpModal";
 import { InfinitePhotoLoader } from "@/features/photo/components/InfinitePhotoLoader";
 import { LightboxModal } from "@/features/photo/components/LightboxModal";
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 export function PhotographerView({
   app,
@@ -31,6 +33,10 @@ export function PhotographerView({
   return (
     <>
       <PhotographerNavbar profile={profile} onLogout={actions.logout} />
+      {!profile.canCreateAlbums && <div className="mx-auto mt-5 w-full max-w-7xl px-4 sm:px-8"><Alert><AlertDescription>
+        {profile.emailVerified ? 'Tài khoản đang chờ quản trị viên cấp quyền tạo album. Bạn vẫn có thể quản lý album hiện có.' : 'Xác minh email bằng Google, sau đó chờ quản trị viên cấp quyền tạo album.'}
+        {!profile.emailVerified && <><p className="mt-2 text-xs text-muted-foreground">Đăng nhập Google bằng {profile.email}. Để bảo vệ tài khoản, mật khẩu đăng ký chưa xác minh sẽ được thay bằng phương thức Google.</p><Button variant="outline" className="mt-3" onClick={() => location.assign('/api/auth/google/start?destination=dashboard')}>Xác minh bằng Google</Button></>}
+      </AlertDescription></Alert></div>}
       {isDetailView && album ? (
         <>
           <AlbumDetailPage
@@ -52,9 +58,10 @@ export function PhotographerView({
           onRetryAlbum={actions.retryAlbum}
           onDeleteAlbum={actions.deleteAlbum}
           onCreateAlbum={actions.openCreate}
+          canCreateAlbums={!!profile.canCreateAlbums}
         />
       )}
-      <CreateAlbumModal {...actions.createModal} />
+      {profile.canCreateAlbums && <CreateAlbumModal {...actions.createModal} />}
       <PublicDriveHelpModal {...actions.driveModal} />
       <LightboxModal
         {...lightbox.props}

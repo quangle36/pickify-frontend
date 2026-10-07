@@ -14,6 +14,7 @@ interface PhotographerDashboardPageProps {
   onRetryAlbum: (albumId: string) => void;
   onDeleteAlbum: (albumId: string) => void;
   onCreateAlbum: () => void;
+  canCreateAlbums?: boolean;
 }
 
 const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
@@ -22,6 +23,7 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
   onRetryAlbum,
   onDeleteAlbum,
   onCreateAlbum,
+  canCreateAlbums = false,
 }) => {
   const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
   const [sharingAlbum, setSharingAlbum] = useState<Album | null>(null);
@@ -34,7 +36,7 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
           <h1 className="text-xl font-semibold leading-[1.4] text-stone-900">Album của bạn</h1>
           {albums.length > 0 && <p className="mt-[5px] text-xs text-stone-500">{albums.length.toLocaleString("vi-VN")} album</p>}
         </div>
-        {albums.length > 0 && (
+        {albums.length > 0 && canCreateAlbums && (
           <div className="w-full sm:w-auto"><CreateAlbumCard onCreate={onCreateAlbum} /></div>
         )}
       </div>
@@ -42,8 +44,8 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
       {albums.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 rounded-2xl border-stone-200 bg-white px-4 py-10 text-center shadow-none sm:px-6 sm:py-14">
           <h2 className="text-base font-semibold text-stone-900">Chưa có album nào</h2>
-          <p className="text-sm text-stone-500">Tạo album đầu tiên từ thư mục Google Drive của bạn.</p>
-          <CreateAlbumCard onCreate={onCreateAlbum} />
+          <p className="text-sm text-stone-500">{canCreateAlbums ? 'Tạo album đầu tiên từ thư mục Google Drive của bạn.' : 'Album sẽ xuất hiện tại đây sau khi tài khoản được cấp quyền tạo album.'}</p>
+          {canCreateAlbums && <CreateAlbumCard onCreate={onCreateAlbum} />}
         </Card>
       ) : (
         <div className="grid grid-cols-1 items-stretch gap-5 min-[701px]:grid-cols-2 min-[701px]:gap-6 lg:grid-cols-3">
@@ -53,6 +55,7 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
               album={album}
               onSelect={onSelectAlbum}
               onRetry={onRetryAlbum}
+              canRetry={canCreateAlbums}
               onDelete={onDeleteAlbum}
               onEdit={setEditingAlbum}
               onShare={setSharingAlbum}

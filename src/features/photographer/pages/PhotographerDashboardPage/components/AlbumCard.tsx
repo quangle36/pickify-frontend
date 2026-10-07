@@ -23,6 +23,7 @@ interface AlbumCardProps {
   album: Album;
   onSelect: (id: string) => void;
   onRetry: (id: string) => void;
+  canRetry?: boolean;
   onDelete: (id: string) => void;
   onEdit: (album: Album) => void;
   onShare: (album: Album) => void;
@@ -32,6 +33,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
   album,
   onSelect,
   onRetry,
+  canRetry = true,
   onDelete,
   onEdit,
   onShare,
@@ -70,14 +72,14 @@ export const AlbumCard: FC<AlbumCardProps> = ({
   return (
     <Card
       onClick={() => onSelect(album.id)}
-      className="flex cursor-pointer flex-col rounded-2xl border-stone-200 bg-white shadow-none transition-colors hover:border-stone-300"
+      className="album-card flex cursor-pointer flex-col rounded-2xl border-stone-200 bg-white shadow-none"
     >
       <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-t-[15px] bg-stone-100">
         {album.coverUrl && !coverFailed ? (
           <img
             src={album.coverUrl}
             alt={album.title}
-            className="absolute inset-0 h-full w-full object-cover object-[center_35%]"
+            className="album-card-cover absolute inset-0 h-full w-full object-cover object-[center_35%]"
             loading="lazy"
             onError={() => setCoverFailed(true)}
           />
@@ -161,7 +163,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
               {album.status === "needs_attention" && <AlertCircle className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />}
               {statusText}
             </Badge>
-            {album.status === "needs_attention" && (
+            {album.status === "needs_attention" && canRetry && (
               <Button
                 type="button"
                 variant="outline"

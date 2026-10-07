@@ -7,6 +7,7 @@ export function useOwnerQuery(enabled: boolean) {
     queryKey: authKeys.owner,
     enabled,
     queryFn: ({ signal }) => authService.getCurrentUser(signal),
+    refetchInterval: enabled ? 30_000 : false,
   });
 }
 

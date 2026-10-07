@@ -62,4 +62,10 @@ export interface PhotographerProfile {
   activeAlbumsCount: number;
   maxPhotosLimit: number;
   albumLifespanDays: number;
+  role?: 'admin' | 'user';
+  emailVerified?: boolean;
+  canCreateAlbums?: boolean;
+  storageBytes?: number;
+  storageLimitBytes?: number;
+  maxAlbums?: number;
 }

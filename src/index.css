@@ -58,6 +58,34 @@
   }
 }
 
+/* Album hover effects only run for devices with a precise hover pointer. */
+.album-card {
+  transition: transform 220ms ease-out, border-color 220ms ease-out;
+}
+
+.album-card-cover {
+  transition: transform 220ms ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .album-card:hover {
+    transform: translateY(-3px);
+    border-color: theme('colors.stone.300');
+  }
+
+  .album-card:hover .album-card-cover {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .album-card,
+  .album-card-cover {
+    transition: none;
+    transform: none !important;
+  }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

@@ -46,6 +46,15 @@
           "value": "noindex, nofollow"
         }
       ]
+    },
+    {
+      "source": "/dashboard/admin",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ],
   "rewrites": [
@@ -80,6 +89,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://p01--pickify-api--cx5nvhfxlc2k.code.run/api/:path*"
+    },
+    {
+      "source": "/dashboard/admin",
+      "destination": "/app.html"
     },
     {
       "source": "/dashboard",

@@ -13,6 +13,7 @@ import { DashboardRoute } from "./routes/DashboardRoute";
 import { GuestAlbumRoute } from "./routes/GuestAlbumRoute";
 import { LandingRoute } from "./routes/LandingRoute";
 import { RootLayout } from "./routes/RootLayout";
+import { AdminRoute } from './routes/AdminRoute';
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -36,6 +37,7 @@ const dashboardAlbumRoute = createRoute({
   path: "/dashboard/album/$albumId",
   component: DashboardAlbumRoute,
 });
+const adminRoute = createRoute({ getParentRoute: () => rootRoute, path: '/dashboard/admin', component: AdminRoute });
 
 const signInRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -76,6 +78,7 @@ const termsRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   landingRoute,
   dashboardRoute,
+  adminRoute,
   dashboardAlbumRoute,
   signInRoute,
   signUpRoute,

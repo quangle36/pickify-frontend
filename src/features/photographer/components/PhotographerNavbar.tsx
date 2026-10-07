@@ -5,6 +5,7 @@ import {
   Heart,
   LogOut,
   ChevronDown,
+  ShieldCheck,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -55,11 +56,11 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
                 className="flex min-h-9 cursor-pointer items-center gap-2 rounded-xl p-1 text-left outline-none hover:bg-stone-100 transition-colors"
                 title="Tài khoản cá nhân"
               >
-                <img
+                {profile.avatarUrl ? <img
                   src={profile.avatarUrl}
                   alt={profile.name}
                   className="h-8 w-8 rounded-[10px] object-cover"
-                />
+                /> : <span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-[10px] bg-stone-100 text-xs font-medium text-stone-600">{profile.name.slice(0, 1).toUpperCase()}</span>}
                 <div className="hidden sm:block text-left">
                   <p className="text-xs font-normal text-stone-600 leading-tight">
                     {profile.name}
@@ -83,6 +84,8 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild><Link to="/dashboard">Album của bạn</Link></DropdownMenuItem>
+              {profile.role === 'admin' && <DropdownMenuItem asChild><Link to="/dashboard/admin"><ShieldCheck className="mr-2 h-4 w-4" />Quản lý tài khoản</Link></DropdownMenuItem>}
               <DropdownMenuItem
                 onClick={onLogout}
                 className="text-rose-600 focus:bg-rose-50 focus:text-rose-700 cursor-pointer font-medium"

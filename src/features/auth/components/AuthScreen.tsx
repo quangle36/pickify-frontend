@@ -32,7 +32,7 @@ const content = {
     eyebrow: "Bắt đầu với Lumipic",
     title: "Trao ảnh tinh tế. Chốt lựa chọn nhanh hơn.",
     description:
-      "Tạo không gian làm việc cho studio và biến mỗi album Drive thành trải nghiệm chọn ảnh thật dễ chịu.",
+      "Đăng ký tài khoản, xác minh email và chờ quản trị viên cấp quyền tạo album cho studio của bạn.",
     action: "Đăng ký với Google",
     alternateText: "Đã có tài khoản?",
     alternateAction: "Đăng nhập",

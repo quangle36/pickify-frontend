@@ -29,8 +29,9 @@ export function PublicDriveHelpModal({
         </li>
       </ol>
       <p className="text-sm text-stone-600">
-        Người có link Drive public có thể xem ảnh gốc. Mật khẩu Lumipic chỉ bảo
-        vệ album trên Lumipic.
+        Người có link Drive public có thể xem ảnh gốc. Trên Lumipic, người có link
+        album có thể xem ảnh ở chế độ công khai; mật khẩu bảo vệ thao tác chọn
+        ảnh và bình luận.
       </p>
     </AppModal>
   );
