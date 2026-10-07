@@ -25,9 +25,14 @@ export const publicPages = {
     file: "chon-anh-tren-dien-thoai.html",
   },
   "/huong-dan/loi-google-drive": {
-    title: "Sửa lỗi nhập ảnh từ Google Drive vào Lumipic - Lumipic",
+    title: "Sửa lỗi nhập ảnh từ Google Drive - Lumipic",
     description: "Kiểm tra ba mục dưới đây khi album thiếu ảnh hoặc không đọc được thư mục Drive.",
     file: "loi-google-drive.html",
+  },
+  "/dashboard/sign-in": {
+    title: "Đăng nhập - Lumipic",
+    description: "Đăng nhập Lumipic bằng Google hoặc email để tạo album từ Google Drive, gửi ảnh cho khách chọn và quản lý ảnh hậu kì.",
+    file: "sign-in.html",
   },
   "/privacy": {
     title: "Chính sách quyền riêng tư - Lumipic",

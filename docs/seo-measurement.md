@@ -13,7 +13,7 @@ Vite tự đọc file này khi build production; biến cùng tên trên hosting
 6. Mở trang chủ production, kiểm tra Realtime. Tạo album thật khi cần: sự kiện `album_created` chỉ gửi sau API thành công. Đánh dấu sự kiện này là key event trong GA4.
 7. Traffic acquisition → Session default channel group → Organic Search để xem lượt truy cập và key event từ tìm kiếm. Thêm `accounts.google.com` vào unwanted referrals nếu OAuth làm sai nguồn phiên. Không tự gán mọi lượt tạo album là organic.
 
-Code chỉ bật GA4 khi production, đúng origin `https://lumipic.space` và có mã hợp lệ. Không gửi tên album, ID, mật khẩu, link Drive, query string hoặc hash. Các URL dashboard được gom thành `/dashboard`; trang khách không khởi tạo GA4. Không ghi page_view trên dashboard.
+Code chỉ bật GA4 khi production, đúng origin `https://lumipic.space` và có mã hợp lệ. Không gửi tên album, ID, mật khẩu, link Drive, query string hoặc hash. Các URL dashboard riêng tư được gom thành `/dashboard`; trang khách không khởi tạo GA4. Không ghi page_view trên dashboard riêng tư. `/dashboard/sign-in` là trang công khai từ bản sửa SEO đăng nhập, được đo page_view với URL canonical, không gửi dữ liệu form.
 
 ## Core Web Vitals
 
@@ -44,7 +44,7 @@ Hiện có 4 bài được prerender, liên kết từ trang chủ và giữa c�
 
 ## Kiểm tra bản triển khai SEO mới
 
-`dist/index.html` phải là trang chủ đã prerender, không chứa `noindex`; `dist/app.html` là khung ứng dụng riêng tư có `noindex`. Dashboard rewrite về `/app.html`; `/index.html` và `/home.html` redirect về `/`. Không thêm rewrite `/` về `home.html`: file index trên filesystem có thể được Vercel phục vụ trước rewrite.
+`dist/index.html` phải là trang chủ đã prerender, không chứa `noindex`; `dist/app.html` là khung ứng dụng riêng tư có `noindex`. Dashboard riêng tư rewrite về `/app.html`; `/dashboard/sign-in` được prerender thành `sign-in.html`, có canonical/index và không nhận header noindex; `/index.html` và `/home.html` redirect về `/`. Không thêm rewrite `/` về `home.html`: file index trên filesystem có thể được Vercel phục vụ trước rewrite.
 
 Chạy `pnpm build && pnpm test:seo` trước deploy. Bộ kiểm tra đọc trực tiếp file index và app ngoài kiểm tra HTTP preview, để không bỏ sót khác biệt giữa preview và Vercel. Sau deploy, kiểm tra lại response HTML thật của `/`, `/dashboard`, `/sitemap.xml` và một URL lạ. Chỉ gửi sitemap/yêu cầu index sau khi `/` trả đúng nội dung và không còn `noindex`.
 

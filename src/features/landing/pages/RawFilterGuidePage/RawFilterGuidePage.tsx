@@ -32,8 +32,8 @@ const guide = {
   "image": {
     "name": "loc-anh-ve-may.jpg",
     "alt": "Hộp Lọc ảnh về máy của Lumipic với định dạng và thư mục nguồn, đích",
-    "width": 688,
-    "height": 432
+    "width": 560,
+    "height": 465
   }
 };
 

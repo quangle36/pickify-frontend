@@ -1,37 +1,23 @@
-import { FC } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BeautyAlbumPreview } from "./BeautyAlbumPreview";
+import { PreviewWindow } from "./PreviewWindow";
 
-interface HeroSectionProps {
-  startHref: string;
-}
-
-export const HeroSection: FC<HeroSectionProps> = ({ startHref }) => {
-  return (
-    <section className="px-6 py-24 sm:py-36 lg:py-44">
-      <div className="mx-auto max-w-4xl text-center">
-        <h1 className="text-[clamp(2.5rem,6vw,4.5rem)] font-medium tracking-[-0.055em] leading-[1.16]">
-          Chọn ảnh để hậu kì sau buổi chụp theo một cách nhanh nhất
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-neutral-500 sm:text-lg">
-          Dành cho nhiếp ảnh gia: gửi ảnh từ Google Drive để khách chọn trên điện thoại,
-          nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom.
-        </p>
-
-        <div className="mt-10 flex justify-center">
-          <Button
-            size="lg"
-            asChild
-            className="h-12 rounded-full px-6 text-sm font-medium bg-neutral-900 hover:bg-neutral-700 text-white shadow-none gap-3 group"
-          >
-            <a href={startHref}><span>Bắt đầu miễn phí</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-          </Button>
-        </div>
-
+export function HeroSection({ startHref }: { startHref: string }) {
+  return <section className="landing-hero">
+    <div className="landing-container landing-center">
+      <p className="landing-eyebrow">Từ buổi chụp đến bộ ảnh được chọn</p>
+      <h1>Ảnh đẹp đã có.<br /><span>Chọn ảnh, để Lumipic.</span></h1>
+      <p className="landing-description">Gửi album từ Google Drive. Khách thả tim trên điện thoại.<br className="hidden sm:block" /> Lấy đúng bộ ảnh RAW để bắt đầu hậu kì.</p>
+      <div className="landing-actions">
+        <Button asChild className="landing-primary"><a href={startHref}>Bắt đầu miễn phí<ArrowRight aria-hidden="true" /></a></Button>
+        <Button asChild variant="ghost" className="landing-text-action"><a href="#how-it-works">Xem cách dùng<ArrowDown aria-hidden="true" /></a></Button>
       </div>
-    </section>
-  );
-};
+      <div className="landing-hero-visual">
+        <PreviewWindow parallax={-0.035}><BeautyAlbumPreview selected interactive priority /></PreviewWindow>
+        <div className="landing-proof-tag" data-parallax="0.08"><Heart aria-hidden="true" />Album beauty · thử thả tim</div>
+      </div>
+    </div>
+  </section>;
+}
 export default HeroSection;

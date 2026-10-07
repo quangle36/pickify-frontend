@@ -11,24 +11,23 @@ export const PricingSection: FC<PricingSectionProps> = ({
 }) => {
   const included = [
     "Không giới hạn album",
-    "1.500 ảnh JPEG mỗi album",
+    "Lọc ảnh RAW đã chọn trên máy",
     "30 ngày lưu trữ",
-    "Xuất CSV không giới hạn",
-    "Mật khẩu bảo mật Argon2id",
+    "Khách chọn ảnh không cần tài khoản",
+    "Mật khẩu bảo mật",
   ];
 
   return (
     <section
       id="pricing"
-      className="py-20 sm:py-28 bg-white"
+      className="landing-section"
     >
-      <div className="max-w-5xl mx-auto px-6 sm:px-8 grid md:grid-cols-2 gap-12 md:gap-20 items-start">
+      <div className="landing-container landing-pricing-layout">
         <div>
-        <h2 className="text-3xl sm:text-4xl font-medium tracking-[-0.04em]">
-          Bắt đầu thật đơn giản.
-        </h2>
-        <p className="mt-3 text-stone-500 text-sm sm:text-base">
-          Dùng đầy đủ tính năng. Không cần thẻ tín dụng.
+        <p className="landing-eyebrow">Bắt đầu thật đơn giản</p>
+        <h2>Đủ tính năng.<br />Không phí bắt đầu.</h2>
+        <p className="landing-description">
+          Gói miễn phí cho luồng chọn ảnh của bạn.<br />Không cần thẻ tín dụng.
         </p>
         </div>
         <div className="rounded-3xl border border-neutral-200 p-7 sm:p-8 text-left">
@@ -54,7 +53,7 @@ export const PricingSection: FC<PricingSectionProps> = ({
             asChild
             className="w-full mt-8 h-12 rounded-full font-medium text-sm bg-neutral-900 hover:bg-neutral-700 text-white shadow-none gap-2"
           >
-            <a href={startHref}><span>Bắt đầu ngay</span>
+            <a href={startHref}><span>Bắt đầu miễn phí</span>
             <ArrowRight className="w-4 h-4" />
             </a>
           </Button>

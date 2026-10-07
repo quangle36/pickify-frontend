@@ -1,90 +1,39 @@
-import { FC } from "react";
-import {
-  ShieldCheck,
-  Zap,
-  Smartphone,
-  Save,
-  FileSpreadsheet,
-  Lock,
-} from "lucide-react";
+import { FileSpreadsheet, LockKeyhole, ShieldCheck } from "lucide-react";
+import { FeaturePreview } from "./FeaturePreview";
 
-export const FeaturesSection: FC = () => {
-  const features = [
-    {
-      icon: Zap,
-      title: "Preview tự động",
-      description:
-        "Ảnh gốc được nén thành preview nhanh, sắc nét cho lưới ảnh và lightbox.",
-    },
-    {
-      icon: Smartphone,
-      title: "Không cần đăng nhập",
-      description:
-        "Khách mở link, nhập mã 4 số và bắt đầu chọn ảnh ngay trên điện thoại.",
-    },
-    {
-      icon: Save,
-      title: "Lưu chọn tức thì",
-      description:
-        "Mỗi lượt thả tim hoặc bỏ tim được ghi nhận ngay lập tức.",
-    },
-    {
-      icon: FileSpreadsheet,
-      title: "Xuất CSV cho Lightroom",
-      description:
-        "File CSV chuẩn UTF-8 BOM, copy tên file vào Library Filter là xong.",
-    },
-    {
-      icon: ShieldCheck,
-      title: "Không can thiệp Drive",
-      description:
-        "Chỉ đọc folder public. Không sửa, không xóa file gốc trên Drive.",
-    },
-    {
-      icon: Lock,
-      title: "Mật khẩu bảo mật",
-      description:
-        "Mã bảo mật Argon2id. Khóa chỉnh sửa hoặc đổi mã bất cứ lúc nào.",
-    },
-  ];
-
-  return (
-    <section id="features" className="py-20 sm:py-28 bg-neutral-50">
-      <div className="max-w-5xl mx-auto px-6 sm:px-8">
-        <div className="mb-14">
-          <h2 className="text-3xl sm:text-4xl font-medium tracking-[-0.04em]">
-            Tính năng chính
-          </h2>
-          <p className="mt-3 text-stone-500 text-sm sm:text-base">
-            Thiết kế theo luồng làm việc thực tế của nhiếp ảnh gia.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
-          {features.map((item, idx) => {
-            const Icon = item.icon;
-            return (
+const chapters = [
+  { label: "01 · Preview tự động", title: <>Gửi một link.<br />Khách thấy cả album.</>, description: "Dán thư mục Google Drive, Lumipic tạo preview để khách xem ảnh nhanh trên điện thoại." },
+  { label: "02 · Chọn và lưu tức thì", title: <>Ảnh ưng ý,<br />chạm một trái tim.</>, description: "Khách mở link, nhập mật khẩu và chọn ngay. Mỗi lượt thả tim được lưu vào danh sách của album." },
+  { label: "03 · Lọc RAW / xuất CSV", title: <>Đúng file RAW.<br />Sẵn sàng hậu kì.</>, description: "Lọc bản sao file RAW từ thư mục trên máy, hoặc xuất CSV để tìm ảnh trong Lightroom." },
+];
+const extras = [
+  { icon: ShieldCheck, title: "Không can thiệp Drive", description: "Chỉ đọc thư mục chia sẻ công khai. Không sửa, không xóa file gốc." },
+  { icon: LockKeyhole, title: "Mật khẩu bảo mật", description: "Đặt mật khẩu, khóa lựa chọn hoặc đổi mã khi cần." },
+  { icon: FileSpreadsheet, title: "Xuất CSV cho Lightroom", description: "Lấy tên file khách đã chọn để tìm trong Library Filter." },
+];
+export function FeaturesSection({ activeChapter = 0 }: { activeChapter?: number }) {
+  return <section id="features" className="landing-section landing-features">
+    <div className="landing-container">
+      <div className="landing-section-head"><h2>Nhẹ phần chọn ảnh.<br />Trọn phần sáng tạo.</h2><p>Cuộn để khám phá luồng làm việc — từ ảnh gửi khách đến file chuẩn bị hậu kì.</p></div>
+      <div className="landing-scroll-story">
+        <div>{chapters.map((chapter, index) => <article className="landing-story-chapter" data-feature-chapter={index} key={chapter.label}><p className="landing-eyebrow">{chapter.label}</p><h2>{chapter.title}</h2><p className="landing-description">{chapter.description}</p><div className="landing-mobile-preview"><FeaturePreview chapter={index} /></div></article>)}</div>
+        <div className="landing-sticky-preview">
+          <div className="landing-preview-panels">
+            {chapters.map((chapter, index) => (
               <div
-                key={idx}
-                className="border-t border-neutral-200 pt-6"
+                key={chapter.label}
+                className="landing-preview-panel"
+                data-active={index === activeChapter}
+                aria-hidden={index !== activeChapter}
               >
-                <div
-                  className="text-neutral-600 mb-5"
-                >
-                  <Icon className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-medium text-neutral-900 mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-neutral-500 leading-7">
-                  {item.description}
-                </p>
+                <FeaturePreview chapter={index} />
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
-    </section>
-  );
-};
+      <div className="landing-feature-extras">{extras.map(({ icon: Icon, title, description }) => <article key={title}><Icon aria-hidden="true" /><h3>{title}</h3><p>{description}</p></article>)}</div>
+    </div>
+  </section>;
+}
 export default FeaturesSection;

@@ -43,7 +43,7 @@ export function LandingNavbar({
   ];
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md">
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 h-[72px] flex items-center justify-between gap-4">
+      <div className="landing-container h-[76px] flex items-center justify-between gap-4">
         <Button
           variant="ghost"
           aria-label="Lumipic — về trang chủ"
@@ -60,9 +60,8 @@ export function LandingNavbar({
 
         <nav
           aria-label="Điều hướng chính"
-          className="hidden md:flex items-center gap-1 text-sm text-neutral-600"
+          className="landing-navlinks hidden md:flex items-center gap-1 text-sm text-neutral-600"
         >
-          <a href="/huong-dan/gui-anh-google-drive" className="rounded-full px-4 py-2 hover:bg-neutral-100 hover:text-neutral-900">Hướng dẫn</a>
           {links.map((link) => (
             <Button
               variant="ghost"
@@ -73,6 +72,7 @@ export function LandingNavbar({
               <a href={`#${link.id}`} onClick={() => setMenuOpen(false)}>{link.label}</a>
             </Button>
           ))}
+          <a href="/huong-dan/gui-anh-google-drive" className="rounded-full px-4 py-2 hover:bg-neutral-100 hover:text-neutral-900">Hướng dẫn</a>
         </nav>
 
         <div className="flex items-center gap-2" aria-label="Tài khoản">
@@ -154,7 +154,7 @@ export function LandingNavbar({
                 asChild
                 variant="ghost"
                 size="sm"
-                className="rounded-full text-xs text-neutral-700 hover:bg-neutral-100"
+                className="hidden sm:inline-flex rounded-full text-xs text-neutral-700 hover:bg-neutral-100"
               ><a href="/dashboard/sign-in">
                 <LogIn className="hidden sm:block w-3.5 h-3.5 mr-1.5" />
                 Đăng nhập
@@ -165,7 +165,7 @@ export function LandingNavbar({
                 className="rounded-full text-xs bg-neutral-900 text-white shadow-none hover:bg-neutral-700 gap-1.5"
               ><a href="/dashboard/sign-in">
                 <Plus className="hidden sm:block w-3.5 h-3.5" />
-                Tạo album
+                Bắt đầu miễn phí
               </a></Button>
             </>
           )}

@@ -42,7 +42,7 @@ export const guideSteps = [
     id: "loc-anh", title: "Lọc ảnh gốc trên máy để bắt đầu hậu kì", audience: "Nhiếp ảnh gia",
     instructions: ["Lọc ảnh → Chọn định dạng, thư mục nguồn và đích.", "Cấp quyền thư mục → Bắt đầu lọc ảnh."],
     note: "Dùng Chrome/Edge trên máy tính. Tên file ảnh gốc phải khớp ảnh JPEG.",
-    image: "loc-anh-ve-may.jpg", width: 688, height: 432,
+    image: "loc-anh-ve-may.jpg", width: 560, height: 465,
     alt: "Hộp Lọc ảnh về máy với lựa chọn định dạng, thư mục nguồn, thư mục đích và nút Bắt đầu lọc ảnh",
   },
 ].map(step => ({ ...step, imageUrl: step.image ? `${imageBase}/${step.image}` : undefined }));

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { getPageSeo } from "@/app/seo";
 import { ArrowLeft, ArrowRight, Heart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { errorMessage } from "@/api/errors";
@@ -20,7 +20,7 @@ interface AuthScreenProps {
 const content = {
   "sign-in": {
     eyebrow: null,
-    title: "Tiếp tục với những khoảnh khắc đẹp.",
+    title: "Đăng nhập Lumipic",
     description:
       "Đăng nhập để quản lý album, theo dõi ảnh khách đã chọn và xuất danh sách cho Lightroom.",
     action: "Đăng nhập với Google",
@@ -42,13 +42,13 @@ const content = {
 
 export function AuthScreen({ mode }: AuthScreenProps) {
   const copy = content[mode];
-  const navigate = useNavigate();
-  const owner = useOwnerQuery(true);
+  const [mounted, setMounted] = useState(false);
+  const owner = useOwnerQuery(mounted);
   const authConfig = useAuthConfigQuery();
   const [isStarting, setIsStarting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const emailAuth = useEmailAuthMutation(mode);
-  const busy = isStarting || emailAuth.isPending || owner.isPending;
+  const busy = !mounted || isStarting || emailAuth.isPending || owner.isPending;
 
   const continueWithEmail = async (input: {
     email: string;
@@ -58,29 +58,31 @@ export function AuthScreen({ mode }: AuthScreenProps) {
     setAuthError(null);
     try {
       await emailAuth.mutateAsync(input);
-      await navigate({ to: "/dashboard", replace: true });
+      window.location.replace("/dashboard");
     } catch (error) {
       setAuthError(errorMessage(error));
     }
   };
 
   useEffect(() => {
+    setMounted(true);
     window.scrollTo({ top: 0, behavior: "instant" });
-    document.title = `${mode === "sign-in" ? "Đăng nhập" : "Đăng ký"} — Lumipic`;
+    const seo = getPageSeo(mode === "sign-in" ? "/dashboard/sign-in" : "/dashboard/sign-up");
+    document.title = mode === "sign-in" ? seo.title : "Đăng ký — Lumipic";
     let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
     if (!robots) {
       robots = document.createElement("meta");
       robots.name = "robots";
       document.head.append(robots);
     }
-    robots.content = "noindex,nofollow";
+    robots.content = seo.robots;
   }, [mode]);
 
   useEffect(() => {
-    if (!owner.isPending && owner.data?.id) {
-      void navigate({ to: "/dashboard", replace: true });
+    if (mounted && !owner.isPending && owner.data?.id) {
+      window.location.replace("/dashboard");
     }
-  }, [navigate, owner.data?.id, owner.isPending]);
+  }, [mounted, owner.data?.id, owner.isPending]);
 
   const continueWithGoogle = async () => {
     setIsStarting(true);
@@ -106,8 +108,8 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
       <div className="relative mx-auto flex min-h-screen max-w-[1440px] flex-col px-5 sm:px-8 lg:px-12">
         <header className="flex h-20 items-center justify-between sm:h-24">
-          <Link
-            to="/"
+          <a
+            href="/"
             aria-label="Lumipic — về trang chủ"
             className="group flex items-center gap-2.5"
           >
@@ -117,14 +119,14 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             <span className="text-xl font-extrabold tracking-[-0.04em]">
               Lumipic
             </span>
-          </Link>
-          <Link
-            to="/"
+          </a>
+          <a
+            href="/"
             className="inline-flex min-h-[40px] items-center gap-2 px-2.5 py-1 text-sm font-bold text-stone-700 transition-colors hover:text-stone-950"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Về trang chủ</span>
-          </Link>
+          </a>
         </header>
 
         <div className="my-auto py-8">
@@ -191,29 +193,29 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             <div className="mt-8 border-t border-stone-100 pt-6 text-center">
               <p className="text-sm text-stone-700">
                 {copy.alternateText}{" "}
-                <Link
-                  to={copy.alternateTo}
+                <a
+                  href={copy.alternateTo}
                   className="font-extrabold text-stone-950 underline decoration-stone-400 decoration-2 underline-offset-4 hover:decoration-stone-900 transition-colors"
                 >
                   {copy.alternateAction}
-                </Link>
+                </a>
               </p>
 
               <p className="mt-6 text-xs leading-relaxed text-stone-600">
                 Bằng cách tiếp tục, bạn đồng ý với{" "}
-                <Link
-                  to="/terms"
+                <a
+                  href="/terms"
                   className="font-semibold text-stone-700 hover:text-stone-950 underline"
                 >
                   Điều khoản sử dụng
-                </Link>{" "}
+                </a>{" "}
                 và{" "}
-                <Link
-                  to="/privacy"
+                <a
+                  href="/privacy"
                   className="font-semibold text-stone-700 hover:text-stone-950 underline"
                 >
                   Chính sách quyền riêng tư
-                </Link>{" "}
+                </a>{" "}
                 của Lumipic.
               </p>
             </div>
@@ -221,7 +223,8 @@ export function AuthScreen({ mode }: AuthScreenProps) {
         </div>
 
         <footer className="pb-6 text-center text-xs text-stone-600">
-          Lumipic &copy; 2026. Nền tảng chọn ảnh số 1 cho photographer.
+          <a href="/huong-dan/gui-anh-google-drive" className="underline underline-offset-4">Hướng dẫn gửi ảnh cho khách chọn</a>
+          <p className="mt-3">Lumipic &copy; 2026. Chọn ảnh nhanh từ Google Drive.</p>
         </footer>
       </div>
     </main>

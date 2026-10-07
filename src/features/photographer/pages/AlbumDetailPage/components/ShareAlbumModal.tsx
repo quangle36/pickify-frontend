@@ -6,7 +6,6 @@ import {
   Heart,
   LockKeyhole,
   Share2,
-  ShieldCheck,
 } from "lucide-react";
 import { AppModal } from "@/components/ui/app-modal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -73,25 +72,7 @@ export function ShareAlbumModal({
       headerClassName="px-4 py-4 sm:px-6 sm:py-5 border-b border-stone-100"
       bodyClassName="space-y-3.5 bg-white px-4 py-4 sm:px-6 sm:py-5"
       onOpenAutoFocus={(event) => event.preventDefault()}
-      footer={
-        <div className="flex w-full items-center justify-between text-xs text-stone-500">
-          <span className="flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <span className="hidden sm:inline">Nhấn sao chép để gửi khách</span>
-            <span className="sm:hidden">1 chạm sao chép</span>
-          </span>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleOpenChange(false)}
-            size="sm"
-            className="rounded-xl px-4 font-medium"
-          >
-            Đóng
-          </Button>
-        </div>
-      }
-      footerClassName="border-t border-stone-100 bg-white px-4 py-3 sm:px-6"
+
     >
       {/* Item 1: Link chọn ảnh (Hành động chính) */}
       <section className="rounded-2xl border border-stone-300 bg-stone-50/60 p-3 sm:p-4 shadow-xs transition-all hover:border-stone-400">

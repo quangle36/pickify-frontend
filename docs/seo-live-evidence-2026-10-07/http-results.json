@@ -1,0 +1,199 @@
+[
+  {
+    "path": "/",
+    "status": "200",
+    "noindex": false,
+    "h1": 1,
+    "canonical": [
+      "https://lumipic.space/"
+    ],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/?utm_source=audit",
+    "status": "200",
+    "noindex": false,
+    "h1": 1,
+    "canonical": [
+      "https://lumipic.space/"
+    ],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/huong-dan/gui-anh-google-drive",
+    "status": "200",
+    "noindex": false,
+    "h1": 1,
+    "canonical": [
+      "https://lumipic.space/huong-dan/gui-anh-google-drive"
+    ],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/huong-dan/loc-anh-raw",
+    "status": "200",
+    "noindex": false,
+    "h1": 1,
+    "canonical": [
+      "https://lumipic.space/huong-dan/loc-anh-raw"
+    ],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/huong-dan/chon-anh-tren-dien-thoai",
+    "status": "200",
+    "noindex": false,
+    "h1": 1,
+    "canonical": [
+      "https://lumipic.space/huong-dan/chon-anh-tren-dien-thoai"
+    ],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/huong-dan/loi-google-drive",
+    "status": "200",
+    "noindex": false,
+    "h1": 1,
+    "canonical": [
+      "https://lumipic.space/huong-dan/loi-google-drive"
+    ],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/privacy",
+    "status": "200",
+    "noindex": false,
+    "h1": 1,
+    "canonical": [
+      "https://lumipic.space/privacy"
+    ],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/terms",
+    "status": "200",
+    "noindex": false,
+    "h1": 1,
+    "canonical": [
+      "https://lumipic.space/terms"
+    ],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/dashboard",
+    "status": "200",
+    "noindex": true,
+    "h1": 0,
+    "canonical": [],
+    "empty": true,
+    "location": [],
+    "xrobots": [
+      "noindex, nofollow"
+    ],
+    "urls": []
+  },
+  {
+    "path": "/app.html",
+    "status": "200",
+    "noindex": true,
+    "h1": 0,
+    "canonical": [],
+    "empty": true,
+    "location": [],
+    "xrobots": [
+      "noindex, nofollow"
+    ],
+    "urls": []
+  },
+  {
+    "path": "/index.html",
+    "status": "308",
+    "noindex": false,
+    "h1": 0,
+    "canonical": [],
+    "empty": false,
+    "location": [
+      "/"
+    ],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/home.html",
+    "status": "308",
+    "noindex": false,
+    "h1": 0,
+    "canonical": [],
+    "empty": false,
+    "location": [
+      "/"
+    ],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/missing-seo-audit",
+    "status": "404",
+    "noindex": true,
+    "h1": 1,
+    "canonical": [],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/robots.txt",
+    "status": "200",
+    "noindex": false,
+    "h1": 0,
+    "canonical": [],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": []
+  },
+  {
+    "path": "/sitemap.xml",
+    "status": "200",
+    "noindex": false,
+    "h1": 0,
+    "canonical": [],
+    "empty": false,
+    "location": [],
+    "xrobots": [],
+    "urls": [
+      "https://lumipic.space/",
+      "https://lumipic.space/huong-dan/gui-anh-google-drive",
+      "https://lumipic.space/huong-dan/loc-anh-raw",
+      "https://lumipic.space/huong-dan/chon-anh-tren-dien-thoai",
+      "https://lumipic.space/huong-dan/loi-google-drive",
+      "https://lumipic.space/privacy",
+      "https://lumipic.space/terms"
+    ]
+  }
+]

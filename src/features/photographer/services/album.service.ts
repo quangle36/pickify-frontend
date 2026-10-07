@@ -22,7 +22,7 @@ export interface SelectedFileManifest {
 
 export interface UpdateAlbumInput {
   name: string;
-  slug: string;
+  slug: string | null;
   selectionLimit: number;
   password?: string;
 }

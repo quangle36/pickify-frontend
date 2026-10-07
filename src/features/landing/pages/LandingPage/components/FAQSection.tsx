@@ -33,12 +33,10 @@ export const FAQSection: FC = () => {
   return (
     <section
       id="faq"
-      className="py-20 sm:py-28 border-t border-neutral-100"
+      className="landing-section"
     >
-      <div className="max-w-5xl mx-auto px-6 sm:px-8 grid md:grid-cols-[1fr_1.4fr] gap-10 md:gap-20">
-        <h2 className="text-3xl sm:text-4xl font-medium tracking-[-0.04em]">
-          Câu hỏi thường gặp
-        </h2>
+      <div className="landing-container landing-faq-layout">
+        <h2>Điều bạn<br />muốn biết.</h2>
 
         <Accordion
           type="single"

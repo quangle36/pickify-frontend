@@ -3,15 +3,6 @@
   "framework": "vite",
   "headers": [
     {
-      "source": "/dashboard/:path*",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
-    },
-    {
       "source": "/album/:path*",
       "headers": [
         {
@@ -22,6 +13,33 @@
     },
     {
       "source": "/app.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/dashboard",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/dashboard/sign-up",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/dashboard/album/:path*",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -69,7 +87,7 @@
     },
     {
       "source": "/dashboard/sign-in",
-      "destination": "/app.html"
+      "destination": "/sign-in.html"
     },
     {
       "source": "/dashboard/sign-up",
@@ -120,6 +138,11 @@
     {
       "source": "/loi-google-drive.html",
       "destination": "/huong-dan/loi-google-drive",
+      "permanent": true
+    },
+    {
+      "source": "/sign-in.html",
+      "destination": "/dashboard/sign-in",
       "permanent": true
     }
   ]

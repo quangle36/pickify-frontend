@@ -28,7 +28,7 @@ test('built pages, redirects and HTTP status codes match SEO policy', async () =
     assert.ok(!homeFile.includes('maximum-scale') && !homeFile.includes('user-scalable=no'));
     const origin = server.resolvedUrls.local[0];
     const request = (path) => fetch(new URL(path, origin), {redirect:'manual'});
-    for (const path of ['/', '/?utm_source=test', '/privacy', '/terms', '/huong-dan/gui-anh-google-drive', '/huong-dan/loc-anh-raw', '/huong-dan/chon-anh-tren-dien-thoai', '/huong-dan/loi-google-drive']) {
+    for (const path of ['/', '/?utm_source=test', '/privacy', '/terms', '/huong-dan/gui-anh-google-drive', '/huong-dan/loc-anh-raw', '/huong-dan/chon-anh-tren-dien-thoai', '/huong-dan/loi-google-drive', '/dashboard/sign-in']) {
       const response = await request(path); const html = await response.text();
       assert.equal(response.status, 200, path);
       assert.equal((html.match(/<h1\b/g) || []).length, 1, path);
@@ -50,11 +50,11 @@ test('built pages, redirects and HTTP status codes match SEO policy', async () =
         const schemas = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/g)].map(match => JSON.parse(match[1]));
         assert.equal(schemas.filter(schema => schema['@type'] === 'WebSite').length, 1);
         assert.ok(schemas.some(schema => schema.name === 'Lumipic' && schema.url === 'https://lumipic.space/'));
-        for (const href of ['#how-it-works','#features','#pricing','/dashboard/sign-in','/huong-dan/gui-anh-google-drive', '/huong-dan/loc-anh-raw', '/huong-dan/chon-anh-tren-dien-thoai', '/huong-dan/loi-google-drive']) assert.ok(html.includes(`href="${href}"`));
+        for (const href of ['#how-it-works','#features','#pricing','/dashboard/sign-in','/huong-dan/gui-anh-google-drive', '/huong-dan/loc-anh-raw', '/huong-dan/chon-anh-tren-dien-thoai', '/huong-dan/loi-google-drive', '/dashboard/sign-in']) assert.ok(html.includes(`href="${href}"`));
         assert.ok(!/<button[^>]*>[^<]*(?:Dashboard|Demo|Bắt đầu)/.test(html));
       }
     }
-    for (const [path, destination] of [['/home.html','/'], ['/index.html','/'], ['/loc-anh-raw.html','/huong-dan/loc-anh-raw'], ['/chon-anh-tren-dien-thoai.html','/huong-dan/chon-anh-tren-dien-thoai'], ['/loi-google-drive.html','/huong-dan/loi-google-drive'], ['/privacy.html','/privacy'], ['/terms.html','/terms'], ['/privacy/','/privacy'], ['/terms/?x=1','/terms?x=1'], ['/gui-anh-google-drive.html','/huong-dan/gui-anh-google-drive'], ['/huong-dan/gui-anh-google-drive/','/huong-dan/gui-anh-google-drive']]) {
+    for (const [path, destination] of [['/sign-in.html','/dashboard/sign-in'], ['/home.html','/'], ['/index.html','/'], ['/loc-anh-raw.html','/huong-dan/loc-anh-raw'], ['/chon-anh-tren-dien-thoai.html','/huong-dan/chon-anh-tren-dien-thoai'], ['/loi-google-drive.html','/huong-dan/loi-google-drive'], ['/privacy.html','/privacy'], ['/terms.html','/terms'], ['/privacy/','/privacy'], ['/terms/?x=1','/terms?x=1'], ['/gui-anh-google-drive.html','/huong-dan/gui-anh-google-drive'], ['/huong-dan/gui-anh-google-drive/','/huong-dan/gui-anh-google-drive']]) {
       const response = await request(path);
       assert.equal(response.status, 308, path);
       assert.equal(response.headers.get('location'), destination, path);
@@ -65,13 +65,17 @@ test('built pages, redirects and HTTP status codes match SEO policy', async () =
       assert.ok(html.includes('id="not-found-title"'), path);
       assert.ok(response.headers.get('x-robots-tag')?.includes('noindex'), path);
     }
-    for (const path of ['/dashboard','/dashboard/sign-in','/dashboard/sign-up','/dashboard/album/abc','/app.html']) {
+    for (const path of ['/dashboard','/dashboard/sign-up','/dashboard/album/abc','/app.html']) {
       const response = await request(path); const html = await response.text();
       assert.equal(response.status, 200, path);
       assert.ok(response.headers.get('x-robots-tag')?.includes('noindex'), path);
       assert.ok(html.includes('content="noindex,nofollow"'), path);
       assert.ok(!html.includes('data-prerender-path'), path);
     }
+    const login = await (await request('/dashboard/sign-in')).text();
+    assert.ok(login.includes('Đăng nhập Lumipic'));
+    assert.ok(login.includes('id="auth-email"') && login.includes('id="auth-password"'));
+    assert.ok(login.includes('href="/huong-dan/gui-anh-google-drive"'));
     const guide = await (await request('/huong-dan/gui-anh-google-drive')).text();
     assert.equal((guide.match(/<img /g)||[]).length, 6);
     assert.ok(guide.includes('id="khach-chon"'));
@@ -84,19 +88,28 @@ test('built pages, redirects and HTTP status codes match SEO policy', async () =
       const response = await request(path);
       assert.equal(response.status, 200, path);
       assert.ok(response.headers.get('content-type')?.includes(type), path);
+      if (path === '/favicon.png') {
+        const data = new DataView(await response.arrayBuffer());
+        assert.equal(data.getUint32(0), 0x89504e47, 'valid PNG favicon');
+        assert.equal(data.getUint32(16), data.getUint32(20), 'square favicon');
+        assert.ok(data.getUint32(16) >= 48, 'large enough favicon');
+      }
     }
     const sitemap = await (await request('/sitemap.xml')).text();
     assert.equal((await request('/assets/missing.js')).status, 404);
-    assert.equal((sitemap.match(/<loc>/g)||[]).length, 7);
+    assert.equal((sitemap.match(/<loc>/g)||[]).length, 8);
     for (const match of sitemap.matchAll(/<loc>https:\/\/lumipic.space([^<]*)<\/loc>/g)) assert.equal((await request(match[1])).status, 200, match[1]);
-    assert.ok(!sitemap.includes('dashboard') && !sitemap.includes('album/'));
+    assert.ok(sitemap.includes('https://lumipic.space/dashboard/sign-in'));
+    assert.ok(!sitemap.includes('/dashboard/sign-up') && !sitemap.includes('/dashboard/album/') && !sitemap.includes('/album/'));
     assert.ok((await (await request('/robots.txt')).text()).includes('Sitemap: https://lumipic.space/sitemap.xml'));
     const config = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
     assert.ok(!config.rewrites.some(({source}) => source === '/(.*)'));
     assert.equal(config.trailingSlash, false);
     assert.ok(!config.headers.some(({source}) => source === '/index.html'));
-    assert.ok(config.rewrites.filter(({source}) => source.startsWith('/dashboard')).every(({destination}) => destination === '/app.html'));
+    assert.ok(config.rewrites.filter(({source}) => source.startsWith('/dashboard') && source !== '/dashboard/sign-in').every(({destination}) => destination === '/app.html'));
     assert.ok(!config.rewrites.some(({source}) => source === '/'));
+    assert.equal(config.rewrites.find(({source}) => source === '/dashboard/sign-in').destination, '/sign-in.html');
+    assert.ok(!config.headers.some(({source}) => source === '/dashboard/:path*' || source === '/dashboard/sign-in'));
   } finally {
     await new Promise((resolve, reject) => server.httpServer.close((error) => error ? reject(error) : resolve()));
   }

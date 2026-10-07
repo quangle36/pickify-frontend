@@ -9,6 +9,7 @@ import {
   Target,
   Trash2,
 } from "lucide-react";
+import { errorMessage } from "@/api/errors";
 import { useAppStore } from "@/app/stores/app.store";
 import { AppModal } from "@/components/ui/app-modal";
 import { Button } from "@/components/ui/button";
@@ -135,13 +136,18 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
           "Đã đổi mật khẩu và thu hồi toàn bộ phiên đăng nhập cũ của khách hàng.",
       });
     } catch (error) {
-      report(error);
+      toast({
+        variant: "destructive",
+        title: "Không thể đổi mật khẩu khách.",
+        description: errorMessage(error),
+      });
     }
   };
 
   // Save selection limit
   const handleSaveLimit = async () => {
     const limitNum = Number(editLimit);
+    if (limitNum === (album.selectionLimit ?? album.totalPhotos)) return;
     if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > 1500) {
       toast({
         variant: "destructive",
@@ -163,7 +169,7 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
         albumId: album.id,
         input: {
           name: album.title,
-          slug: album.slug ?? album.shareId,
+          slug: album.slug,
           selectionLimit: limitNum,
         },
       });
@@ -173,7 +179,11 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
         title: "Đã cập nhật giới hạn số ảnh chọn.",
       });
     } catch (error) {
-      report(error);
+      toast({
+        variant: "destructive",
+        title: "Không thể cập nhật giới hạn ảnh chọn.",
+        description: errorMessage(error),
+      });
     }
   };
 
@@ -220,116 +230,108 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
 
   const switchId = `selection-editing-${album.id}`;
   const currentLimit = album.selectionLimit ?? album.totalPhotos;
+  const limitUnchanged = Number(editLimit) === currentLimit;
 
   return (
     <AppModal
       open={open}
       onOpenChange={handleOpenChange}
+      onEscapeKeyDown={(event) => {
+        if (editingPasscode || editingLimit) {
+          event.preventDefault();
+          if (editingPasscode && !updatePasscode.isPending) {
+            setNewPasscode("");
+            setEditingPasscode(false);
+            setNewPasscodeVisible(false);
+          }
+          if (editingLimit && !updateAlbum.isPending) {
+            setEditLimit(String(currentLimit));
+            setEditingLimit(false);
+          }
+        }
+      }}
       title="Cài đặt album"
       description="Quản lý bảo mật và quyền chọn ảnh."
       contentClassName="max-w-lg"
       bodyClassName="space-y-4"
-      footer={
-        <div className="flex w-full justify-end">
-          <Button
-            type="button"
-            variant="dark"
-            onClick={() => handleOpenChange(false)}
-            className="h-8.5 px-4 rounded-xl text-xs font-semibold"
-          >
-            Xong
-          </Button>
-        </div>
-      }
+
     >
       {/* Option A: Flat List Container with Hairline Dividers */}
       <section className="rounded-2xl border border-stone-200/90 bg-white shadow-xs divide-y divide-stone-100 overflow-hidden">
         {/* Row 2: Selection Limit */}
         <div className="p-4 transition-colors hover:bg-stone-50/40">
-          {!editingLimit ? (
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
-                  <Target className="h-4 w-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-xs font-semibold text-stone-900">
-                    Giới hạn ảnh chọn
-                  </h3>
-                  <p className="text-[11px] text-stone-500">
-                    Khách đã chọn{" "}
-                    <span className="font-semibold text-stone-800">
-                      {album.selectedPhotosCount}
-                    </span>{" "}
-                    / {currentLimit} ảnh tối đa
-                  </p>
-                </div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
+                <Target className="h-4 w-4" />
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="rounded-md bg-stone-100 px-2 py-0.5 font-mono text-xs font-bold text-stone-700">
-                  {currentLimit}
-                </span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditingLimit(true)}
-                  className="h-7.5 px-2.5 text-xs font-semibold"
-                >
-                  Đổi
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3 pt-0.5">
-              <div>
-                <Label className="text-[11px] font-semibold text-stone-700">
-                  Số lượng ảnh khách được chọn
-                </Label>
-                <div className="mt-1 flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min={album.selectedPhotosCount}
-                    max={1500}
-                    value={editLimit}
-                    onChange={(e) => setEditLimit(e.target.value)}
-                    disabled={updateAlbum.isPending}
-                    className="h-8 w-28 font-mono text-xs font-bold"
-                  />
-                  <span className="text-xs text-stone-500">ảnh</span>
-                </div>
-                <p className="mt-1 text-[11px] text-stone-400">
-                  Tối thiểu {album.selectedPhotosCount} ảnh (đã chọn), tối đa 1.500 ảnh.
+              <div className="min-w-0 flex-1">
+                <h3 className="text-xs font-semibold text-stone-900">
+                  Giới hạn ảnh chọn
+                </h3>
+                <p className="text-[11px] text-stone-500">
+                  Khách đã chọn{" "}
+                  <span className="font-semibold text-stone-800">
+                    {album.selectedPhotosCount}
+                  </span>{" "}
+                  / {currentLimit} ảnh tối đa
                 </p>
               </div>
-
-              <div className="flex justify-end gap-2 pt-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setEditLimit(String(album.selectionLimit ?? album.totalPhotos));
-                    setEditingLimit(false);
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {editingLimit ? (
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={Math.max(1, album.selectedPhotosCount)}
+                  max={1500}
+                  step={1}
+                  aria-label="Giới hạn ảnh chọn"
+                  title="Enter để lưu, Esc để hủy"
+                  autoFocus
+                  value={editLimit}
+                  onFocus={(event) => event.target.select()}
+                  onChange={(event) => setEditLimit(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                      event.preventDefault();
+                      if (!updateAlbum.isPending) void handleSaveLimit();
+                    } else if (event.key === "Escape") {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (!updateAlbum.isPending) {
+                        setEditLimit(String(currentLimit));
+                        setEditingLimit(false);
+                      }
+                    }
                   }}
                   disabled={updateAlbum.isPending}
-                  className="h-7.5 px-3 text-xs"
-                >
-                  Hủy
-                </Button>
-                <Button
-                  type="button"
-                  variant="dark"
-                  size="sm"
-                  onClick={() => void handleSaveLimit()}
-                  disabled={updateAlbum.isPending}
-                  className="h-7.5 px-3 text-xs font-semibold"
-                >
-                  Lưu
-                </Button>
-              </div>
+                  className="h-8 w-12 rounded-md bg-white px-1 py-0.5 text-center font-mono text-xs font-bold text-stone-700 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                />
+              ) : (
+                <span className="flex h-8 w-12 items-center justify-center rounded-md bg-stone-100 px-1 py-0.5 font-mono text-xs font-bold text-stone-700">
+                  {currentLimit}
+                </span>
+              )}
+              <Button
+                type="button"
+                variant={editingLimit ? "dark" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (editingLimit) {
+                    void handleSaveLimit();
+                  } else {
+                    setEditLimit(String(currentLimit));
+                    setEditingLimit(true);
+                  }
+                }}
+                disabled={updateAlbum.isPending || (editingLimit && limitUnchanged)}
+                className="h-8 w-11 px-0 text-xs font-semibold"
+              >
+                {editingLimit ? "Lưu" : "Đổi"}
+              </Button>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Row 3: Selection Lock Toggle */}
@@ -380,123 +382,98 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
 
         {/* Row 4: Client Passcode */}
         <div className="p-4 transition-colors hover:bg-stone-50/40">
-          {!editingPasscode ? (
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
-                  <KeyRound className="h-4 w-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-xs font-semibold text-stone-900">
-                    Mật khẩu khách
-                  </h3>
-                  <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-stone-500">
-                    <span>Mật khẩu:</span>
-                    <span className="font-mono font-bold tracking-wider text-stone-800">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
+                <KeyRound className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-xs font-semibold text-stone-900">
+                  Mật khẩu khách
+                </h3>
+                <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-stone-500">
+                  <span className="shrink-0">Mật khẩu:</span>
+                  {editingPasscode ? (
+                    <Input
+                      type={newPasscodeVisible ? "text" : "password"}
+                      autoFocus
+                      autoComplete="new-password"
+                      aria-label="Mật khẩu mới cho khách"
+                      title="Ít nhất 4 ký tự. Enter để lưu, Esc để hủy."
+                      minLength={4}
+                      maxLength={128}
+                      value={newPasscode}
+                      onChange={(event) => setNewPasscode(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                          event.preventDefault();
+                          if (!updatePasscode.isPending) void handleSavePasscode();
+                        } else if (event.key === "Escape") {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          if (!updatePasscode.isPending) {
+                            setNewPasscode("");
+                            setEditingPasscode(false);
+                            setNewPasscodeVisible(false);
+                          }
+                        }
+                      }}
+                      disabled={updatePasscode.isPending}
+                      className="h-7 w-14 shrink-0 rounded-md bg-white px-1 py-0.5 font-mono text-xs font-bold text-stone-800"
+                    />
+                  ) : (
+                    <span className="flex h-7 w-14 shrink-0 items-center overflow-hidden font-mono font-bold tracking-wider text-stone-800">
                       {visiblePasscode ?? "••••"}
                     </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => void togglePasscode()}
-                      disabled={revealPasscode.isPending || updatePasscode.isPending}
-                      aria-label={
-                        visiblePasscode !== null
-                          ? "Ẩn mật khẩu khách"
-                          : "Hiển thị mật khẩu khách"
-                      }
-                      aria-pressed={visiblePasscode !== null}
-                      className="h-5 w-5 rounded-full p-0 text-stone-400 hover:bg-stone-100 hover:text-stone-700"
-                    >
-                      {visiblePasscode !== null ? (
-                        <EyeOff className="h-3.5 w-3.5" />
-                      ) : (
-                        <Eye className="h-3.5 w-3.5" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  revealRequest.current++;
-                  setVisiblePasscode(null);
-                  setEditingPasscode(true);
-                }}
-                className="h-7.5 px-2.5 text-xs font-semibold shrink-0"
-              >
-                Đổi mật khẩu
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-3 pt-0.5">
-              <div>
-                <Label className="text-[11px] font-semibold text-stone-700">
-                  Mật khẩu mới cho khách
-                </Label>
-                <div className="relative mt-1">
-                  <Input
-                    type={newPasscodeVisible ? "text" : "password"}
-                    value={newPasscode}
-                    onChange={(event) => setNewPasscode(event.target.value)}
-                    placeholder="Nhập mật khẩu mới (ít nhất 4 ký tự)"
-                    disabled={updatePasscode.isPending}
-                    className="h-8 font-mono text-xs pr-8"
-                  />
+                  )}
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => setNewPasscodeVisible((val) => !val)}
-                    aria-label={
-                      newPasscodeVisible ? "Ẩn mật khẩu mới" : "Hiển thị mật khẩu mới"
-                    }
-                    className="absolute right-1 top-1 h-6 w-6 p-0 text-stone-400 hover:text-stone-700"
+                    onClick={() => {
+                      if (editingPasscode) {
+                        setNewPasscodeVisible((value) => !value);
+                      } else {
+                        void togglePasscode();
+                      }
+                    }}
+                    disabled={revealPasscode.isPending || updatePasscode.isPending}
+                    aria-label={editingPasscode
+                      ? (newPasscodeVisible ? "Ẩn mật khẩu mới" : "Hiển thị mật khẩu mới")
+                      : (visiblePasscode !== null ? "Ẩn mật khẩu khách" : "Hiển thị mật khẩu khách")}
+                    aria-pressed={editingPasscode ? newPasscodeVisible : visiblePasscode !== null}
+                    className="h-5 w-5 shrink-0 rounded-full p-0 text-stone-400 hover:bg-stone-100 hover:text-stone-700"
                   >
-                    {newPasscodeVisible ? (
+                    {(editingPasscode ? newPasscodeVisible : visiblePasscode !== null) ? (
                       <EyeOff className="h-3.5 w-3.5" />
                     ) : (
                       <Eye className="h-3.5 w-3.5" />
                     )}
                   </Button>
                 </div>
-                <p className="mt-1 text-[11px] text-stone-400">
-                  Đổi mật khẩu sẽ tự động thu hồi toàn bộ phiên đăng nhập cũ của khách hàng.
-                </p>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setNewPasscode("");
-                    setEditingPasscode(false);
-                    setNewPasscodeVisible(false);
-                  }}
-                  disabled={updatePasscode.isPending}
-                  className="h-7.5 px-3 text-xs"
-                >
-                  Hủy
-                </Button>
-                <Button
-                  type="button"
-                  variant="dark"
-                  size="sm"
-                  onClick={() => void handleSavePasscode()}
-                  disabled={updatePasscode.isPending || newPasscode.length < 4}
-                  className="h-7.5 px-3 text-xs font-semibold"
-                >
-                  Lưu
-                </Button>
               </div>
             </div>
-          )}
+            <Button
+              type="button"
+              variant={editingPasscode ? "dark" : "outline"}
+              size="sm"
+              onClick={() => {
+                if (editingPasscode) {
+                  void handleSavePasscode();
+                } else {
+                  revealRequest.current++;
+                  setVisiblePasscode(null);
+                  setNewPasscode("");
+                  setNewPasscodeVisible(false);
+                  setEditingPasscode(true);
+                }
+              }}
+              disabled={updatePasscode.isPending || (editingPasscode && newPasscode.length < 4)}
+              className="h-8 w-[100px] px-0 text-xs font-semibold shrink-0"
+            >
+              {editingPasscode ? "Lưu" : "Đổi mật khẩu"}
+            </Button>
+          </div>
         </div>
       </section>
 

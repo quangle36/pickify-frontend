@@ -22,6 +22,7 @@ interface AppModalProps {
   headerClassName?: string;
   bodyClassName?: string;
   footerClassName?: string;
+  onEscapeKeyDown?: ComponentPropsWithoutRef<typeof DialogContent>["onEscapeKeyDown"];
   onOpenAutoFocus?: ComponentPropsWithoutRef<
     typeof DialogContent
   >["onOpenAutoFocus"];
@@ -41,6 +42,7 @@ export function AppModal({
   bodyClassName,
   footerClassName,
   onOpenAutoFocus,
+  onEscapeKeyDown,
 }: AppModalProps) {
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && preventClose) return;
@@ -54,7 +56,10 @@ export function AppModal({
           "max-h-[92vh] max-w-lg grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden border-stone-200 bg-white p-0",
           contentClassName,
         )}
-        onEscapeKeyDown={(event) => preventClose && event.preventDefault()}
+        onEscapeKeyDown={(event) => {
+          if (preventClose) event.preventDefault();
+          onEscapeKeyDown?.(event);
+        }}
         onOpenAutoFocus={onOpenAutoFocus}
         onPointerDownOutside={(event) => preventClose && event.preventDefault()}
       >

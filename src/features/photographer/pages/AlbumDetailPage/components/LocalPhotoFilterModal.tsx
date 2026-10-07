@@ -4,7 +4,7 @@ import {
   CheckCircle2,
   FolderInput,
   FolderOutput,
-  HardDrive,
+  ArrowRight,
   Loader2,
   Square,
 } from "lucide-react";
@@ -181,44 +181,34 @@ export function LocalPhotoFilterModal({
       onOpenChange={(nextOpen) => !nextOpen && closeModal()}
       title="Lọc ảnh về máy"
       preventClose={running}
-      contentClassName="max-w-2xl"
-      bodyClassName="space-y-5"
-      footer={
-        running ? (
-          <Button
-            variant="outline"
-            onClick={() => {
-              stopRequested.current = true;
-            }}
-            className="gap-2"
-          >
-            <Square className="h-3.5 w-3.5 fill-current" />
-            Dừng sau file hiện tại
-          </Button>
-        ) : (
-          <>
-            <Button variant="ghost" onClick={closeModal}>
-              Đóng
+      description="Sao chép ảnh khách đã tim từ thư mục trên máy."
+      contentClassName="max-w-[560px] rounded-2xl"
+      headerClassName="px-5 py-5 min-[700px]:px-7 min-[700px]:py-6 [&_h2]:text-lg [&_h2]:font-semibold min-[700px]:[&_h2]:text-xl [&_p]:mt-1.5"
+      bodyClassName="space-y-5 bg-white px-5 py-5 min-[700px]:px-7 min-[700px]:py-6"
+      footerClassName="px-5 py-4 min-[700px]:px-7"
+      footer={supported ? (
+        <div className="flex w-full justify-end">
+          {running ? (
+            <Button
+              variant="dark"
+              onClick={() => { stopRequested.current = true; }}
+              className="min-h-11 gap-2 min-[700px]:min-h-10"
+            >
+              <Square className="h-4 w-4" />
+              Dừng sau file hiện tại
             </Button>
-            {supported && (
-              <Button
-                variant="dark"
-                disabled={
-                  !format ||
-                  !source ||
-                  !destination ||
-                  (multipleCameras && !cameraSourceId)
-                }
-                onClick={() => void startFiltering()}
-                className="gap-2"
-              >
-                <HardDrive className="h-4 w-4" />
-                {summary ? "Lọc lại" : "Bắt đầu lọc ảnh"}
-              </Button>
-            )}
-          </>
-        )
-      }
+          ) : (
+            <Button
+              variant="dark"
+              disabled={!format || !source || !destination || (multipleCameras && !cameraSourceId)}
+              onClick={() => void startFiltering()}
+              className="min-h-11 min-[700px]:min-h-10"
+            >
+              {summary ? "Lọc lại" : "Bắt đầu lọc ảnh"}
+            </Button>
+          )}
+        </div>
+      ) : undefined}
     >
       {!supported ? (
         <Alert variant="warning">
@@ -233,7 +223,7 @@ export function LocalPhotoFilterModal({
         <>
           {multipleCameras && (
             <div className="space-y-2">
-              <Label htmlFor="local-camera-source">Máy ảnh cần lấy file</Label>
+              <Label htmlFor="local-camera-source" className="text-xs font-semibold">Máy ảnh cần lấy file</Label>
               <Select
                 value={cameraSourceId}
                 disabled={running}
@@ -244,7 +234,7 @@ export function LocalPhotoFilterModal({
                   resetRun();
                 }}
               >
-                <SelectTrigger id="local-camera-source">
+                <SelectTrigger id="local-camera-source" className="h-11 rounded-xl border-stone-300 bg-white px-3 text-sm font-medium min-[700px]:h-10">
                   <SelectValue placeholder="Chọn máy ảnh" />
                 </SelectTrigger>
                 <SelectContent>
@@ -256,17 +246,16 @@ export function LocalPhotoFilterModal({
                 </SelectContent>
               </Select>
               <p className="text-xs text-stone-500">
-                Chọn thư mục ảnh gốc của máy này. Ảnh được lưu trong thư mục con
-                riêng cho từng máy để tránh trùng tên.
+                Ảnh của mỗi máy được lưu vào thư mục con riêng để tránh trùng tên.
               </p>
             </div>
           )}
           <div className="space-y-2">
             <Label
               htmlFor="local-photo-format"
-              className="text-xs font-bold uppercase tracking-[0.12em] text-stone-500"
+              className="text-xs font-semibold text-stone-900"
             >
-              1. Định dạng file cần lấy
+              Định dạng file cần lấy
             </Label>
             <Select
               value={format}
@@ -278,7 +267,7 @@ export function LocalPhotoFilterModal({
             >
               <SelectTrigger
                 id="local-photo-format"
-                className="h-12 rounded-2xl border-stone-200 bg-white px-4 font-semibold shadow-xs focus:ring-rose-200"
+                className="h-11 rounded-xl border-stone-300 bg-white px-3 text-sm font-medium min-[700px]:h-10"
               >
                 <SelectValue placeholder="Chọn định dạng ảnh…" />
               </SelectTrigger>
@@ -293,50 +282,60 @@ export function LocalPhotoFilterModal({
             </Select>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="relative grid gap-3 min-[700px]:grid-cols-2">
             <Button
               type="button"
               variant="outline"
               disabled={running}
               onClick={() => void chooseDirectory("source")}
-              className="group h-auto justify-start whitespace-normal rounded-2xl border-stone-200 bg-white p-4 text-left shadow-xs transition hover:-translate-y-0.5 hover:border-rose-300 hover:bg-white hover:shadow-md"
+              title={source?.name}
+              className="h-auto min-h-11 min-w-0 justify-start gap-3 whitespace-normal rounded-xl border-stone-200 bg-white px-4 py-3.5 text-left min-[700px]:min-h-[150px] min-[700px]:flex-col min-[700px]:items-start hover:bg-stone-100"
             >
-              <span className="min-w-0">
-                <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-700 group-hover:bg-amber-100">
-                  <FolderInput className="h-4.5 w-4.5" />
-                </span>
-                <span className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
-                  2. Thư mục nguồn
-                </span>
-                <span className="mt-1 block truncate text-sm font-bold text-stone-900">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-stone-100 text-stone-600">
+                <FolderInput className="h-[18px] w-[18px]" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block break-words text-[13px] font-semibold text-stone-900 [overflow-wrap:anywhere]">
                   {source?.name ?? "Chọn thư mục ảnh gốc"}
                 </span>
+                <span className="mt-0.5 block text-[11px] font-normal text-stone-500">
+                  Thư mục nguồn · chứa ảnh gốc
+                </span>
+              </span>
+              <span className="shrink-0 text-[11px] font-normal text-stone-500">
+                {source ? "Đổi" : "Chọn"}
               </span>
             </Button>
-
+            <span aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 min-[700px]:flex">
+              <ArrowRight className="h-4 w-4" />
+            </span>
             <Button
               type="button"
               variant="outline"
               disabled={running}
               onClick={() => void chooseDirectory("destination")}
-              className="group h-auto justify-start whitespace-normal rounded-2xl border-stone-200 bg-white p-4 text-left shadow-xs transition hover:-translate-y-0.5 hover:border-rose-300 hover:bg-white hover:shadow-md"
+              title={destination?.name}
+              className="h-auto min-h-11 min-w-0 justify-start gap-3 whitespace-normal rounded-xl border-stone-200 bg-white px-4 py-3.5 text-left min-[700px]:min-h-[150px] min-[700px]:flex-col min-[700px]:items-start hover:bg-stone-100"
             >
-              <span className="min-w-0">
-                <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100">
-                  <FolderOutput className="h-4.5 w-4.5" />
-                </span>
-                <span className="block text-[11px] font-bold uppercase tracking-[0.12em] text-stone-400">
-                  3. Thư mục đích
-                </span>
-                <span className="mt-1 block truncate text-sm font-bold text-stone-900">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-stone-100 text-stone-600">
+                <FolderOutput className="h-[18px] w-[18px]" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block break-words text-[13px] font-semibold text-stone-900 [overflow-wrap:anywhere]">
                   {destination?.name ?? "Chọn nơi lưu ảnh đã lọc"}
                 </span>
+                <span className="mt-0.5 block text-[11px] font-normal text-stone-500">
+                  Thư mục đích · lưu bản sao
+                </span>
+              </span>
+              <span className="shrink-0 text-[11px] font-normal text-stone-500">
+                {destination ? "Đổi" : "Chọn"}
               </span>
             </Button>
           </div>
 
           {running && (
-            <div className="space-y-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-xs">
+            <div className="space-y-3 rounded-xl border border-stone-200 bg-stone-50 p-4">
               <div className="flex items-center justify-between gap-4 text-xs">
                 <span className="flex min-w-0 items-center gap-2 font-semibold text-stone-700">
                   <Loader2 className="h-4 w-4 shrink-0 animate-spin text-rose-500" />
@@ -365,11 +364,11 @@ export function LocalPhotoFilterModal({
           )}
 
           {summary && (
-            <div className="space-y-4 rounded-2xl border border-stone-200 bg-white p-4 shadow-xs">
+            <div className="space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-4">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                 <div>
-                  <h3 className="text-sm font-extrabold text-stone-900">
+                  <h3 className="text-sm font-semibold text-stone-900">
                     {summary.copy.stopped
                       ? "Đã dừng lọc ảnh"
                       : "Đã lọc ảnh xong"}
@@ -399,15 +398,15 @@ export function LocalPhotoFilterModal({
                       summary.plan.conflicts.length,
                     "text-rose-700",
                   ],
-                ].map(([label, value, color]) => (
+                ].map(([label, value]) => (
                   <div
                     key={String(label)}
                     className="rounded-xl bg-stone-50 p-3"
                   >
-                    <span className={`block text-xl font-black ${color}`}>
+                    <span className={`block text-xl font-semibold text-stone-900`}>
                       {value}
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wide text-stone-500">
+                    <span className="text-[10px] font-normal text-stone-500">
                       {label}
                     </span>
                   </div>

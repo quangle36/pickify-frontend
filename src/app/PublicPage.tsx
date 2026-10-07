@@ -1,3 +1,4 @@
+import SignInPage from "@/features/auth/pages/SignInPage";
 import DriveTroubleshootingGuidePage from "@/features/landing/pages/DriveTroubleshootingGuidePage";
 import PhoneSelectionGuidePage from "@/features/landing/pages/PhoneSelectionGuidePage";
 import RawFilterGuidePage from "@/features/landing/pages/RawFilterGuidePage";
@@ -16,6 +17,7 @@ export function PublicPage({ pathname }: { pathname: string }) {
       : pathname === "/huong-dan/loc-anh-raw" ? <RawFilterGuidePage />
       : pathname === "/huong-dan/chon-anh-tren-dien-thoai" ? <PhoneSelectionGuidePage />
       : pathname === "/huong-dan/loi-google-drive" ? <DriveTroubleshootingGuidePage />
+      : pathname === "/dashboard/sign-in" ? <SignInPage />
       : pathname === "/privacy" ? <PrivacyPage />
       : pathname === "/terms" ? <TermsPage /> : <NotFoundPage />}
   </AppShell></ApiQueryProvider>;
