@@ -7,12 +7,27 @@ export const publicPages = {
   "/": {
     title: HOME_TITLE,
     description: "Lumipic giúp nhiếp ảnh gia gửi ảnh từ Google Drive cho khách chọn trên điện thoại, nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom.",
-    file: "home.html",
+    file: "index.html",
   },
   "/huong-dan/gui-anh-google-drive": {
     title: "Cách gửi ảnh từ Google Drive cho khách chọn - Lumipic",
     description: "Hướng dẫn từng bước tạo album từ Google Drive, gửi link cho khách chọn ảnh, nhận danh sách đã tim và lọc ảnh gốc để hậu kì với Lumipic.",
     file: "gui-anh-google-drive.html",
+  },
+  "/huong-dan/loc-anh-raw": {
+    title: "Lọc ảnh RAW theo ảnh khách đã chọn - Lumipic",
+    description: "Dùng Chrome hoặc Edge trên máy tính. Giữ cùng tên gốc giữa ảnh JPEG gửi khách và ảnh RAW.",
+    file: "loc-anh-raw.html",
+  },
+  "/huong-dan/chon-anh-tren-dien-thoai": {
+    title: "Cách chọn ảnh trên điện thoại - Lumipic",
+    description: "Khách mở link do nhiếp ảnh gia gửi, không cần tạo tài khoản Lumipic.",
+    file: "chon-anh-tren-dien-thoai.html",
+  },
+  "/huong-dan/loi-google-drive": {
+    title: "Sửa lỗi nhập ảnh từ Google Drive vào Lumipic - Lumipic",
+    description: "Kiểm tra ba mục dưới đây khi album thiếu ảnh hoặc không đọc được thư mục Drive.",
+    file: "loi-google-drive.html",
   },
   "/privacy": {
     title: "Chính sách quyền riêng tư - Lumipic",

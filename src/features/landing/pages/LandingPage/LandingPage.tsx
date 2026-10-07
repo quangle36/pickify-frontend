@@ -1,3 +1,4 @@
+import { RelatedGuides } from "../../components/RelatedGuides";
 import { FC } from 'react';
 import { LandingNavbar } from './components/LandingNavbar';
 import { HeroSection } from './components/HeroSection';
@@ -54,6 +55,7 @@ const LandingPage: FC<LandingPageProps> = ({
         <ScrollReveal>
           <FAQSection />
         </ScrollReveal>
+        <div className="mx-auto max-w-5xl px-6 sm:px-8"><RelatedGuides /></div>
       </main>
       <ScrollReveal>
         <LandingFooter />

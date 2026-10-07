@@ -1,3 +1,6 @@
+import DriveTroubleshootingGuidePage from "@/features/landing/pages/DriveTroubleshootingGuidePage";
+import PhoneSelectionGuidePage from "@/features/landing/pages/PhoneSelectionGuidePage";
+import RawFilterGuidePage from "@/features/landing/pages/RawFilterGuidePage";
 import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
 import DriveSelectionGuidePage from "@/features/landing/pages/DriveSelectionGuidePage";
 import SignInPage from "@/features/auth/pages/SignInPage";
@@ -77,6 +80,9 @@ const routeTree = rootRoute.addChildren([
   signInRoute,
   signUpRoute,
   guestAlbumRoute,
+  createRoute({ getParentRoute: () => rootRoute, path: "/huong-dan/loc-anh-raw", component: RawFilterGuidePage }),
+  createRoute({ getParentRoute: () => rootRoute, path: "/huong-dan/chon-anh-tren-dien-thoai", component: PhoneSelectionGuidePage }),
+  createRoute({ getParentRoute: () => rootRoute, path: "/huong-dan/loi-google-drive", component: DriveTroubleshootingGuidePage }),
   guideRoute,
   privacyRoute,
   termsRoute,

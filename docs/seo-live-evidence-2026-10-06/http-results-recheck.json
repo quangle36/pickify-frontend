@@ -1,0 +1,627 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "title": "Lumipic - Phần mềm hỗ trợ chọn ảnh nhanh từ Google Drive",
+    "h1": [],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow",
+      "description": "Lumipic giúp nhiếp ảnh gia gửi ảnh từ Google Drive cho khách chọn trên điện thoại, nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom."
+    },
+    "schema": [],
+    "links": [],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": false,
+    "faq": false
+  },
+  {
+    "path": "/?utm_source=seo-audit",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "title": "Lumipic - Phần mềm hỗ trợ chọn ảnh nhanh từ Google Drive",
+    "h1": [],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow",
+      "description": "Lumipic giúp nhiếp ảnh gia gửi ảnh từ Google Drive cho khách chọn trên điện thoại, nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom."
+    },
+    "schema": [],
+    "links": [],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": false,
+    "faq": false
+  },
+  {
+    "path": "/huong-dan/gui-anh-google-drive",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "title": "Cách gửi ảnh từ Google Drive cho khách chọn - Lumipic",
+    "h1": [
+      "Cách gửi ảnh từ Google Drive cho khách chọn"
+    ],
+    "canonical": [
+      "https://lumipic.space/huong-dan/gui-anh-google-drive"
+    ],
+    "robots": "index,follow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "index,follow",
+      "description": "Hướng dẫn từng bước tạo album từ Google Drive, gửi link cho khách chọn ảnh, nhận danh sách đã tim và lọc ảnh gốc để hậu kì với Lumipic.",
+      "og:type": "website",
+      "og:site_name": "Lumipic",
+      "og:locale": "vi_VN",
+      "og:title": "Cách gửi ảnh từ Google Drive cho khách chọn - Lumipic",
+      "og:description": "Hướng dẫn từng bước tạo album từ Google Drive, gửi link cho khách chọn ảnh, nhận danh sách đã tim và lọc ảnh gốc để hậu kì với Lumipic.",
+      "og:url": "https://lumipic.space/huong-dan/gui-anh-google-drive",
+      "og:image": "https://lumipic.space/images/lumipic-social.jpg",
+      "og:image:width": "1200",
+      "og:image:height": "630",
+      "og:image:alt": "Lumipic — chọn ảnh nhanh từ Google Drive",
+      "twitter:card": "summary_large_image",
+      "twitter:title": "Cách gửi ảnh từ Google Drive cho khách chọn - Lumipic",
+      "twitter:description": "Hướng dẫn từng bước tạo album từ Google Drive, gửi link cho khách chọn ảnh, nhận danh sách đã tim và lọc ảnh gốc để hậu kì với Lumipic.",
+      "twitter:image": "https://lumipic.space/images/lumipic-social.jpg"
+    },
+    "schema": [],
+    "links": [
+      "/",
+      "/dashboard",
+      "/",
+      "#chuan-bi-drive",
+      "#tao-album",
+      "#kiem-tra-album",
+      "#gui-link",
+      "#khach-chon",
+      "#nhan-ket-qua",
+      "#loc-anh",
+      "https://support.google.com/drive/answer/7166529?hl=vi",
+      "/images/guides/gui-anh-google-drive/tao-album.jpg",
+      "/images/guides/gui-anh-google-drive/album-san-sang.jpg",
+      "/images/guides/gui-anh-google-drive/chia-se-album.jpg",
+      "/images/guides/gui-anh-google-drive/khach-mo-album.jpg",
+      "/images/guides/gui-anh-google-drive/anh-da-chon.jpg",
+      "/images/guides/gui-anh-google-drive/loc-anh-ve-may.jpg",
+      "/dashboard",
+      "/privacy",
+      "/terms"
+    ],
+    "images": [
+      {
+        "src": "/images/guides/gui-anh-google-drive/tao-album.jpg",
+        "alt": "Form Tạo album mới của Lumipic với tên album, tên máy ảnh và ô dán link thư mục Google Drive",
+        "width": "528",
+        "height": "752",
+        "loading": "lazy",
+        "decoding": "async",
+        "class": "mx-auto h-auto w-full rounded-lg max-w-md"
+      },
+      {
+        "src": "/images/guides/gui-anh-google-drive/album-san-sang.jpg",
+        "alt": "Album grad 3 trên Lumipic local hiển thị lưới ảnh JPEG, tên file và nút Chia sẻ",
+        "width": "1244",
+        "height": "680",
+        "loading": "lazy",
+        "decoding": "async",
+        "class": "mx-auto h-auto w-full rounded-lg "
+      },
+      {
+        "src": "/images/guides/gui-anh-google-drive/chia-se-album.jpg",
+        "alt": "Hộp Chia sẻ album có Link khách chọn ảnh và Link người thân chỉ xem, mỗi loại có nút sao chép",
+        "width": "528",
+        "height": "482",
+        "loading": "lazy",
+        "decoding": "async",
+        "class": "mx-auto h-auto w-full rounded-lg max-w-md"
+      },
+      {
+        "src": "/images/guides/gui-anh-google-drive/khach-mo-album.jpg",
+        "alt": "Màn hình khách mở album grad 3, nhập mật khẩu và nhấn nút Mở album",
+        "width": "432",
+        "height": "464",
+        "loading": "lazy",
+        "decoding": "async",
+        "class": "mx-auto h-auto w-full rounded-lg max-w-md"
+      },
+      {
+        "src": "/images/guides/gui-anh-google-drive/anh-da-chon.jpg",
+        "alt": "Tab Đã tim trong album grad 3 hiển thị 20 ảnh khách đã chọn trên tổng giới hạn 20 ảnh",
+        "width": "1244",
+        "height": "680",
+        "loading": "lazy",
+        "decoding": "async",
+        "class": "mx-auto h-auto w-full rounded-lg "
+      },
+      {
+        "src": "/images/guides/gui-anh-google-drive/loc-anh-ve-may.jpg",
+        "alt": "Hộp Lọc ảnh về máy với lựa chọn định dạng, thư mục nguồn, thư mục đích và nút Bắt đầu lọc ảnh",
+        "width": "688",
+        "height": "432",
+        "loading": "lazy",
+        "decoding": "async",
+        "class": "mx-auto h-auto w-full rounded-lg "
+      }
+    ],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": true,
+    "faq": false
+  },
+  {
+    "path": "/privacy",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "title": "Chính sách quyền riêng tư - Lumipic",
+    "h1": [
+      "Chính sách quyền riêng tư"
+    ],
+    "canonical": [
+      "https://lumipic.space/privacy"
+    ],
+    "robots": "index,follow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "index,follow",
+      "description": "Tìm hiểu cách Lumipic xử lý thông tin tài khoản, dữ liệu ảnh và yêu cầu xóa dữ liệu của người dùng.",
+      "og:type": "website",
+      "og:site_name": "Lumipic",
+      "og:locale": "vi_VN",
+      "og:title": "Chính sách quyền riêng tư - Lumipic",
+      "og:description": "Tìm hiểu cách Lumipic xử lý thông tin tài khoản, dữ liệu ảnh và yêu cầu xóa dữ liệu của người dùng.",
+      "og:url": "https://lumipic.space/privacy",
+      "og:image": "https://lumipic.space/images/lumipic-social.jpg",
+      "og:image:width": "1200",
+      "og:image:height": "630",
+      "og:image:alt": "Lumipic — chọn ảnh nhanh từ Google Drive",
+      "twitter:card": "summary_large_image",
+      "twitter:title": "Chính sách quyền riêng tư - Lumipic",
+      "twitter:description": "Tìm hiểu cách Lumipic xử lý thông tin tài khoản, dữ liệu ảnh và yêu cầu xóa dữ liệu của người dùng.",
+      "twitter:image": "https://lumipic.space/images/lumipic-social.jpg"
+    },
+    "schema": [],
+    "links": [
+      "/"
+    ],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": true,
+    "faq": false
+  },
+  {
+    "path": "/terms",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "title": "Điều khoản sử dụng - Lumipic",
+    "h1": [
+      "Điều khoản sử dụng"
+    ],
+    "canonical": [
+      "https://lumipic.space/terms"
+    ],
+    "robots": "index,follow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "index,follow",
+      "description": "Điều khoản sử dụng Lumipic và trách nhiệm của người dùng khi chia sẻ nội dung và tạo album ảnh.",
+      "og:type": "website",
+      "og:site_name": "Lumipic",
+      "og:locale": "vi_VN",
+      "og:title": "Điều khoản sử dụng - Lumipic",
+      "og:description": "Điều khoản sử dụng Lumipic và trách nhiệm của người dùng khi chia sẻ nội dung và tạo album ảnh.",
+      "og:url": "https://lumipic.space/terms",
+      "og:image": "https://lumipic.space/images/lumipic-social.jpg",
+      "og:image:width": "1200",
+      "og:image:height": "630",
+      "og:image:alt": "Lumipic — chọn ảnh nhanh từ Google Drive",
+      "twitter:card": "summary_large_image",
+      "twitter:title": "Điều khoản sử dụng - Lumipic",
+      "twitter:description": "Điều khoản sử dụng Lumipic và trách nhiệm của người dùng khi chia sẻ nội dung và tạo album ảnh.",
+      "twitter:image": "https://lumipic.space/images/lumipic-social.jpg"
+    },
+    "schema": [],
+    "links": [
+      "/"
+    ],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": true,
+    "faq": false
+  },
+  {
+    "path": "/robots.txt",
+    "status": 200,
+    "type": "text/plain; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "content": "User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: https://lumipic.space/sitemap.xml\n"
+  },
+  {
+    "path": "/sitemap.xml",
+    "status": 200,
+    "type": "application/xml",
+    "location": null,
+    "xRobots": null,
+    "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>https://lumipic.space/</loc></url>\n  <url><loc>https://lumipic.space/huong-dan/gui-anh-google-drive</loc></url>\n  <url><loc>https://lumipic.space/privacy</loc></url>\n  <url><loc>https://lumipic.space/terms</loc></url>\n</urlset>\n"
+  },
+  {
+    "path": "/favicon.png",
+    "status": 200,
+    "type": "image/png",
+    "location": null,
+    "xRobots": null,
+    "bytes": 4124
+  },
+  {
+    "path": "/favicon.ico",
+    "status": 200,
+    "type": "image/vnd.microsoft.icon",
+    "location": null,
+    "xRobots": null,
+    "bytes": 4040
+  },
+  {
+    "path": "/apple-touch-icon.png",
+    "status": 200,
+    "type": "image/png",
+    "location": null,
+    "xRobots": null,
+    "bytes": 8638
+  },
+  {
+    "path": "/images/lumipic-social.jpg",
+    "status": 200,
+    "type": "image/jpeg",
+    "location": null,
+    "xRobots": null,
+    "bytes": 95815
+  },
+  {
+    "path": "/home.html",
+    "status": 308,
+    "type": "text/plain",
+    "location": "/",
+    "xRobots": null,
+    "content": "Redirecting...\n"
+  },
+  {
+    "path": "/privacy.html",
+    "status": 308,
+    "type": "text/plain",
+    "location": "/privacy",
+    "xRobots": null,
+    "content": "Redirecting...\n"
+  },
+  {
+    "path": "/terms.html",
+    "status": 308,
+    "type": "text/plain",
+    "location": "/terms",
+    "xRobots": null,
+    "content": "Redirecting...\n"
+  },
+  {
+    "path": "/gui-anh-google-drive.html",
+    "status": 308,
+    "type": "text/plain",
+    "location": "/huong-dan/gui-anh-google-drive",
+    "xRobots": null,
+    "content": "Redirecting...\n"
+  },
+  {
+    "path": "/privacy/",
+    "status": 308,
+    "type": "text/plain",
+    "location": "/privacy",
+    "xRobots": null,
+    "content": "Redirecting...\n"
+  },
+  {
+    "path": "/huong-dan/gui-anh-google-drive/",
+    "status": 308,
+    "type": "text/plain",
+    "location": "/huong-dan/gui-anh-google-drive",
+    "xRobots": null,
+    "content": "Redirecting...\n"
+  },
+  {
+    "path": "/seo-audit-nonexistent-20261006",
+    "status": 404,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "title": "Không tìm thấy trang — Lumipic",
+    "h1": [
+      "Không tìm thấy trang"
+    ],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow"
+    },
+    "schema": [],
+    "links": [
+      "/",
+      "/"
+    ],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": true,
+    "faq": false
+  },
+  {
+    "path": "/dashboard/missing",
+    "status": 404,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": "noindex, nofollow",
+    "title": "Không tìm thấy trang — Lumipic",
+    "h1": [
+      "Không tìm thấy trang"
+    ],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow"
+    },
+    "schema": [],
+    "links": [
+      "/",
+      "/"
+    ],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": true,
+    "faq": false
+  },
+  {
+    "path": "/privacy/missing",
+    "status": 404,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "title": "Không tìm thấy trang — Lumipic",
+    "h1": [
+      "Không tìm thấy trang"
+    ],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow"
+    },
+    "schema": [],
+    "links": [
+      "/",
+      "/"
+    ],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": true,
+    "faq": false
+  },
+  {
+    "path": "/album/a/b",
+    "status": 404,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": "noindex, nofollow",
+    "title": "Không tìm thấy trang — Lumipic",
+    "h1": [
+      "Không tìm thấy trang"
+    ],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow"
+    },
+    "schema": [],
+    "links": [
+      "/",
+      "/"
+    ],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": true,
+    "faq": false
+  },
+  {
+    "path": "/dashboard",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": "noindex, nofollow",
+    "title": "Lumipic - Phần mềm hỗ trợ chọn ảnh nhanh từ Google Drive",
+    "h1": [],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow",
+      "description": "Lumipic giúp nhiếp ảnh gia gửi ảnh từ Google Drive cho khách chọn trên điện thoại, nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom."
+    },
+    "schema": [],
+    "links": [],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": false,
+    "faq": false
+  },
+  {
+    "path": "/dashboard/sign-in",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": "noindex, nofollow",
+    "title": "Lumipic - Phần mềm hỗ trợ chọn ảnh nhanh từ Google Drive",
+    "h1": [],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow",
+      "description": "Lumipic giúp nhiếp ảnh gia gửi ảnh từ Google Drive cho khách chọn trên điện thoại, nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom."
+    },
+    "schema": [],
+    "links": [],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": false,
+    "faq": false
+  },
+  {
+    "path": "/dashboard/sign-up",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": "noindex, nofollow",
+    "title": "Lumipic - Phần mềm hỗ trợ chọn ảnh nhanh từ Google Drive",
+    "h1": [],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow",
+      "description": "Lumipic giúp nhiếp ảnh gia gửi ảnh từ Google Drive cho khách chọn trên điện thoại, nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom."
+    },
+    "schema": [],
+    "links": [],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": false,
+    "faq": false
+  },
+  {
+    "path": "/dashboard/album/seo-audit",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": "noindex, nofollow",
+    "title": "Lumipic - Phần mềm hỗ trợ chọn ảnh nhanh từ Google Drive",
+    "h1": [],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow",
+      "description": "Lumipic giúp nhiếp ảnh gia gửi ảnh từ Google Drive cho khách chọn trên điện thoại, nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom."
+    },
+    "schema": [],
+    "links": [],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": false,
+    "faq": false
+  },
+  {
+    "path": "/index.html",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": "noindex, nofollow",
+    "title": "Lumipic - Phần mềm hỗ trợ chọn ảnh nhanh từ Google Drive",
+    "h1": [],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow",
+      "description": "Lumipic giúp nhiếp ảnh gia gửi ảnh từ Google Drive cho khách chọn trên điện thoại, nhận danh sách ảnh cần hậu kì và xuất tên file để lọc trong Lightroom."
+    },
+    "schema": [],
+    "links": [],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": false,
+    "faq": false
+  },
+  {
+    "path": "/assets/seo-audit-missing.js",
+    "status": 404,
+    "type": "text/html; charset=utf-8",
+    "location": null,
+    "xRobots": null,
+    "title": "Không tìm thấy trang — Lumipic",
+    "h1": [
+      "Không tìm thấy trang"
+    ],
+    "canonical": [],
+    "robots": "noindex,nofollow",
+    "meta": {
+      "null": null,
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      "robots": "noindex,nofollow"
+    },
+    "schema": [],
+    "links": [
+      "/",
+      "/"
+    ],
+    "images": [],
+    "scripts": [
+      "/assets/index-XQPHOtaR.js"
+    ],
+    "prerender": true,
+    "faq": false
+  }
+]

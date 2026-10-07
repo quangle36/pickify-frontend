@@ -19,7 +19,7 @@ Code chỉ bật GA4 khi production, đúng origin `https://lumipic.space` và c
 
 Thư viện `web-vitals` đo LCP (ms), CLS (không đơn vị), INP (ms) trên các trang công khai; gửi sự kiện `web_vitals` với metric_name/value/id/rating/delta. `value` là số nguyên; CLS được nhân 1000, `metric_value` giữ giá trị gốc. INP cần tương tác; các báo cáo cuối có thể đến khi người dùng ẩn/rời trang.
 
-Tạo custom dimensions cho metric_name, metric_rating; custom metric cho metric_value. Khi phân tích qua BigQuery, lấy giá trị cuối theo metric_id. So sánh percentile 75 của từng metric, phân nhóm thiết bị và landing page; không lấy trung bình event value chung cho ba metric.
+Đã tạo ngày 06/10/2026: custom dimensions `Web vital name` → `metric_name`, `Web vital rating` → `metric_rating` (scope Event); custom metric `Web vital value` → `metric_value` (Standard). Luôn lọc theo tên chỉ số: LCP/INP có đơn vị ms; CLS không có đơn vị, không cộng hoặc lấy trung bình chung cả ba. Khi phân tích qua BigQuery, lấy giá trị cuối theo metric_id. So sánh percentile 75 của từng metric, phân nhóm thiết bị và landing page; không lấy trung bình event value chung cho ba metric.
 
 Đo baseline production tại https://pagespeed.web.dev/ cho trang chủ và bài hướng dẫn, chọn mobile; ghi ngày, URL, LCP/CLS/TBT lab và dữ liệu CrUX nếu có. TBT lab không thay thế INP thực tế. Chỉ tối ưu bundle/font/hydration sau khi có kết quả. Nếu chưa đủ traffic, CrUX/Search Console có thể chưa có số liệu.
 
@@ -36,7 +36,20 @@ Hướng dẫn chính thức: [Google tag ID](https://support.google.com/analyti
 
 ## Liên kết bài hướng dẫn
 
-Hiện có một bài: `/huong-dan/gui-anh-google-drive`, được liên kết từ navbar và footer trang chủ, bài có link về trang chủ. Khi thêm bài, thêm link liên quan bằng `<a href>` trong nội dung bài cũ/mới; không thêm link đến trang chưa tồn tại.
+Hiện có 4 bài được prerender, liên kết từ trang chủ và giữa các bài bằng `<a href>`:
+- `/huong-dan/gui-anh-google-drive`
+- `/huong-dan/loc-anh-raw`
+- `/huong-dan/chon-anh-tren-dien-thoai`
+- `/huong-dan/loi-google-drive`
+
+## Kiểm tra bản triển khai SEO mới
+
+`dist/index.html` phải là trang chủ đã prerender, không chứa `noindex`; `dist/app.html` là khung ứng dụng riêng tư có `noindex`. Dashboard rewrite về `/app.html`; `/index.html` và `/home.html` redirect về `/`. Không thêm rewrite `/` về `home.html`: file index trên filesystem có thể được Vercel phục vụ trước rewrite.
+
+Chạy `pnpm build && pnpm test:seo` trước deploy. Bộ kiểm tra đọc trực tiếp file index và app ngoài kiểm tra HTTP preview, để không bỏ sót khác biệt giữa preview và Vercel. Sau deploy, kiểm tra lại response HTML thật của `/`, `/dashboard`, `/sitemap.xml` và một URL lạ. Chỉ gửi sitemap/yêu cầu index sau khi `/` trả đúng nội dung và không còn `noindex`.
+
+GA4 property Lumipic (`557674306`) / stream Lumipic Website (`G-DQ2K1W0FF0`) đã báo nhận dữ liệu trong 48 giờ gần nhất ngày 06/10/2026. Enhanced measurement đang tắt. `album_created` đã được đăng ký là key event, đếm mỗi sự kiện, không gán giá trị tiền tệ. Chưa có bằng chứng sự kiện tạo album thật đã được GA4 xử lý; báo cáo organic cần lưu lượng thực tế.
+
 
 ## Baseline production — 06/10/2026, 17:29 GMT+7
 

@@ -1,3 +1,4 @@
+import { RelatedGuides } from "../../components/RelatedGuides";
 import { ArrowLeft, ArrowRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { guideSteps } from "./guide";
@@ -51,6 +52,7 @@ export default function DriveSelectionGuidePage() {
               <div><h3 className="font-medium text-neutral-900">Lọc ảnh trên máy không tìm thấy file?</h3><p>Kiểm tra định dạng, thư mục nguồn và tên file.</p></div>
             </div>
           </section>
+          <RelatedGuides currentPath="/huong-dan/gui-anh-google-drive" />
           <section className="border-t border-neutral-200 py-10">
             <h2 className="text-2xl font-medium tracking-tight">Bắt đầu với album đầu tiên của bạn</h2>
             <Button asChild className="mt-6 rounded-full bg-neutral-900 px-6 text-white shadow-none hover:bg-neutral-700"><a href="/dashboard">Mở Dashboard <ArrowRight className="ml-2 size-4" aria-hidden="true" /></a></Button>

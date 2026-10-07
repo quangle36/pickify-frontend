@@ -3,8 +3,24 @@ import { readFile, writeFile, rm } from "node:fs/promises";
 import { publicPages, getPageSeo, renderPage, SITE_ORIGIN } from "../.prerender/prerender.js";
 
 const template = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
+await writeFile(new URL("../dist/app.html", import.meta.url), template);
+// Start public hydration dependencies while the browser parses the HTML.
+const manifest = JSON.parse(await readFile(new URL("../dist/.vite/manifest.json", import.meta.url), "utf8"));
+const publicEntry = Object.entries(manifest).find(([key]) => key.endsWith("app/mountPublic.tsx"))?.[0];
+if (!publicEntry) throw new Error("Missing public hydration entry in Vite manifest");
+const preloadFiles = new Set();
+function collectImports(key) {
+  const chunk = manifest[key];
+  if (preloadFiles.has(chunk.file)) return;
+  preloadFiles.add(chunk.file);
+  for (const dependency of chunk.imports || []) collectImports(dependency);
+}
+collectImports(publicEntry);
+const publicTemplate = template.replace("</head>", [...preloadFiles].filter(file => !template.includes(`href="/${file}"`)).map(file => `<link rel="modulepreload" crossorigin href="/${file}" />`).join("\n") + "</head>");
 for (const [pathname, page] of Object.entries(publicPages)) {
-  const html = renderHtml(template, renderPage(pathname), getPageSeo(pathname), pathname);
+  // The landing page already uses a system font; avoid loading unused Google Fonts.
+  const pageTemplate = pathname === "/" ? publicTemplate.replace(/<link\b[^>]*href="https:\/\/(?:fonts\.googleapis\.com|fonts\.gstatic\.com)[^>]*>/g, "") : publicTemplate;
+  const html = renderHtml(pageTemplate, renderPage(pathname), getPageSeo(pathname), pathname);
   await writeFile(new URL(`../dist/${page.file}`, import.meta.url), html);
 }
 const notFoundSeo = { title: "Không tìm thấy trang — Lumipic", description: "", robots: "noindex,nofollow", canonical: null };

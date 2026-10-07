@@ -21,7 +21,7 @@
       ]
     },
     {
-      "source": "/index.html",
+      "source": "/app.html",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -32,8 +32,16 @@
   ],
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/home.html"
+      "source": "/huong-dan/loi-google-drive",
+      "destination": "/loi-google-drive.html"
+    },
+    {
+      "source": "/huong-dan/chon-anh-tren-dien-thoai",
+      "destination": "/chon-anh-tren-dien-thoai.html"
+    },
+    {
+      "source": "/huong-dan/loc-anh-raw",
+      "destination": "/loc-anh-raw.html"
     },
     {
       "source": "/privacy",
@@ -57,23 +65,28 @@
     },
     {
       "source": "/dashboard",
-      "destination": "/index.html"
+      "destination": "/app.html"
     },
     {
       "source": "/dashboard/sign-in",
-      "destination": "/index.html"
+      "destination": "/app.html"
     },
     {
       "source": "/dashboard/sign-up",
-      "destination": "/index.html"
+      "destination": "/app.html"
     },
     {
       "source": "/dashboard/album/:albumId",
-      "destination": "/index.html"
+      "destination": "/app.html"
     }
   ],
   "trailingSlash": false,
   "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
     {
       "source": "/home.html",
       "destination": "/",
@@ -92,6 +105,21 @@
     {
       "source": "/gui-anh-google-drive.html",
       "destination": "/huong-dan/gui-anh-google-drive",
+      "permanent": true
+    },
+    {
+      "source": "/loc-anh-raw.html",
+      "destination": "/huong-dan/loc-anh-raw",
+      "permanent": true
+    },
+    {
+      "source": "/chon-anh-tren-dien-thoai.html",
+      "destination": "/huong-dan/chon-anh-tren-dien-thoai",
+      "permanent": true
+    },
+    {
+      "source": "/loi-google-drive.html",
+      "destination": "/huong-dan/loi-google-drive",
       "permanent": true
     }
   ]

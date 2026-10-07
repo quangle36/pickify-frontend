@@ -18,7 +18,7 @@ export default defineConfig(({ mode, command }) => {
         server.middlewares.use((req, res, next) => {
           const url = new URL(req.url || "/", "http://localhost");
           const pathname = url.pathname.replace(/\/+$/, "") || "/";
-          const alias = Object.entries(publicPages).find(([, page]) => `/${page.file}` === url.pathname)?.[0];
+          const alias = url.pathname === "/home.html" ? "/" : Object.entries(publicPages).find(([, page]) => `/${page.file}` === url.pathname)?.[0];
           if (alias !== undefined || pathname !== url.pathname) {
             res.statusCode = 308;
             res.setHeader("Location", `${alias ?? pathname}${url.search}`);
@@ -27,9 +27,9 @@ export default defineConfig(({ mode, command }) => {
           }
           const page = publicPages[pathname as keyof typeof publicPages];
           if (page) req.url = `/${page.file}${url.search}`;
-          else if (/^\/dashboard(?:\/(?:sign-in|sign-up|album\/[^/]+))?$/.test(pathname) || /^\/album\/[^/]+$/.test(pathname) || pathname === "/index.html") {
+          else if (/^\/dashboard(?:\/(?:sign-in|sign-up|album\/[^/]+))?$/.test(pathname) || /^\/album\/[^/]+$/.test(pathname) || pathname === "/app.html") {
             res.setHeader("X-Robots-Tag", "noindex, nofollow");
-            req.url = "/index.html";
+            req.url = "/app.html";
           } else if (!pathname.startsWith("/assets/") && !pathname.startsWith("/images/") && !["/robots.txt", "/sitemap.xml", "/404.html", "/favicon.png", "/favicon.ico", "/apple-touch-icon.png"].includes(pathname)) {
             res.statusCode = 404;
             res.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -41,6 +41,7 @@ export default defineConfig(({ mode, command }) => {
         });
       },
     }],
+    build: { manifest: true },
     resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
     server: {
       port: Number(origin.port || 5184),

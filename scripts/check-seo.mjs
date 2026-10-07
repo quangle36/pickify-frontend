@@ -6,7 +6,7 @@ import { renderHtml } from './seo-html.mjs';
 
 const dist = new URL('../dist/', import.meta.url);
 test('prerender refuses a broken template and a missing FAQ answer', async () => {
-  const template = await readFile(new URL('index.html', dist), 'utf8');
+  const template = await readFile(new URL('app.html', dist), 'utf8');
   const seo = {title:'Test',description:'Test',robots:'index,follow',canonical:'https://lumipic.space/'};
   assert.throws(() => renderHtml(template.replace('<div id="root"></div>', ''), '<h1>Test</h1>', seo, '/'), /insertion point/);
   assert.throws(() => renderHtml(template, '<h1>Test</h1>', seo, '/'), /FAQ answer/);
@@ -16,9 +16,19 @@ test('prerender refuses a broken template and a missing FAQ answer', async () =>
 test('built pages, redirects and HTTP status codes match SEO policy', async () => {
   const server = await preview({ preview: { host: '127.0.0.1', port: 0, strictPort: false } });
   try {
+    const homeFile = await readFile(new URL('index.html', dist), 'utf8');
+    assert.ok(homeFile.includes('data-prerender-path="/"'));
+    assert.ok(homeFile.includes('<h1'));
+    assert.ok(homeFile.includes('rel="modulepreload"'));
+    assert.ok(!homeFile.includes('fonts.googleapis.com'));
+    const privateFile = await readFile(new URL('app.html', dist), 'utf8');
+    assert.ok(privateFile.includes('<div id="root"></div>'));
+    assert.ok(privateFile.includes('content="noindex,nofollow"'));
+    assert.ok(!homeFile.includes('content="noindex'));
+    assert.ok(!homeFile.includes('maximum-scale') && !homeFile.includes('user-scalable=no'));
     const origin = server.resolvedUrls.local[0];
     const request = (path) => fetch(new URL(path, origin), {redirect:'manual'});
-    for (const path of ['/', '/?utm_source=test', '/privacy', '/terms', '/huong-dan/gui-anh-google-drive']) {
+    for (const path of ['/', '/?utm_source=test', '/privacy', '/terms', '/huong-dan/gui-anh-google-drive', '/huong-dan/loc-anh-raw', '/huong-dan/chon-anh-tren-dien-thoai', '/huong-dan/loi-google-drive']) {
       const response = await request(path); const html = await response.text();
       assert.equal(response.status, 200, path);
       assert.equal((html.match(/<h1\b/g) || []).length, 1, path);
@@ -30,16 +40,21 @@ test('built pages, redirects and HTTP status codes match SEO policy', async () =
       assert.ok(html.includes('property="og:image" content="https://lumipic.space/images/lumipic-social.jpg"'));
       assert.ok(html.includes('name="twitter:card" content="summary_large_image"'));
       assert.ok(html.includes('href="/favicon.png"'));
+      if (path === '/' || path.startsWith('/huong-dan/')) {
+        for (const otherPath of ['/huong-dan/gui-anh-google-drive', '/huong-dan/loc-anh-raw', '/huong-dan/chon-anh-tren-dien-thoai', '/huong-dan/loi-google-drive']) {
+          if (path !== otherPath) assert.ok(html.includes(`href="${otherPath}"`), `${path}: missing related guide ${otherPath}`);
+        }
+      }
       if (path === '/') {
         assert.ok(html.includes('Không. Lumipic chỉ đọc folder được chia sẻ công khai'));
         const schemas = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/g)].map(match => JSON.parse(match[1]));
         assert.equal(schemas.filter(schema => schema['@type'] === 'WebSite').length, 1);
         assert.ok(schemas.some(schema => schema.name === 'Lumipic' && schema.url === 'https://lumipic.space/'));
-        for (const href of ['#how-it-works','#features','#pricing','/dashboard/sign-in','/huong-dan/gui-anh-google-drive']) assert.ok(html.includes(`href="${href}"`));
+        for (const href of ['#how-it-works','#features','#pricing','/dashboard/sign-in','/huong-dan/gui-anh-google-drive', '/huong-dan/loc-anh-raw', '/huong-dan/chon-anh-tren-dien-thoai', '/huong-dan/loi-google-drive']) assert.ok(html.includes(`href="${href}"`));
         assert.ok(!/<button[^>]*>[^<]*(?:Dashboard|Demo|Bắt đầu)/.test(html));
       }
     }
-    for (const [path, destination] of [['/home.html','/'], ['/privacy.html','/privacy'], ['/terms.html','/terms'], ['/privacy/','/privacy'], ['/terms/?x=1','/terms?x=1'], ['/gui-anh-google-drive.html','/huong-dan/gui-anh-google-drive'], ['/huong-dan/gui-anh-google-drive/','/huong-dan/gui-anh-google-drive']]) {
+    for (const [path, destination] of [['/home.html','/'], ['/index.html','/'], ['/loc-anh-raw.html','/huong-dan/loc-anh-raw'], ['/chon-anh-tren-dien-thoai.html','/huong-dan/chon-anh-tren-dien-thoai'], ['/loi-google-drive.html','/huong-dan/loi-google-drive'], ['/privacy.html','/privacy'], ['/terms.html','/terms'], ['/privacy/','/privacy'], ['/terms/?x=1','/terms?x=1'], ['/gui-anh-google-drive.html','/huong-dan/gui-anh-google-drive'], ['/huong-dan/gui-anh-google-drive/','/huong-dan/gui-anh-google-drive']]) {
       const response = await request(path);
       assert.equal(response.status, 308, path);
       assert.equal(response.headers.get('location'), destination, path);
@@ -50,7 +65,7 @@ test('built pages, redirects and HTTP status codes match SEO policy', async () =
       assert.ok(html.includes('id="not-found-title"'), path);
       assert.ok(response.headers.get('x-robots-tag')?.includes('noindex'), path);
     }
-    for (const path of ['/dashboard','/dashboard/sign-in','/dashboard/sign-up','/dashboard/album/abc','/index.html']) {
+    for (const path of ['/dashboard','/dashboard/sign-in','/dashboard/sign-up','/dashboard/album/abc','/app.html']) {
       const response = await request(path); const html = await response.text();
       assert.equal(response.status, 200, path);
       assert.ok(response.headers.get('x-robots-tag')?.includes('noindex'), path);
@@ -72,12 +87,16 @@ test('built pages, redirects and HTTP status codes match SEO policy', async () =
     }
     const sitemap = await (await request('/sitemap.xml')).text();
     assert.equal((await request('/assets/missing.js')).status, 404);
-    assert.equal((sitemap.match(/<loc>/g)||[]).length, 4);
+    assert.equal((sitemap.match(/<loc>/g)||[]).length, 7);
+    for (const match of sitemap.matchAll(/<loc>https:\/\/lumipic.space([^<]*)<\/loc>/g)) assert.equal((await request(match[1])).status, 200, match[1]);
     assert.ok(!sitemap.includes('dashboard') && !sitemap.includes('album/'));
     assert.ok((await (await request('/robots.txt')).text()).includes('Sitemap: https://lumipic.space/sitemap.xml'));
     const config = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
     assert.ok(!config.rewrites.some(({source}) => source === '/(.*)'));
     assert.equal(config.trailingSlash, false);
+    assert.ok(!config.headers.some(({source}) => source === '/index.html'));
+    assert.ok(config.rewrites.filter(({source}) => source.startsWith('/dashboard')).every(({destination}) => destination === '/app.html'));
+    assert.ok(!config.rewrites.some(({source}) => source === '/'));
   } finally {
     await new Promise((resolve, reject) => server.httpServer.close((error) => error ? reject(error) : resolve()));
   }
