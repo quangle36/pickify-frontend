@@ -17,7 +17,7 @@ import { AlbumPhotoGrid } from "./components/AlbumPhotoGrid";
 import { AlbumPhotoGridSkeleton } from "./components/AlbumPhotoGridSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { AlbumPhotoEmptyState } from "./components/AlbumPhotoEmptyState";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlbumSettingsModal } from "./components/AlbumSettingsModal";
 import { PhotoTimeSettingsModal } from "./components/PhotoTimeSettingsModal";
@@ -145,11 +145,11 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
           <h1 className="text-base sm:text-xl font-bold text-stone-900 truncate">
             {album.title}
           </h1>
-          {album.status === "importing" && (
+          {["scanning", "importing"].includes(album.status) && (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600">
               <RefreshCw className="w-3 h-3 animate-spin" />
               <span>
-                Đang tải ({album.importedPhotos}/{album.totalPhotos})
+                {album.status === "scanning" ? "Đang quét ảnh…" : `Đang tải (${album.importedPhotos}/${album.totalPhotos})`}
               </span>
             </span>
           )}
@@ -321,34 +321,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             onOpenLightbox={onOpenLightbox}
           />
         ) : (
-          <Card className="rounded-2xl p-12 text-center border border-stone-200 shadow-xs space-y-3 bg-white max-w-md mx-auto my-8">
-            {album.status === "importing" ? (
-              <>
-                <div className="w-12 h-12 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-900">
-                  <RefreshCw className="w-6 h-6 animate-spin" />
-                </div>
-                <h3 className="text-sm font-bold text-stone-900">
-                  Đang quét ảnh từ Google Drive...
-                </h3>
-                <p className="text-xs text-stone-500">
-                  Đã nhập {album.importedPhotos}/{album.totalPhotos} ảnh. Ảnh sẵn
-                  sàng sẽ tự động xuất hiện tại đây.
-                </p>
-              </>
-            ) : (
-              <>
-                <div className="w-12 h-12 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-400">
-                  <Images className="w-6 h-6" />
-                </div>
-                <h3 className="text-sm font-bold text-stone-900">
-                  Không có ảnh nào phù hợp
-                </h3>
-                <p className="text-xs text-stone-500">
-                  Thử thay đổi bộ lọc ảnh hoặc từ khóa tìm kiếm của bạn.
-                </p>
-              </>
-            )}
-          </Card>
+          <AlbumPhotoEmptyState album={album} />
         )}
       </div>
 
