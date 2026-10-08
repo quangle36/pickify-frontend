@@ -15,6 +15,8 @@ import { LandingRoute } from "./routes/LandingRoute";
 import { RootLayout } from "./routes/RootLayout";
 import { AdminRoute } from './routes/AdminRoute';
 
+import { QuotationRoute } from "./routes/QuotationRoute";
+
 const rootRoute = createRootRoute({
   component: RootLayout,
   notFoundComponent: NotFoundPage,
@@ -78,6 +80,7 @@ const termsRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   landingRoute,
   dashboardRoute,
+  createRoute({ getParentRoute: () => rootRoute, path: "/dashboard/quotes", component: QuotationRoute }),
   adminRoute,
   dashboardAlbumRoute,
   signInRoute,

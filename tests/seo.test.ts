@@ -23,7 +23,7 @@ describe("page SEO policy", () => {
     expect(getPageSeo("/dashboard/sign-in")).toMatchObject({title: "Đăng nhập - Lumipic", canonical: "https://lumipic.space/dashboard/sign-in", robots: "index,follow"});
   });
 
-  it.each(["/dashboard", "/dashboard/sign-up", "/dashboard/album/123", "/album/private-album", "/missing"])(
+  it.each(["/dashboard", "/dashboard/sign-up", "/dashboard/quotes", "/dashboard/album/123", "/album/private-album", "/missing"])(
     "keeps %s out of search and removes the public canonical",
     (path) => {
       expect(getPageSeo(path)).toMatchObject({ canonical: null, robots: "noindex,nofollow", description: "" });

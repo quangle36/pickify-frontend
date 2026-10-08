@@ -55,6 +55,15 @@
           "value": "noindex, nofollow"
         }
       ]
+    },
+    {
+      "source": "/dashboard/quotes",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ],
   "rewrites": [
@@ -108,6 +117,10 @@
     },
     {
       "source": "/dashboard/album/:albumId",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/dashboard/quotes",
       "destination": "/app.html"
     }
   ],

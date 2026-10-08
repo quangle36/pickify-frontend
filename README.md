@@ -35,3 +35,9 @@ After deploying, check the raw HTML of an album link, verify the OG image URL re
 `/huong-dan/gui-anh-google-drive` is a public, prerendered seven-step guide linked from the landing navigation and footer. Copy and screenshot metadata live under `src/features/landing/pages/DriveSelectionGuidePage/`. The six JPEG screenshots in `public/images/guides/gui-anh-google-drive/` were captured from the local UI using the existing `grad 3` album, plus a create-album form that was canceled without submission. The guest screenshot shows the password entry screen; no album password is embedded. Retake screenshots when the workflow changes. The SEO HTTP check verifies the guide, its canonical, redirects, and every image response.
 
 SEO/GA4/Search Console setup: [docs/seo-measurement.md](docs/seo-measurement.md).
+
+## Báo giá
+
+`/dashboard/quotes` is an authenticated quotation editor linked from the photographer navigation. It supports a minimal theme, custom studio/logo, days and services, live totals, and PNG export at 1600 px wide. Drafts are stored only in this browser under `lumipic:quotation:v1:<ownerId>`; there is no server persistence or cross-device sync. A storage failure does not prevent editing or export.
+
+Form data and draft validation live in the `quotation` feature. The editor follows the Studio Split layout: a 440 px sidebar with collapsible form sections, a dotted canvas, zoom/Fit/100% controls and a pinned export header. Both the editor and exported document use `ui-sans-serif, system-ui, sans-serif`. Optional quotation codes are supported; older drafts without codes still restore. The theme registry shares a renderer between the scaled preview and export, so adding a theme does not require duplicating form logic. Exports use a frozen validated snapshot with system fonts and a locally embedded logo. Vite preview, Vercel and the nginx example explicitly serve this route through `app.html` with `noindex`.

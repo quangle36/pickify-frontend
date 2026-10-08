@@ -65,7 +65,7 @@ test('built pages, redirects and HTTP status codes match SEO policy', async () =
       assert.ok(html.includes('id="not-found-title"'), path);
       assert.ok(response.headers.get('x-robots-tag')?.includes('noindex'), path);
     }
-    for (const path of ['/dashboard','/dashboard/sign-up','/dashboard/album/abc','/app.html']) {
+    for (const path of ['/dashboard','/dashboard/sign-up','/dashboard/quotes','/dashboard/album/abc','/app.html']) {
       const response = await request(path); const html = await response.text();
       assert.equal(response.status, 200, path);
       assert.ok(response.headers.get('x-robots-tag')?.includes('noindex'), path);

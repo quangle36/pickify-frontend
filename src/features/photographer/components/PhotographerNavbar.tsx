@@ -85,6 +85,7 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild><Link to="/dashboard">Album của bạn</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/dashboard/quotes">Báo giá</Link></DropdownMenuItem>
               {profile.role === 'admin' && <DropdownMenuItem asChild><Link to="/dashboard/admin"><ShieldCheck className="mr-2 h-4 w-4" />Quản lý tài khoản</Link></DropdownMenuItem>}
               <DropdownMenuItem
                 onClick={onLogout}
