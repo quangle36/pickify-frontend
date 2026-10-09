@@ -19,6 +19,7 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
   photo, isFailed, isPending, onClick, onToggleHeart, onRetrySave, selectionEnabled = true,
 }) => {
   const [failedImageUrl, setFailedImageUrl] = useState<string>();
+  const [heartbeat, setHeartbeat] = useState(false);
   const preload = () => {
     if (photo.status === "ready") void preloadImage(photo.displayUrl, "high").catch(() => undefined);
   };
@@ -49,10 +50,21 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
         {photo.status === "ready" && (selectionEnabled || photo.isSelected) && (
           selectionEnabled ? (
             <Button
-              size="icon" variant="ghost" onClick={() => onToggleHeart(photo)} disabled={isPending} aria-busy={isPending}
+              size="icon" variant="ghost" onClick={() => {
+                setHeartbeat(!photo.isSelected);
+                onToggleHeart(photo);
+              }} disabled={isPending} aria-busy={isPending}
               aria-pressed={photo.isSelected} aria-label={`${photo.isSelected ? "Bỏ tim" : "Thả tim"} ${photo.name}`}
               className={`absolute right-2 top-2 h-10 w-10 rounded-full text-white hover:text-white md:right-3 md:top-3 ${photo.isSelected ? "bg-primary hover:bg-primary/90" : "bg-neutral-500/90 hover:bg-neutral-600/90"}`}
-            ><Heart className={`h-5 w-5 ${photo.isSelected ? "fill-current" : ""}`} /></Button>
+            >
+              <span
+                aria-hidden="true"
+                className={`inline-flex ${heartbeat && photo.isSelected ? "animate-heartbeat" : ""}`}
+                onAnimationEnd={() => setHeartbeat(false)}
+              >
+                <Heart className={`h-5 w-5 ${photo.isSelected ? "fill-current" : ""}`} />
+              </span>
+            </Button>
           ) : (
             <span role="img" aria-label="Đã chọn" className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white md:right-3 md:top-3"><Heart className="h-5 w-5 fill-current" /></span>
           )

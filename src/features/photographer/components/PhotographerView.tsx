@@ -54,6 +54,7 @@ export function PhotographerView({
       ) : (
         <PhotographerDashboardPage
           albums={albums}
+          profile={profile}
           onSelectAlbum={actions.selectAlbum}
           onRetryAlbum={actions.retryAlbum}
           onDeleteAlbum={actions.deleteAlbum}
@@ -61,7 +62,7 @@ export function PhotographerView({
           canCreateAlbums={!!profile.canCreateAlbums}
         />
       )}
-      {profile.canCreateAlbums && <CreateAlbumModal {...actions.createModal} />}
+      {profile.canCreateAlbums && <CreateAlbumModal {...actions.createModal} profile={profile} />}
       <PublicDriveHelpModal {...actions.driveModal} />
       <LightboxModal
         {...lightbox.props}

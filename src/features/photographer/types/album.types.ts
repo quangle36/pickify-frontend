@@ -67,5 +67,6 @@ export interface PhotographerProfile {
   canCreateAlbums?: boolean;
   storageBytes?: number;
   storageLimitBytes?: number;
+  storageReconciliationRequired?: boolean;
   maxAlbums?: number;
 }

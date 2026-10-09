@@ -28,7 +28,9 @@ import type {
   Album,
   AlbumSourceInput,
   PhotoSortMode,
+  PhotographerProfile,
 } from "@/features/photographer/types/album.types";
+import { StorageUsage } from "@/features/photographer/components/StorageUsage";
 import { AlbumFormField } from "./AlbumFormField";
 import { AlbumSourceFields } from "./AlbumSourceFields";
 
@@ -36,6 +38,7 @@ interface CreateAlbumModalProps {
   isOpen: boolean;
   onClose: () => void;
   album?: Album;
+  profile?: PhotographerProfile;
   onSubmit: (data: {
     name: string;
     slug: string;
@@ -51,7 +54,13 @@ export function CreateAlbumModal({
   onClose,
   onSubmit,
   album,
+  profile,
 }: CreateAlbumModalProps) {
+  const storageBlocked = !album && !!profile && (
+    profile.storageReconciliationRequired ||
+    (profile.storageBytes !== undefined && profile.storageLimitBytes !== undefined &&
+      profile.storageBytes >= profile.storageLimitBytes)
+  );
   const [customization, setCustomization] = useState("");
   const defaults = useMemo<AlbumFormInput>(
     () => ({
@@ -155,6 +164,7 @@ export function CreateAlbumModal({
             type="submit"
             form="create-album-form"
             isLoading={isSubmitting}
+            disabled={!!storageBlocked}
             className="min-h-11 flex-1 md:min-h-10 sm:flex-none"
           >
             {album ? "Lưu thay đổi" : "Tạo album"}
@@ -172,6 +182,14 @@ export function CreateAlbumModal({
           })}
           className="space-y-6"
         >
+          {!album && profile && <div className="space-y-3">
+            <StorageUsage profile={profile} />
+            <p className="text-xs leading-relaxed text-stone-500">
+              Tối đa {profile.maxPhotosLimit.toLocaleString("vi-VN")} ảnh JPEG. Sau khi tạo album,
+              hệ thống sẽ quét Drive và ước tính dung lượng sau resize từ ảnh mẫu,
+              cộng 20% dự phòng. Nếu không đủ dung lượng, album sẽ báo lỗi trước khi lưu ảnh.
+            </p>
+          </div>}
           {errors.root?.server && (
             <Alert
               variant="destructive"

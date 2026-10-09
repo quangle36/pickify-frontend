@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { FC, useState } from "react";
-import type { Album } from "@/features/photographer/types/album.types";
+import { StorageUsage } from "@/features/photographer/components/StorageUsage";
+import type { Album, PhotographerProfile } from "@/features/photographer/types/album.types";
 import { AlbumCard } from "./components/AlbumCard";
 import { CreateAlbumCard } from "./components/CreateAlbumCard";
 import { CreateAlbumModal } from "./components/CreateAlbumModal";
@@ -10,6 +11,7 @@ import { errorMessage } from "@/api/errors";
 
 interface PhotographerDashboardPageProps {
   albums: Album[];
+  profile?: PhotographerProfile;
   onSelectAlbum: (albumId: string) => void;
   onRetryAlbum: (albumId: string) => void;
   onDeleteAlbum: (albumId: string) => void;
@@ -19,6 +21,7 @@ interface PhotographerDashboardPageProps {
 
 const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
   albums,
+  profile,
   onSelectAlbum,
   onRetryAlbum,
   onDeleteAlbum,
@@ -40,6 +43,8 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
           <div className="w-full sm:w-auto"><CreateAlbumCard onCreate={onCreateAlbum} /></div>
         )}
       </div>
+
+      {profile && <div className="mb-6 max-w-xl"><StorageUsage profile={profile} /></div>}
 
       {albums.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 rounded-2xl border-stone-200 bg-white px-4 py-10 text-center shadow-none sm:px-6 sm:py-14">

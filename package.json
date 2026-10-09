@@ -8,6 +8,7 @@
     "build": "tsc && vite build && vite build --ssr src/app/prerender.tsx --outDir .prerender && node scripts/prerender.mjs",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:loading": "pnpm build && node scripts/check-global-loading.mjs",
     "test:seo": "node --test scripts/check-seo.mjs"
   },
   "dependencies": {
@@ -48,6 +49,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
+    "playwright": "^1.64.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "typescript": "^5.6.3",

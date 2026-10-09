@@ -114,6 +114,23 @@
   animation: heartPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* A short double beat confirms a newly selected guest photo. */
+@keyframes heartBeat {
+  0%, 42%, 100% { transform: scale(1); }
+  24% { transform: scale(1.3); }
+  65% { transform: scale(1.18); }
+}
+
+.animate-heartbeat {
+  animation: heartBeat 520ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-heartbeat {
+    animation: none;
+  }
+}
+
 @keyframes toastCountdown {
   from { stroke-dasharray: 100; stroke-dashoffset: 0; }
   to { stroke-dasharray: 100; stroke-dashoffset: 100; }

@@ -2,6 +2,7 @@ import { applyPublicSeo } from "../applyPublicSeo";
 import { useEffect } from "react";
 import { Outlet, useRouterState } from "@tanstack/react-router";
 import { getPageSeo, SITE_ORIGIN } from "../seo";
+import { GlobalLoadingProvider } from "../providers/GlobalLoadingProvider";
 
 export function RootLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -40,5 +41,5 @@ export function RootLayout() {
       canonical?.remove();
     }
   }, [pathname, isNotFound]);
-  return <Outlet />;
+  return <GlobalLoadingProvider><Outlet /></GlobalLoadingProvider>;
 }

@@ -9,6 +9,8 @@ export const apiMessages: Record<string, string> = {
   ALBUM_CREATION_NOT_ALLOWED: 'Tài khoản chưa được quản trị viên cấp quyền tạo album.',
   ALBUM_LIMIT_REACHED: 'Bạn đã đạt giới hạn album. Hãy xoá album không còn dùng và chờ dọn xong.',
   USER_STORAGE_LIMIT_REACHED: 'Tài khoản đã đạt hạn mức dung lượng. Hãy xoá album không còn dùng.',
+  ALBUM_ESTIMATED_STORAGE_EXCEEDED: 'Dung lượng album ước tính sau resize vượt dung lượng còn lại (đã tính 20% dự phòng). Hãy giảm số ảnh hoặc xoá album không còn dùng, chờ dọn xong rồi thử lại.',
+  ALBUM_ESTIMATED_GLOBAL_STORAGE_EXCEEDED: 'Dung lượng album ước tính vượt dung lượng còn lại của hệ thống. Vui lòng thử lại sau hoặc giảm số ảnh.',
   GLOBAL_STORAGE_LIMIT_REACHED: 'Hệ thống tạm dừng import vì đã đạt hạn mức dung lượng.',
   STORAGE_RECONCILIATION_REQUIRED: 'Hệ thống đang đối soát dung lượng. Vui lòng thử lại sau.',
   DAILY_IMPORT_LIMIT_REACHED: 'Bạn đã đạt giới hạn tạo hoặc thử lại album trong ngày.',
