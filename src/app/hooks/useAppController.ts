@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { ApiError } from "@/api/errors";
 import { mergeOwnerAlbumSnapshot } from "@/features/photographer/utils/mergeOwnerAlbumSnapshot";
 import { useAlbums } from "@/features/photographer/queries/album.queries";
@@ -46,6 +47,7 @@ const defaultFilters = { selected: false, search: "" };
 
 export function useAppController(route: AppRoute) {
   const client = useQueryClient();
+  const navigate = useNavigate();
   const guestShare =
     route.pathname.match(/^\/album\/([a-zA-Z0-9_-]+)\/?$/)?.[1] ?? null;
   const guestReadOnly =
@@ -144,6 +146,17 @@ export function useAppController(route: AppRoute) {
   }, [albumId, client, nextCoverUrl, scope]);
 
   useEffect(() => {
+    // The album behind this page was deleted (or never existed): the page
+    // already shows the album list, so fix the URL instead of showing an
+    // error that every refetch would show again.
+    if (
+      !guestShare &&
+      photosQuery.error instanceof ApiError &&
+      photosQuery.error.status === 404
+    ) {
+      void navigate({ to: "/dashboard", replace: true, search: {} });
+      return;
+    }
     const queryError =
       owner.error ?? albumsQuery.error ?? guest.error ?? photosQuery.error;
     if (
@@ -163,6 +176,7 @@ export function useAppController(route: AppRoute) {
     clearError,
     guest.error,
     guestShare,
+    navigate,
     owner.error,
     photosQuery.error,
     report,
