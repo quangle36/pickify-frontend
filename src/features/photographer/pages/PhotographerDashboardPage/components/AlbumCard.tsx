@@ -18,6 +18,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { ImportProgressRing, useCountUp } from "@/features/photographer/components/ImportProgressRing";
+import { importPercent } from "@/features/photographer/utils/importProgress";
 
 interface AlbumCardProps {
   album: Album;
@@ -49,6 +51,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
     ? Math.min(100, Math.max(0, (album.selectedPhotosCount / selectionLimit) * 100))
     : 0;
   const processing = album.status === "scanning" || album.status === "importing";
+  const imported = useCountUp(album.importedPhotos);
   const statusText = {
     scanning: "Đang quét Drive",
     importing: "Đang nhập ảnh",
@@ -159,7 +162,9 @@ export const AlbumCard: FC<AlbumCardProps> = ({
                     : "bg-stone-100 text-stone-600"
               }`}
             >
-              {processing && <RefreshCw className="h-4 w-4 animate-spin motion-reduce:animate-none" strokeWidth={1.5} aria-hidden="true" />}
+              {album.status === "importing" ? (
+                <ImportProgressRing percent={importPercent(imported, album.totalPhotos)} className="h-4 w-4" />
+              ) : processing && <RefreshCw className="h-4 w-4 animate-spin motion-reduce:animate-none" strokeWidth={1.5} aria-hidden="true" />}
               {album.status === "needs_attention" && <AlertCircle className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />}
               {statusText}
             </Badge>

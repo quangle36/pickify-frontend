@@ -12,7 +12,7 @@ export function useAlbums(ownerId?: string) {
     queryFn: ({ signal }) => albumService.getAlbums(signal),
     refetchInterval: (query) =>
       query.state.data?.some((album) => isProcessing(album.status))
-        ? 5000
+        ? 2000
         : false,
   });
 }

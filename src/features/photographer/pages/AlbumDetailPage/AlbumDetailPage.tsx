@@ -13,6 +13,8 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
+import { ImportProgressRing, useCountUp } from "@/features/photographer/components/ImportProgressRing";
+import { importPercent } from "@/features/photographer/utils/importProgress";
 import { AlbumPhotoGrid } from "./components/AlbumPhotoGrid";
 import { AlbumPhotoGridSkeleton } from "./components/AlbumPhotoGridSkeleton";
 import { Button } from "@/components/ui/button";
@@ -56,6 +58,7 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
 
   const [timeSettingsOpen, setTimeSettingsOpen] = useState(false);
   const selectedCount = album.selectedPhotosCount;
+  const imported = useCountUp(album.importedPhotos);
   const tabsListRef = useRef<HTMLDivElement>(null);
   const photoContentRef = useRef<HTMLDivElement>(null);
   const previousFilterRef = useRef(filterMode);
@@ -146,10 +149,14 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
             {album.title}
           </h1>
           {["scanning", "importing"].includes(album.status) && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600">
-              <RefreshCw className="w-3 h-3 animate-spin" />
-              <span>
-                {album.status === "scanning" ? "Đang quét ảnh…" : `Đang tải (${album.importedPhotos}/${album.totalPhotos})`}
+            <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600">
+              {album.status === "importing" ? (
+                <ImportProgressRing percent={importPercent(imported, album.totalPhotos)} className="w-3.5 h-3.5" />
+              ) : (
+                <RefreshCw className="w-3 h-3 animate-spin" />
+              )}
+              <span className="tabular-nums">
+                {album.status === "scanning" ? "Đang quét ảnh…" : `Đang tải (${imported}/${album.totalPhotos})`}
               </span>
             </span>
           )}
