@@ -58,6 +58,9 @@ const AlbumDetailPage: FC<AlbumDetailPageProps> = ({
 
   const [timeSettingsOpen, setTimeSettingsOpen] = useState(false);
   const selectedCount = album.selectedPhotosCount;
+  // shortcut: the page is not remounted per album, so going straight from one
+  // importing album to another counts between their numbers for up to 3 s;
+  // reset per album if that ever matters.
   const imported = useCountUp(album.importedPhotos);
   const tabsListRef = useRef<HTMLDivElement>(null);
   const photoContentRef = useRef<HTMLDivElement>(null);
