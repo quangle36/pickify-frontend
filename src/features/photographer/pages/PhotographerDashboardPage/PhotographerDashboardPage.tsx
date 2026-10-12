@@ -1,5 +1,7 @@
+import { Trash2 } from "lucide-react";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Card } from "@/components/ui/card";
-import { FC, useState } from "react";
+import { FC, useRef, useState } from "react";
 import { StorageUsage } from "@/features/photographer/components/StorageUsage";
 import type { Album, PhotographerProfile } from "@/features/photographer/types/album.types";
 import { AlbumCard } from "./components/AlbumCard";
@@ -14,7 +16,7 @@ interface PhotographerDashboardPageProps {
   profile?: PhotographerProfile;
   onSelectAlbum: (albumId: string) => void;
   onRetryAlbum: (albumId: string) => void;
-  onDeleteAlbum: (albumId: string) => void;
+  onDeleteAlbum: (albumId: string) => Promise<boolean>;
   onCreateAlbum: () => void;
   canCreateAlbums?: boolean;
 }
@@ -30,6 +32,8 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
 }) => {
   const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
   const [sharingAlbum, setSharingAlbum] = useState<Album | null>(null);
+  const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const [deletingAlbum, setDeletingAlbum] = useState<Album | null>(null);
   const updateAlbum = useUpdateAlbum();
 
   return (
@@ -61,7 +65,7 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
               onSelect={onSelectAlbum}
               onRetry={onRetryAlbum}
               canRetry={canCreateAlbums}
-              onDelete={onDeleteAlbum}
+              onDelete={(_id, trigger) => { deleteTriggerRef.current = trigger; setDeletingAlbum(album); }}
               onEdit={setEditingAlbum}
               onShare={setSharingAlbum}
             />
@@ -69,6 +73,17 @@ const PhotographerDashboardPage: FC<PhotographerDashboardPageProps> = ({
         </div>
       )}
 
+      <ConfirmationModal
+        open={deletingAlbum !== null}
+        onOpenChange={(nextOpen) => { if (!nextOpen) setDeletingAlbum(null); }}
+        returnFocusRef={deleteTriggerRef}
+        title="Xóa album?"
+        description={<><span className="font-medium text-stone-900">{deletingAlbum?.title}</span> và toàn bộ phiên chọn ảnh sẽ bị xóa vĩnh viễn. Khách hàng sẽ không thể truy cập album. Thao tác này không thể hoàn tác.</>}
+        confirmLabel="Xóa album"
+        variant="destructive"
+        icon={<Trash2 className="h-5 w-5" strokeWidth={1.5} />}
+        onConfirm={() => deletingAlbum ? onDeleteAlbum(deletingAlbum.id) : false}
+      />
       {editingAlbum && (
         <CreateAlbumModal
           key={editingAlbum.id}

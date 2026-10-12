@@ -67,4 +67,4 @@ GA4 property Lumipic (`557674306`) / stream Lumipic Website (`G-DQ2K1W0FF0`) đ�
 
 CrUX: No Data; chưa có bằng chứng INP/p75 thực tế hay thứ hạng. Đây là bản production trước những thay đổi local trong phiên này, không phải số đo bản vừa sửa.
 
-Phát hiện production: `/robots.txt` trả HTML shell ứng dụng, báo 32 lỗi trong Lighthouse. Bản build local đã tạo robots.txt đúng và đã kiểm tra HTTP; cần deploy build mới để sửa production. Báo cáo còn chỉ ra render-blocking requests (~600 ms), JS chưa dùng (~67 KiB), CSS chưa dùng (~11 KiB), chặn zoom trong viewport và tương phản. Ưu tiên xác nhận lại sau deploy trước khi tối ưu rộng hơn.
+Phát hiện production: `/robots.txt` trả HTML shell ứng dụng, báo 32 lỗi trong Lighthouse. Bản build local đã tạo robots.txt đúng và đã kiểm tra HTTP; cần deploy build mới để sửa production. Báo cáo còn chỉ ra render-blocking requests (~600 ms), JS chưa dùng (~67 KB), CSS chưa dùng (~11 KB), chặn zoom trong viewport và tương phản. Ưu tiên xác nhận lại sau deploy trước khi tối ưu rộng hơn.

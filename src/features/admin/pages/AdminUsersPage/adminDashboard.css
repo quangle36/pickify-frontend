@@ -11,3 +11,19 @@
 @media(prefers-reduced-motion:reduce){.admin-cms *{transition:none!important;scroll-behavior:auto!important}}
 
 .admin-cms .admin-menu-trigger:hover{background:#e7e5e4}
+.admin-row-progress{flex-wrap:wrap}
+.admin-table-heading,.admin-user-row{grid-template-columns:minmax(0,1fr) 140px 64px 260px 120px}
+.admin-album-count{text-align:left;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.admin-storage-limit{min-height:40px;display:flex;flex-direction:column;justify-content:center}
+.admin-storage-limit-line{display:flex;align-items:center;justify-content:flex-start;gap:4px;height:40px;flex-wrap:nowrap}
+.admin-storage-limit-line>span{white-space:nowrap}
+.admin-storage-limit-input{display:flex;align-items:center;gap:4px}
+.admin-cms .admin-inline-quota{height:24px;width:3ch;min-width:3ch;max-width:3ch;padding:0;border:0;border-bottom:1px solid transparent;border-radius:0;background:transparent;box-shadow:none;font:inherit;line-height:inherit;color:inherit;text-align:left;outline:none}
+.admin-cms .admin-inline-quota:focus-visible{box-shadow:none;outline:none}
+.admin-cms .admin-inline-quota:not(.is-editing){pointer-events:none}
+.admin-cms .admin-inline-quota.is-editing{border-bottom-color:var(--admin-ink)}
+.admin-cms .admin-inline-quota[aria-invalid=true]{border-bottom-color:#be123c}
+.admin-table-heading>span,.admin-user-row>div{min-width:0;text-align:left}
+.admin-user-storage-progress{height:4px;margin-top:4px}
+@media(min-width:768px) and (max-width:1279px){.admin-table-heading,.admin-user-row{grid-template-columns:minmax(0,1fr) 120px 48px 240px 110px;gap:10px}}
+@media(max-width:767px){.admin-user-row{grid-template-columns:minmax(0,1fr) auto}.admin-album-count{grid-column:1/-1;grid-row:3;text-align:left;padding-left:48px}.admin-usage{grid-row:4}.admin-storage-limit-line{justify-content:flex-start}.admin-user-storage-progress{max-width:240px}}

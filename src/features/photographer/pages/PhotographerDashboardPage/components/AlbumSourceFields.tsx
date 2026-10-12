@@ -59,6 +59,23 @@ export function AlbumSourceFields({ disabled }: { disabled: boolean }) {
               />
             </div>
           ))}
+          {!disabled && (
+            <div className="space-y-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={fields.length >= MAX_ALBUM_SOURCES}
+                onClick={() => append({ label: "", folderUrl: "" })}
+                className="min-h-11 md:min-h-10"
+              >
+                <Plus className="h-4 w-4" />
+                Thêm máy ảnh
+              </Button>
+              <p className="text-xs leading-relaxed text-stone-500">
+                Tối đa 10 máy · mỗi máy một thư mục riêng.
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <AlbumFormField
@@ -95,23 +112,6 @@ export function AlbumSourceFields({ disabled }: { disabled: boolean }) {
           Chụp bằng nhiều máy ảnh
         </Label>
       </div>
-      {multipleCameras && !disabled && (
-        <div className="space-y-2">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={fields.length >= MAX_ALBUM_SOURCES}
-            onClick={() => append({ label: "", folderUrl: "" })}
-            className="min-h-11 md:min-h-10"
-          >
-            <Plus className="h-4 w-4" />
-            Thêm máy ảnh
-          </Button>
-          <p className="text-xs leading-relaxed text-stone-500">
-            Tối đa 10 máy · mỗi máy một thư mục riêng.
-          </p>
-        </div>
-      )}
     </fieldset>
   );
 }

@@ -29,7 +29,7 @@ Sau JavaScript, trang có đúng H1/title/canonical, link href, metadata và Web
 
 Một lần Lighthouse mobile mới: Performance 78, LCP 4,7 s, TBT 210 ms. Baseline trước đó: Performance 95, LCP 2,4 s, TBT 0 ms. Đây là các lần đo lab riêng lẻ, chưa đủ kết luận mức hồi quy ổn định hoặc quy lỗi cho GA4.
 
-Lighthouse chỉ ra render-blocking requests (~610 ms), JS chưa dùng (~135 KiB), CSS chưa dùng (~12 KiB), 4 long tasks. Ưu tiên phục vụ đúng homepage prerender/hydration, rồi đo lại; tiếp theo mới phân tích bundle, font và mã bên thứ ba. Chưa có CrUX/INP thực tế.
+Lighthouse chỉ ra render-blocking requests (~610 ms), JS chưa dùng (~135 KB), CSS chưa dùng (~12 KB), 4 long tasks. Ưu tiên phục vụ đúng homepage prerender/hydration, rồi đo lại; tiếp theo mới phân tích bundle, font và mã bên thứ ba. Chưa có CrUX/INP thực tế.
 
 ### P2 — Những kiểm tra và cấu hình còn cần thực hiện
 

@@ -44,12 +44,14 @@ export function useAppActions() {
     try {
       await deleteAlbumMutation.mutateAsync(id);
       toast({ title: "Đã chặn truy cập và yêu cầu dọn album" });
+      return true;
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Không thể xóa album",
         description: `Album đã được khôi phục. ${errorMessage(error)}`,
       });
+      return false;
     }
   };
   return {

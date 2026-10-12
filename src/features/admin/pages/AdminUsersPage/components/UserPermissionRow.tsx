@@ -2,9 +2,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import type { AdminUser } from '../../../types/admin.types';
-import { formatBytes } from '../../../utils/formatBytes';
 import { storagePercent } from '../../../utils/storagePercent';
-export function UserPermissionRow({ user, pending, onChange, storageLimit }: {
+import { UserStorageLimit } from './UserStorageLimit';
+export function UserPermissionRow({ user, pending, onChange }: {
   user: AdminUser; pending: boolean; storageLimit: number; onChange: (user: AdminUser) => void;
 }) {
   const isAdmin = user.role === 'admin';
@@ -15,7 +15,8 @@ export function UserPermissionRow({ user, pending, onChange, storageLimit }: {
         <div className="admin-identity-text"><p>{user.name}</p><small title={user.email}>{user.email}</small></div>
       </div>
       <div className="admin-permission"><Badge variant="outline" className={`admin-badge ${isAdmin ? '' : user.canCreateAlbums ? 'success' : !user.emailVerified ? 'warning' : ''}`}>{isAdmin ? 'Quản trị viên' : user.canCreateAlbums ? 'Được tạo album' : !user.emailVerified ? 'Chưa xác minh' : 'Chưa cấp quyền'}</Badge></div>
-      <div className="admin-usage"><span>{user.albumCount} album</span><div className="admin-row-progress"><Progress className="admin-progress" value={storagePercent(user.storageBytes, storageLimit)} aria-label={`Dung lượng ${user.name}`} /><small>{formatBytes(user.storageBytes)}</small></div></div>
+      <div className="admin-album-count">{user.albumCount} album</div>
+      <div className="admin-usage"><UserStorageLimit user={user} /><Progress className="admin-progress admin-user-storage-progress" value={storagePercent(user.storageBytes, user.storageLimitBytes)} aria-label={`Dung lượng ${user.name}`} /></div>
       <div className="admin-action">
         <Button variant="outline" size="sm" disabled={pending || isAdmin || (!user.emailVerified && !user.canCreateAlbums)}
           aria-label={`${user.canCreateAlbums ? 'Thu hồi' : 'Cấp'} quyền tạo album cho ${user.email}`}

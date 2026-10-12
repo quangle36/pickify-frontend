@@ -5,7 +5,7 @@ import type { PhotographerProfile } from "../types/album.types";
 function formatStorage(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   const unit = bytes < 1024 ** 2 ? 1 : bytes < 1024 ** 3 ? 2 : 3;
-  return `${(bytes / 1024 ** unit).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} ${["B", "KiB", "MiB", "GiB"][unit]}`;
+  return `${(bytes / 1024 ** unit).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} ${["B", "KB", "MB", "GB"][unit]}`;
 }
 
 export function StorageUsage({ profile }: { profile: Pick<PhotographerProfile,

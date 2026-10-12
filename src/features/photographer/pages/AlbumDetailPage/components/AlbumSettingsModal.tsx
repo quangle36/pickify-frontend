@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { errorMessage } from "@/api/errors";
 import { useAppStore } from "@/app/stores/app.store";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { AppModal } from "@/components/ui/app-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,8 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
   const selectionLock = useSetAlbumSelectionLocked();
   const deleteAlbum = useDeleteAlbum();
   const revealPasscode = useRevealAlbumPasscode();
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
   // State: Selection Limit editing
   const [editingLimit, setEditingLimit] = useState(false);
@@ -73,6 +76,7 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
+      setDeleteConfirmationOpen(false);
       revealRequest.current++;
       setVisiblePasscode(null);
       setNewPasscodeVisible(false);
@@ -207,14 +211,6 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
 
   // Delete album
   const handleDeleteAlbum = async () => {
-    if (
-      !confirm(
-        `Bạn có chắc chắn muốn xóa album "${album.title}"? Thao tác này sẽ xóa vĩnh viễn và không thể hoàn tác.`,
-      )
-    ) {
-      return;
-    }
-
     try {
       await deleteAlbum.mutateAsync(album.id);
       handleOpenChange(false);
@@ -223,8 +219,10 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
         variant: "dark",
         title: "Đã xóa album.",
       });
+      return true;
     } catch (error) {
       report(error);
+      return false;
     }
   };
 
@@ -233,8 +231,10 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
   const limitUnchanged = Number(editLimit) === currentLimit;
 
   return (
+    <>
     <AppModal
       open={open}
+      preventClose={deleteAlbum.isPending}
       onOpenChange={handleOpenChange}
       onEscapeKeyDown={(event) => {
         if (editingPasscode || editingLimit) {
@@ -489,7 +489,8 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => void handleDeleteAlbum()}
+          ref={deleteButtonRef}
+          onClick={() => setDeleteConfirmationOpen(true)}
           disabled={deleteAlbum.isPending}
           className="h-7.5 px-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-100/60 hover:text-rose-700 shrink-0"
         >
@@ -497,6 +498,18 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
         </Button>
       </section>
     </AppModal>
+    <ConfirmationModal
+      open={open && deleteConfirmationOpen}
+      onOpenChange={setDeleteConfirmationOpen}
+      returnFocusRef={deleteButtonRef}
+      title="Xóa album?"
+      description={<><span className="font-medium text-stone-900">{album.title}</span> và toàn bộ phiên chọn ảnh sẽ bị xóa vĩnh viễn. Khách hàng sẽ không thể truy cập album. Thao tác này không thể hoàn tác.</>}
+      confirmLabel="Xóa album"
+      variant="destructive"
+      icon={<Trash2 className="h-5 w-5" strokeWidth={1.5} />}
+      onConfirm={handleDeleteAlbum}
+    />
+    </>
   );
 };
 

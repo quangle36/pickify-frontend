@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import type { Album } from "@/features/photographer/types/album.types";
 import {
   RefreshCw,
@@ -24,7 +24,7 @@ interface AlbumCardProps {
   onSelect: (id: string) => void;
   onRetry: (id: string) => void;
   canRetry?: boolean;
-  onDelete: (id: string) => void;
+  onDelete: (id: string, trigger: HTMLButtonElement | null) => void;
   onEdit: (album: Album) => void;
   onShare: (album: Album) => void;
 }
@@ -38,6 +38,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
   onEdit,
   onShare,
 }) => {
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [coverFailed, setCoverFailed] = useState(false);
 
   useEffect(() => {
@@ -59,15 +60,6 @@ export const AlbumCard: FC<AlbumCardProps> = ({
     ready: "",
   }[album.status];
 
-  const handleDelete = () => {
-    if (
-      window.confirm(
-        `Bạn có chắc chắn muốn xóa album "${album.title}" không? Khách hàng sẽ không thể truy cập nữa.`,
-      )
-    ) {
-      onDelete(album.id);
-    }
-  };
 
   return (
     <Card
@@ -113,6 +105,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
                   type="button"
                   variant="ghost"
                   size="icon"
+                  ref={menuButtonRef}
                   aria-label={`Thao tác với album ${album.title}`}
                   className="h-8 w-8 rounded-[10px] text-stone-500 sm:h-9 sm:w-9"
                 >
@@ -128,7 +121,7 @@ export const AlbumCard: FC<AlbumCardProps> = ({
                   <Share2 />
                   Chia sẻ
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={handleDelete} className="text-rose-700 focus:bg-rose-50 focus:text-rose-700">
+                <DropdownMenuItem onSelect={() => onDelete(album.id, menuButtonRef.current)} className="text-rose-700 focus:bg-rose-50 focus:text-rose-700">
                   <Trash2 />
                   Xóa
                 </DropdownMenuItem>

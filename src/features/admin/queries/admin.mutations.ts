@@ -2,6 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from './admin.key';
 import { adminService } from '../services/admin.service';
 import { authKeys } from '@/features/auth/queries/auth.key';
+export function useSetStorageLimit() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, bytes }: { id: string; bytes: number }) => adminService.setStorageLimit(id, bytes),
+    onSuccess: async () => { await Promise.all([client.invalidateQueries({ queryKey: adminKeys.all }), client.invalidateQueries({ queryKey: authKeys.owner })]); },
+  });
+}
 export function useSetAlbumPermission() {
   const client = useQueryClient();
   return useMutation({

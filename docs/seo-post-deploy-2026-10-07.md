@@ -46,7 +46,7 @@ Sitemap: trước phiên này chưa có sitemap trong danh sách. Đã gửi htt
 
 FCP hiện 1,7 s, Speed Index 2,8 s, Best Practices 96. Chưa có dữ liệu CrUX. Điểm lab có biến động, không chứng minh riêng một thay đổi gây cải thiện và không tương đương thứ hạng tìm kiếm. LCP vẫn cần cải thiện.
 
-Các mục còn được PageSpeed chỉ ra: unused JS ~111 KiB, CSS ~12 KiB, 3 tác vụ dài; H1 là phần tử LCP, element render delay 1.440 ms trong breakdown. Contrast còn một số mục. Console báo 401 từ `/api/me` ở phiên chưa đăng nhập; chưa kết luận đây là lỗi người dùng.
+Các mục còn được PageSpeed chỉ ra: unused JS ~111 KB, CSS ~12 KB, 3 tác vụ dài; H1 là phần tử LCP, element render delay 1.440 ms trong breakdown. Contrast còn một số mục. Console báo 401 từ `/api/me` ở phiên chưa đăng nhập; chưa kết luận đây là lỗi người dùng.
 
 ## Giới hạn
 

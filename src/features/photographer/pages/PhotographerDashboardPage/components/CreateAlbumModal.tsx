@@ -143,7 +143,7 @@ export function CreateAlbumModal({
       description={
         album
           ? "Cập nhật thông tin và thiết lập chọn ảnh."
-          : "Thêm ảnh từ Drive để gửi khách chọn."
+          : undefined
       }
       contentClassName="w-[calc(100%-2rem)] max-w-lg rounded-2xl border-stone-200 sm:rounded-2xl [&>button]:flex [&>button]:h-8 [&>button]:w-8 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-lg [&>button>svg]:h-4 [&>button>svg]:w-4"
       headerClassName="border-stone-200 px-5 py-5 sm:px-6 sm:py-6 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:leading-[1.35] [&_p]:text-xs [&_p]:leading-relaxed"
@@ -184,11 +184,6 @@ export function CreateAlbumModal({
         >
           {!album && profile && <div className="space-y-3">
             <StorageUsage profile={profile} />
-            <p className="text-xs leading-relaxed text-stone-500">
-              Tối đa {profile.maxPhotosLimit.toLocaleString("vi-VN")} ảnh JPEG. Sau khi tạo album,
-              hệ thống sẽ quét Drive và ước tính dung lượng sau resize từ ảnh mẫu,
-              cộng 20% dự phòng. Nếu không đủ dung lượng, album sẽ báo lỗi trước khi lưu ảnh.
-            </p>
           </div>}
           {errors.root?.server && (
             <Alert

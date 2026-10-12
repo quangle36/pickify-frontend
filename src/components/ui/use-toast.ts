@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
+import { TOAST_DURATION, type ToastActionElement, type ToastProps } from '@/components/ui/toast';
 
 const TOAST_LIMIT = 3;
 const TOAST_REMOVE_DELAY = 4000;
@@ -50,6 +50,23 @@ interface State {
 }
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+const dismissTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+
+function clearDismissTimeout(id: string) {
+  const timer = dismissTimeouts.get(id);
+  if (timer !== undefined) clearTimeout(timer);
+  dismissTimeouts.delete(id);
+}
+
+function scheduleDismiss(toast: ToasterToast) {
+  clearDismissTimeout(toast.id);
+  const duration = toast.duration ?? TOAST_DURATION;
+  if (!toast.open || !Number.isFinite(duration)) return;
+  dismissTimeouts.set(toast.id, setTimeout(() => {
+    dismissTimeouts.delete(toast.id);
+    dispatch({ type: 'DISMISS_TOAST', toastId: toast.id });
+  }, duration));
+}
 
 const addToRemoveQueue = (toastId: string) => {
   if (toastTimeouts.has(toastId)) {
@@ -126,6 +143,17 @@ let memoryState: State = { toasts: [] };
 
 function dispatch(action: Action) {
   memoryState = reducer(memoryState, action);
+  // Keep the visible countdown and lifetime aligned even when Radix pauses
+  // its own timer on pointer hover, viewport focus, or window blur.
+  for (const id of dismissTimeouts.keys()) {
+    if (!memoryState.toasts.some(toast => toast.id === id && toast.open))
+      clearDismissTimeout(id);
+  }
+  if (action.type === 'ADD_TOAST' ||
+      (action.type === 'UPDATE_TOAST' && (action.toast.duration !== undefined || action.toast.open === true))) {
+    const current = memoryState.toasts.find(toast => toast.id === action.toast.id);
+    if (current) scheduleDismiss(current);
+  }
   listeners.forEach((listener) => {
     listener(memoryState);
   });
