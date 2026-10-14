@@ -7,7 +7,7 @@ export interface AdminUser {
   canCreateAlbums: boolean;
   albumCount: number;
   storageBytes: number;
-  storageLimitBytes: number;
+  storageLimitBytes?: number;
   createdAt: string;
 }
 export interface AdminUsersPage {

@@ -7,6 +7,7 @@ import {
   Lock,
   LockOpen,
   Target,
+  Shield,
   Trash2,
 } from "lucide-react";
 import { errorMessage } from "@/api/errors";
@@ -143,6 +144,27 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
       toast({
         variant: "destructive",
         title: "Không thể đổi mật khẩu khách.",
+        description: errorMessage(error),
+      });
+    }
+  };
+
+  const handleImageProtectionChange = async (enabled: boolean) => {
+    if (updateAlbum.isPending) return;
+    try {
+      await updateAlbum.mutateAsync({
+        albumId: album.id,
+        input: {
+          name: album.title,
+          slug: album.slug,
+          selectionLimit: album.selectionLimit ?? album.totalPhotos,
+          imageProtectionEnabled: enabled,
+        },
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Không thể cập nhật hạn chế tải ảnh.",
         description: errorMessage(error),
       });
     }
@@ -326,7 +348,7 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
                   }
                 }}
                 disabled={updateAlbum.isPending || (editingLimit && limitUnchanged)}
-                className="h-8 w-11 px-0 text-xs font-semibold"
+                className="h-8 w-11 shrink-0 whitespace-nowrap px-0 text-xs font-semibold sm:px-0"
               >
                 {editingLimit ? "Lưu" : "Đổi"}
               </Button>
@@ -375,6 +397,33 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
                   ? "Cho phép khách chỉnh sửa lựa chọn"
                   : "Khóa chỉnh sửa lựa chọn của khách"
               }
+              className="shrink-0 data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-stone-300"
+            />
+          </div>
+        </div>
+
+        <div className="p-4 transition-colors hover:bg-stone-50/40">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
+                <Shield className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <Label htmlFor={`image-protection-${album.id}`} className="cursor-pointer text-xs font-semibold text-stone-900">
+                  Hạn chế tải ảnh
+                </Label>
+                <p id={`image-protection-description-${album.id}`} className="text-[11px] text-stone-500">
+                  Hạn chế lưu ảnh và phím tắt công cụ nhà phát triển. Không ngăn được chụp màn hình hoặc tải ảnh hoàn toàn.
+                </p>
+              </div>
+            </div>
+            <Switch
+              id={`image-protection-${album.id}`}
+              checked={album.imageProtectionEnabled ?? false}
+              onCheckedChange={handleImageProtectionChange}
+              disabled={album.status !== "ready" || updateAlbum.isPending}
+              aria-label="Hạn chế tải ảnh"
+              aria-describedby={`image-protection-description-${album.id}`}
               className="shrink-0 data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-stone-300"
             />
           </div>
@@ -469,7 +518,7 @@ export const AlbumSettingsModal: FC<AlbumSettingsModalProps> = ({
                 }
               }}
               disabled={updatePasscode.isPending || (editingPasscode && newPasscode.length < 4)}
-              className="h-8 w-[100px] px-0 text-xs font-semibold shrink-0"
+              className="h-8 w-[100px] shrink-0 whitespace-nowrap px-0 text-xs font-semibold sm:px-0"
             >
               {editingPasscode ? "Lưu" : "Đổi mật khẩu"}
             </Button>

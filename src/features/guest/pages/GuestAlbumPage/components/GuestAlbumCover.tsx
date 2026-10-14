@@ -7,9 +7,10 @@ interface GuestAlbumCoverProps {
   album: Album;
   fallbackUrl?: string;
   readOnly: boolean;
+  protectImages?: boolean;
 }
 
-export function GuestAlbumCover({ album, fallbackUrl, readOnly }: GuestAlbumCoverProps) {
+export function GuestAlbumCover({ album, fallbackUrl, readOnly, protectImages = false }: GuestAlbumCoverProps) {
   const [failedUrls, setFailedUrls] = useState<Record<string, boolean>>({});
   const coverUrl = album.coverUrl && !failedUrls[album.coverUrl]
     ? album.coverUrl
@@ -19,6 +20,8 @@ export function GuestAlbumCover({ album, fallbackUrl, readOnly }: GuestAlbumCove
     <section aria-labelledby="guest-album-title" className="relative isolate mb-5 flex min-h-[420px] items-end overflow-hidden rounded-xl bg-stone-800 md:mb-6 md:min-h-[480px]">
       {coverUrl && (
         <img
+          data-protected-image={protectImages ? "true" : undefined}
+          draggable={protectImages ? false : undefined}
           src={coverUrl}
           alt={`Ảnh bìa album ${album.title}`}
           onError={() => setFailedUrls((previous) => ({ ...previous, [coverUrl]: true }))}
@@ -27,7 +30,7 @@ export function GuestAlbumCover({ album, fallbackUrl, readOnly }: GuestAlbumCove
           className="absolute inset-0 -z-20 h-full w-full object-cover object-[center_35%] md:object-[center_40%]"
         />
       )}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,transparent_25%,rgba(0,0,0,.35)_55%,rgba(0,0,0,.88)_100%)]" />
+      <div aria-hidden="true" data-protected-image={protectImages ? "true" : undefined} className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,transparent_25%,rgba(0,0,0,.35)_55%,rgba(0,0,0,.88)_100%)]" />
       <div className="min-w-0 max-w-xl p-6 text-white md:p-8">
         <p className="text-xs text-stone-200">ALBUM CỦA BẠN</p>
         <h1 id="guest-album-title" className="my-2 break-words text-2xl font-semibold leading-snug md:text-3xl">{album.title}</h1>

@@ -7,6 +7,7 @@ export const guestService = {
       shareId: string;
       selectionLimit?: number | null;
       selectionLocked: boolean;
+      imageProtectionEnabled: boolean;
       requiresPassword: boolean;
       readOnly: boolean;
     }>({
