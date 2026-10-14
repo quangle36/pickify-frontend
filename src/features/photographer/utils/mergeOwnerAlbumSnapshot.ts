@@ -9,6 +9,7 @@ export function mergeOwnerAlbumSnapshot(
     ...photoAlbum,
     // Settings mutations refresh the album query independently of paginated photos.
     selectionLocked: album.selectionLocked,
+    imageProtectionEnabled: album.imageProtectionEnabled,
     selectionLimit: album.selectionLimit,
   };
 }

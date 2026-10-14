@@ -13,6 +13,7 @@ import {
 import { usePhotoFilters } from "@/features/photo/queries/photo.queries";
 import { usePhotoSelection } from "@/features/photo/queries/photo.mutations";
 import { LightboxModal } from "@/features/photo/components/LightboxModal";
+import { useImageProtection } from "@/features/guest/hooks/useImageProtection";
 import { GuestPhotoCard } from "./GuestPhotoCard";
 import { GuestAlbumCover } from "./GuestAlbumCover";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,8 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
   onExitGuestView,
   readOnly,
 }) => {
+  const protectImages = album.imageProtectionEnabled ?? false;
+  useImageProtection(protectImages);
   const photoSelection = usePhotoSelection("guest", album.shareId);
   const filterPhotos = usePhotoFilters(album.shareId);
   const [filterOnlyHearts, setFilterOnlyHearts] = useState(false);
@@ -142,6 +145,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
           album={album}
           fallbackUrl={coverFallback.current.url}
           readOnly={readOnly}
+          protectImages={protectImages}
         />
         {!readOnly && selectionLocked && (
           <Alert className="mb-4 rounded-xl border-border bg-muted text-foreground">
@@ -225,6 +229,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
                   }}
                   onToggleHeart={handleToggleHeart}
                   onRetrySave={handleRetrySave}
+                  protectImages={protectImages}
                   selectionEnabled={!readOnly && !selectionLocked}
                 />
               ))}
@@ -287,6 +292,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
       {/* Lightbox for Guest View */}
       <LightboxModal
         theme="light"
+        protectImages={protectImages}
         commentsBasePath={
           readOnly ? undefined : `/public/albums/${album.shareId}`
         }

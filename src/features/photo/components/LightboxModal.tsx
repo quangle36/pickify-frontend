@@ -19,6 +19,7 @@ import { PhotoCommentsPanel } from "./PhotoCommentsPanel";
 
 interface LightboxModalProps {
   theme?: "light" | "dark";
+  protectImages?: boolean;
   photos: Photo[];
   totalPhotos: number;
   currentIndex: number;
@@ -36,6 +37,7 @@ interface LightboxModalProps {
 
 export const LightboxModal: FC<LightboxModalProps> = ({
   theme = "dark",
+  protectImages = false,
   photos,
   totalPhotos,
   currentIndex,
@@ -298,8 +300,9 @@ export const LightboxModal: FC<LightboxModalProps> = ({
       </div>
 
       {/* Main Image Stage */}
-      <div className="relative min-h-0 flex-1 flex items-center justify-center p-2 sm:p-6 overflow-hidden">
+      <div data-protected-image={protectImages ? "true" : undefined} className="relative min-h-0 flex-1 flex items-center justify-center p-2 sm:p-6 overflow-hidden">
         <img
+          draggable={protectImages ? false : undefined}
           src={currentPhoto.displayUrl}
           alt={currentPhoto.name}
           loading="eager"

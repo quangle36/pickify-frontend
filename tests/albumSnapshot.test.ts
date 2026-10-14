@@ -5,12 +5,20 @@ import type { Album } from "../src/features/photographer/types/album.types";
 const album: Album = {
   id: "album", title: "Album", folderUrl: "", folderId: "folder", shareId: "share",
   slug: null, status: "ready", totalPhotos: 10, importedPhotos: 10,
-  selectedPhotosCount: 0, selectionLimit: 20, selectionLocked: true,
+  selectedPhotosCount: 0, selectionLimit: 20, selectionLocked: true, imageProtectionEnabled: false,
   createdAt: "", expiresAt: null, coverUrl: "",
   guestSessionCount: 0,
 };
 
 describe("owner album settings with a stale photo cache", () => {
+  it.each([true, false])("keeps saved image protection %s over a stale photo snapshot", (enabled) => {
+    const displayed = mergeOwnerAlbumSnapshot(
+      { ...album, imageProtectionEnabled: enabled },
+      { imageProtectionEnabled: !enabled, selectedPhotosCount: 5 },
+    );
+    expect(displayed.imageProtectionEnabled).toBe(enabled);
+    expect(displayed.selectedPhotosCount).toBe(5);
+  });
   it("keeps the saved selection limit while photo metadata stays cached", () => {
     const displayed = mergeOwnerAlbumSnapshot(
       { ...album, selectionLimit: 28 },

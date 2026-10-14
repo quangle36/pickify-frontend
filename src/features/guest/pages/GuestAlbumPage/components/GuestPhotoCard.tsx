@@ -13,10 +13,11 @@ interface GuestPhotoCardProps {
   onToggleHeart: (photo: Photo) => void;
   onRetrySave: (photo: Photo) => void;
   selectionEnabled?: boolean;
+  protectImages?: boolean;
 }
 
 export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
-  photo, isFailed, isPending, onClick, onToggleHeart, onRetrySave, selectionEnabled = true,
+  photo, isFailed, isPending, onClick, onToggleHeart, onRetrySave, selectionEnabled = true, protectImages = false,
 }) => {
   const [failedImageUrl, setFailedImageUrl] = useState<string>();
   const [heartbeat, setHeartbeat] = useState(false);
@@ -32,6 +33,7 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
         className={`relative aspect-[3/4] overflow-hidden rounded-xl border-0 bg-muted shadow-none md:aspect-[3/2] ${photo.isSelected ? "ring-2 ring-inset ring-primary" : ""}`}
       >
         <Button
+          data-protected-image={protectImages ? "true" : undefined}
           variant="ghost"
           onClick={onClick}
           disabled={photo.status !== "ready"}
@@ -39,7 +41,7 @@ export const GuestPhotoCard: FC<GuestPhotoCardProps> = ({
           className="absolute inset-0 h-full w-full rounded-xl border-0 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground disabled:opacity-100"
         >
           {photo.status === "ready" && failedImageUrl !== photo.displayUrl ? (
-            <img src={photo.displayUrl} alt={photo.name} onError={() => setFailedImageUrl(photo.displayUrl)} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+            <img draggable={protectImages ? false : undefined} src={photo.displayUrl} alt={photo.name} onError={() => setFailedImageUrl(photo.displayUrl)} className="h-full w-full object-cover" loading="lazy" decoding="async" />
           ) : photo.status === "processing" ? (
             <span role="status" aria-label={`Đang xử lý ${photo.name}`} className="absolute inset-0 animate-skeleton-breathe bg-muted motion-reduce:animate-none" />
           ) : (

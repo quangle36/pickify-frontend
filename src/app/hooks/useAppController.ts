@@ -96,6 +96,7 @@ export function useAppController(route: AppRoute) {
             ...guest.data,
             ...photoAlbum,
             selectionLocked: guest.data.selectionLocked,
+            imageProtectionEnabled: guest.data.imageProtectionEnabled,
           },
         ]
       : []

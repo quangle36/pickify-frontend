@@ -20,6 +20,7 @@ export function useGuestAlbumQuery(shareId: string | null, readOnly = false) {
         selectedPhotosCount: 0,
         selectionLimit: metadata.selectionLimit ?? null,
         selectionLocked: metadata.selectionLocked,
+        imageProtectionEnabled: metadata.imageProtectionEnabled ?? false,
         guestSessionCount: 0,
         folderUrl: "",
         folderId: "",

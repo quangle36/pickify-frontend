@@ -11,20 +11,22 @@ import { formatBytes } from '../../../utils/formatBytes';
 
 const GB = 1024 ** 3;
 
-export function UserStorageLimit({ user }: { user: AdminUser }) {
+export function UserStorageLimit({ user, storageLimit }: { user: AdminUser; storageLimit: number }) {
+  const limitBytes = user.storageLimitBytes ?? storageLimit;
+  const canEdit = user.storageLimitBytes !== undefined;
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [value, setValue] = useState(String(user.storageLimitBytes / GB));
+  const [value, setValue] = useState(String(limitBytes / GB));
   const [editing, setEditing] = useState(false);
   const mutation = useSetStorageLimit();
   const { toast } = useToast();
-  useEffect(() => { setValue(String(user.storageLimitBytes / GB)); }, [user.storageLimitBytes]);
+  useEffect(() => { setValue(String(limitBytes / GB)); }, [limitBytes]);
   const numericValue = Number(value.replace(',', '.'));
   const bytes = Math.round(numericValue * GB);
   const valid = value.trim() !== '' && numericValue >= 0 && Number.isSafeInteger(bytes) && bytes >= 0;
-  const changed = valid && bytes !== user.storageLimitBytes;
+  const changed = valid && bytes !== limitBytes;
   const save = async () => {
-    if (!changed || mutation.isPending) return;
+    if (!canEdit || !changed || mutation.isPending) return;
     try {
       await mutation.mutateAsync({ id: user.id, bytes });
       setEditing(false);
@@ -35,7 +37,7 @@ export function UserStorageLimit({ user }: { user: AdminUser }) {
   };
   const cancel = () => {
     if (mutation.isPending) return;
-    setValue(String(user.storageLimitBytes / GB));
+    setValue(String(limitBytes / GB));
     setEditing(false);
   };
   return <form className="admin-storage-limit" onSubmit={event => { event.preventDefault(); void save(); }}
@@ -51,15 +53,15 @@ export function UserStorageLimit({ user }: { user: AdminUser }) {
           disabled={mutation.isPending} onChange={event => setValue(event.target.value)} />
         <span>GB</span>
       </div>
-      <TooltipProvider><Tooltip><TooltipTrigger asChild>
+      {canEdit && <TooltipProvider><Tooltip><TooltipTrigger asChild>
         <Button type="button" variant="ghost" size="icon" className="h-10 w-8 shrink-0"
           disabled={mutation.isPending || (editing && !changed)}
           aria-label={`${editing ? 'Lưu' : 'Sửa'} hạn mức của ${user.email}`}
           onPointerDown={event => { if (editing) event.preventDefault(); }}
-          onClick={() => { if (editing) void save(); else { setValue(String(user.storageLimitBytes / GB)); setEditing(true); requestAnimationFrame(() => { inputRef.current?.focus({ preventScroll: true }); inputRef.current?.select(); }); } }}>
+          onClick={() => { if (editing) void save(); else { setValue(String(limitBytes / GB)); setEditing(true); requestAnimationFrame(() => { inputRef.current?.focus({ preventScroll: true }); inputRef.current?.select(); }); } }}>
           {mutation.isPending ? <Loader2 className="animate-spin" /> : editing ? <Save /> : <Pencil />}
         </Button>
-      </TooltipTrigger><TooltipContent>{editing ? 'Lưu hạn mức' : 'Sửa hạn mức'}</TooltipContent></Tooltip></TooltipProvider>
+      </TooltipTrigger><TooltipContent>{editing ? 'Lưu hạn mức' : 'Sửa hạn mức'}</TooltipContent></Tooltip></TooltipProvider>}
     </div>
     {editing && <p className="sr-only" role={!valid ? 'alert' : undefined}>
       {!valid ? 'Nhập dung lượng hợp lệ từ 0 GB.' : changed && bytes < user.storageBytes ? 'Dung lượng đã dùng vượt hạn mức mới.' : ''}

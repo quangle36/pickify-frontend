@@ -46,6 +46,7 @@ export interface Album {
   selectedPhotosCount: number;
   selectionLimit: number | null;
   selectionLocked: boolean;
+  imageProtectionEnabled: boolean;
   createdAt: string;
   expiresAt: string | null;
   readyAt?: string;

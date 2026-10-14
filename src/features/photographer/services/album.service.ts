@@ -25,6 +25,7 @@ export interface UpdateAlbumInput {
   slug: string | null;
   selectionLimit: number;
   password?: string;
+  imageProtectionEnabled?: boolean;
 }
 
 export const albumService = {

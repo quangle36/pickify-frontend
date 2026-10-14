@@ -205,3 +205,45 @@ body:has(.guest-album),
 html:has(.album-detail) {
   scrollbar-gutter: stable;
 }
+
+/* Only guest photo surfaces opt in; text and comment fields retain normal selection. */
+[data-protected-image="true"] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+[data-protected-image="true"] img, img[data-protected-image="true"] {
+  -webkit-user-drag: none;
+}
+
+/* Keep centering in both keyframes so modal motion stays vertical. */
+.dialog-content-motion[data-state="open"] {
+  animation: dialog-rise-in 200ms ease-out both;
+}
+.dialog-content-motion[data-state="closed"] {
+  animation: dialog-rise-out 150ms ease-in both;
+}
+@keyframes dialog-rise-in {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 24px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+@keyframes dialog-rise-out {
+  from { opacity: 1; transform: translate(-50%, -50%); }
+  to { opacity: 0; transform: translate(-50%, calc(-50% + 24px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialog-content-motion[data-state="open"] {
+    animation-name: dialog-fade-in;
+  }
+  .dialog-content-motion[data-state="closed"] {
+    animation-name: dialog-fade-out;
+  }
+}
+@keyframes dialog-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes dialog-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

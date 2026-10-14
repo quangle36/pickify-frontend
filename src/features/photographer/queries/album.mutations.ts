@@ -80,7 +80,14 @@ export function useUpdateAlbum() {
       albumId: string;
       input: UpdateAlbumInput;
     }) => albumService.updateAlbum(albumId, input),
-    onSuccess: () => invalidateAlbumData(client, false),
+    onSuccess: (updatedAlbum) => {
+      client.setQueryData<Album[]>(albumKeys.all, (current) =>
+        current?.map((album) =>
+          album.id === updatedAlbum.id ? { ...album, ...updatedAlbum } : album,
+        ),
+      );
+      return invalidateAlbumData(client, false);
+    },
   });
 }
 
