@@ -18,7 +18,7 @@ function collectImports(key) {
 collectImports(publicEntry);
 const publicTemplate = template.replace("</head>", [...preloadFiles].filter(file => !template.includes(`href="/${file}"`)).map(file => `<link rel="modulepreload" crossorigin href="/${file}" />`).join("\n") + "</head>");
 for (const [pathname, page] of Object.entries(publicPages)) {
-  // The landing page already uses a system font; avoid loading unused Google Fonts.
+  // The landing page self-hosts its fonts (LandingPage.css); avoid loading unused Google Fonts.
   const pageTemplate = pathname === "/" ? publicTemplate.replace(/<link\b[^>]*href="https:\/\/(?:fonts\.googleapis\.com|fonts\.gstatic\.com)[^>]*>/g, "") : publicTemplate;
   const html = renderHtml(pageTemplate, renderPage(pathname), getPageSeo(pathname), pathname);
   await writeFile(new URL(`../dist/${page.file}`, import.meta.url), html);
