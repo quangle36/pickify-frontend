@@ -1,38 +1,30 @@
-import { FileSpreadsheet, LockKeyhole, ShieldCheck } from "lucide-react";
-import { FeaturePreview } from "./FeaturePreview";
+import { Folder, Heart, LockKeyhole } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { landingPhotos } from "../photos";
 
-const chapters = [
-  { label: "01 · Preview tự động", title: <>Gửi một link.<br />Khách thấy cả album.</>, description: "Dán thư mục Google Drive, Lumipic tạo preview để khách xem ảnh nhanh trên điện thoại." },
-  { label: "02 · Chọn và lưu tức thì", title: <>Ảnh ưng ý,<br />chạm một trái tim.</>, description: "Khách mở link, nhập mật khẩu và chọn ngay. Mỗi lượt thả tim được lưu vào danh sách của album." },
-  { label: "03 · Lọc RAW / xuất CSV", title: <>Đúng file RAW.<br />Sẵn sàng hậu kì.</>, description: "Lọc bản sao file RAW từ thư mục trên máy, hoặc xuất CSV để tìm ảnh trong Lightroom." },
+const points = [
+  { icon: Heart, title: "Nhiều người cùng chọn", description: "Lựa chọn từ mọi điện thoại gộp về một danh sách chung." },
+  { icon: LockKeyhole, title: "Riêng tư bằng mã 4 số", description: "Khoá lựa chọn hoặc đổi mã bất cứ lúc nào." },
+  { icon: Folder, title: "Drive của bạn, nguyên vẹn", description: "Chỉ đọc thư mục chia sẻ công khai — không sửa, không xoá." },
 ];
-const extras = [
-  { icon: ShieldCheck, title: "Không can thiệp Drive", description: "Chỉ đọc thư mục chia sẻ công khai. Không sửa, không xóa file gốc." },
-  { icon: LockKeyhole, title: "Mật khẩu bảo mật", description: "Đặt mật khẩu, khóa lựa chọn hoặc đổi mã khi cần." },
-  { icon: FileSpreadsheet, title: "Xuất CSV cho Lightroom", description: "Lấy tên file khách đã chọn để tìm trong Library Filter." },
-];
-export function FeaturesSection({ activeChapter = 0 }: { activeChapter?: number }) {
-  return <section id="features" className="landing-section landing-features">
-    <div className="landing-container">
-      <div className="landing-section-head"><h2>Nhẹ phần chọn ảnh.<br />Trọn phần sáng tạo.</h2><p>Cuộn để khám phá luồng làm việc — từ ảnh gửi khách đến file chuẩn bị hậu kì.</p></div>
-      <div className="landing-scroll-story">
-        <div>{chapters.map((chapter, index) => <article className="landing-story-chapter" data-feature-chapter={index} key={chapter.label}><p className="landing-eyebrow">{chapter.label}</p><h2>{chapter.title}</h2><p className="landing-description">{chapter.description}</p><div className="landing-mobile-preview"><FeaturePreview chapter={index} /></div></article>)}</div>
-        <div className="landing-sticky-preview">
-          <div className="landing-preview-panels">
-            {chapters.map((chapter, index) => (
-              <div
-                key={chapter.label}
-                className="landing-preview-panel"
-                data-active={index === activeChapter}
-                aria-hidden={index !== activeChapter}
-              >
-                <FeaturePreview chapter={index} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="landing-feature-extras">{extras.map(({ icon: Icon, title, description }) => <article key={title}><Icon aria-hidden="true" /><h3>{title}</h3><p>{description}</p></article>)}</div>
+const photo = landingPhotos[1];
+
+export function FeaturesSection() {
+  return <section id="features" className="lp-wrap lp-section lp-split">
+    <div className="lp-split-photo">
+      <img src={photo.src} alt={photo.alt} width="640" height="960" loading="lazy" decoding="async" />
+      <Badge className="lp-photo-badge"><span className="lp-accent-text" aria-hidden="true">♥</span>4 người cùng chọn</Badge>
+    </div>
+    <div className="lp-split-copy">
+      <h2>Khách chọn lúc thảnh thơi.<br /><span className="lp-accent-text">Bạn rảnh tay làm việc khác.</span></h2>
+      <ul className="lp-points">
+        {points.map(({ icon: Icon, title, description }) => (
+          <li key={title}>
+            <span className="lp-point-icon" aria-hidden="true"><Icon /></span>
+            <div><strong>{title}</strong><span>{description}</span></div>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>;
 }

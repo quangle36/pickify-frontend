@@ -1,11 +1,8 @@
 import { useState } from "react";
 import {
-  Heart,
   LayoutDashboard,
-  LogIn,
   LogOut,
   Menu,
-  Plus,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LumipicLogo } from "./LumipicLogo";
 
 interface LandingNavbarProps {
   onLogout: () => void;
@@ -42,37 +40,27 @@ export function LandingNavbar({
     { id: "pricing", label: "Bảng giá" },
   ];
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md">
-      <div className="landing-container h-[76px] flex items-center justify-between gap-4">
-        <Button
-          variant="ghost"
-          aria-label="Lumipic — về trang chủ"
-          asChild
-          className="flex items-center gap-2.5 shrink-0 px-0 hover:bg-transparent"
-        >
-          <a href="/" aria-label="Lumipic — về trang chủ"><span className="w-8 h-8 rounded-full bg-neutral-900 grid place-items-center text-white">
-            <Heart className="w-4 h-4 fill-white" />
-          </span>
-          <span className="text-xl font-medium tracking-tight text-neutral-900">
-            Lumipic
-          </span></a>
-        </Button>
+    <header className="lp-header">
+      <div className="lp-wrap lp-header-inner">
+        <a href="/" aria-label="Lumipic — về trang chủ" className="shrink-0">
+          <LumipicLogo />
+        </a>
 
         <nav
           aria-label="Điều hướng chính"
-          className="landing-navlinks hidden md:flex items-center gap-1 text-sm text-neutral-600"
+          className="hidden md:flex items-center gap-1.5"
         >
           {links.map((link) => (
             <Button
-              variant="ghost"
+              variant={null}
+              size={null}
               key={link.id}
               asChild
-              className="rounded-full px-4 font-normal text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+              className="lp-nav-link"
             >
-              <a href={`#${link.id}`} onClick={() => setMenuOpen(false)}>{link.label}</a>
+              <a href={`#${link.id}`}>{link.label}</a>
             </Button>
           ))}
-          <a href="/huong-dan/gui-anh-google-drive" className="rounded-full px-4 py-2 hover:bg-neutral-100 hover:text-neutral-900">Hướng dẫn</a>
         </nav>
 
         <div className="flex items-center gap-2" aria-label="Tài khoản">
@@ -89,9 +77,9 @@ export function LandingNavbar({
             <>
               <Button
                 asChild
-                variant="secondary"
-                size="sm"
-                className="rounded-full gap-1.5 text-xs"
+                variant={null}
+                size={null}
+                className="lp-nav-cta"
               ><a href="/dashboard">
                 <LayoutDashboard className="w-3.5 h-3.5" />
                 <span>Dashboard</span>
@@ -152,28 +140,23 @@ export function LandingNavbar({
             <>
               <Button
                 asChild
-                variant="ghost"
-                size="sm"
-                className="hidden sm:inline-flex rounded-full text-xs text-neutral-700 hover:bg-neutral-100"
-              ><a href="/dashboard/sign-in">
-                <LogIn className="hidden sm:block w-3.5 h-3.5 mr-1.5" />
-                Đăng nhập
-              </a></Button>
+                variant={null}
+                size={null}
+                className="lp-nav-link hidden sm:inline-flex"
+              ><a href="/dashboard/sign-in">Đăng nhập</a></Button>
               <Button
                 asChild
-                size="sm"
-                className="rounded-full text-xs bg-neutral-900 text-white shadow-none hover:bg-neutral-700 gap-1.5"
-              ><a href="/dashboard/sign-in">
-                <Plus className="hidden sm:block w-3.5 h-3.5" />
-                Bắt đầu miễn phí
-              </a></Button>
+                variant={null}
+                size={null}
+                className="lp-nav-cta"
+              ><a href="/dashboard/sign-in">Bắt đầu miễn phí</a></Button>
             </>
           )}
           <Button
             onClick={() => setMenuOpen((open) => !open)}
-            size="icon-sm"
-            variant="ghost"
-            className="md:hidden shrink-0"
+            size={null}
+            variant={null}
+            className="lp-menu-btn md:hidden shrink-0"
             aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
             aria-expanded={menuOpen}
           >
@@ -189,15 +172,15 @@ export function LandingNavbar({
       {menuOpen && (
         <nav
           aria-label="Điều hướng di động"
-          className="md:hidden border-t border-stone-100 p-3 flex flex-col text-sm"
+          className="lp-wrap md:hidden pb-3 flex flex-col"
         >
-          <a href="/huong-dan/gui-anh-google-drive" className="rounded-lg px-3 py-2.5 text-neutral-600 hover:bg-neutral-100">Hướng dẫn gửi ảnh</a>
           {links.map((link) => (
             <Button
-              variant="ghost"
+              variant={null}
+              size={null}
               key={link.id}
               asChild
-              className="justify-start rounded-lg px-3 py-2.5 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 font-normal"
+              className="lp-nav-link justify-start"
             >
               <a href={`#${link.id}`} onClick={() => setMenuOpen(false)}>{link.label}</a>
             </Button>
