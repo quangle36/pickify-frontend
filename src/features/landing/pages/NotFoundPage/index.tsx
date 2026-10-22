@@ -1,5 +1,6 @@
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function NotFoundPage() {
@@ -14,10 +15,7 @@ export default function NotFoundPage() {
         className="mx-auto flex w-max items-center gap-2.5 text-xl font-extrabold leading-[normal] tracking-[-0.8px] outline-none focus-visible:underline focus-visible:underline-offset-4"
         aria-label="Lumipic — về trang chủ"
       >
-        <span className="grid h-8 w-8 place-items-center rounded-xl bg-brand-600 text-white" aria-hidden="true">
-          <Heart className="h-4 w-4 fill-current" strokeWidth={0} />
-        </span>
-        Lumipic
+        <LumipicLogo />
       </a>
 
       <section className="flex min-w-0 flex-1 items-center justify-center py-10" aria-labelledby="not-found-title">

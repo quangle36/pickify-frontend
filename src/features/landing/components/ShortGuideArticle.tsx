@@ -1,3 +1,4 @@
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
 import { Button } from "@/components/ui/button";
 import { RelatedGuides } from "./RelatedGuides";
 
@@ -7,7 +8,7 @@ interface Props { path: string; title: string; intro: string; sections: readonly
 export function ShortGuideArticle({ path, title, intro, sections, image }: Props) {
   return <div className="min-h-screen bg-white text-neutral-900">
     <header className="border-b border-neutral-200"><div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5 sm:px-8">
-      <a href="/" className="text-xl font-medium tracking-tight">Lumipic</a>
+      <a href="/" aria-label="Lumipic — về trang chủ"><LumipicLogo /></a>
       <Button asChild className="rounded-full"><a href="/dashboard">Tạo album</a></Button>
     </div></header>
     <main className="mx-auto max-w-3xl px-6 py-12 sm:px-8 sm:py-16">

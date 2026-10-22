@@ -1,0 +1,21 @@
+@import "@/lib/brand/typography.css";
+
+.lumipic-dashboard,
+body:has(.lumipic-dashboard) [role="dialog"],
+body:has(.lumipic-dashboard) [role="menu"] {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.lumipic-dashboard :is(h1, h2, h3),
+body:has(.lumipic-dashboard) [role="dialog"] :is(h1, h2, h3) {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+}
+.lumipic-dashboard h1 {
+  font-weight: 800;
+  letter-spacing: -.035em;
+}
+@media (max-width: 639px) {
+  .photographer-navbar .lumipic-logo { font-size: 22px; }
+  .photographer-navbar .lumipic-logo svg { width: 32px; height: 32px; }
+}

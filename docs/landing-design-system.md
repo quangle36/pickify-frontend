@@ -1,6 +1,8 @@
 # Hệ thống thiết kế trang landing
 
-Trang landing (`/`) có hệ thống thiết kế riêng: nền trắng xen hồng nhạt, một màu nhấn hồng `#D61F5B`, tiêu đề Bricolage Grotesque, chữ thường Be Vietnam Pro.
+Bộ nhận diện trích xuất để redesign các trang khác: [Lumipic brand kit](brand/README.md), kèm token CSS/JSON, logo SVG, font và trang xem mẫu.
+
+Trang landing (`/`) có hệ thống thiết kế riêng: nền trắng xen hồng nhạt, một màu nhấn hồng `#D61F5B`, tiêu đề Bricolage Grotesque, chữ thường ui-sans-serif.
 
 Toàn bộ nằm trong `src/features/landing/pages/LandingPage/LandingPage.css` và chỉ áp dụng bên trong `.landing-page`. Dashboard và các trang khác vẫn dùng token chung của app (`.agents/skills/ui-ux/references/brand-tokens.md`). Đừng trộn hai bên.
 
@@ -38,10 +40,10 @@ Chữ màu nhấn dùng `--lp-accent-text`, không dùng `--lp-accent`. Bản đ
 
 ## Chữ
 
-Hai font, chia vai rõ:
+Font chữ chia vai rõ:
 
 - **Bricolage Grotesque** (500–800): h1, h2, logo, số giá, tên album, tiêu đề bước. Tiêu đề lớn dùng 800, tiêu đề nhỏ dùng 700.
-- **Be Vietnam Pro** (400, 500, 600): mọi chữ còn lại. Cỡ gốc 17px, line-height 1.6.
+- **ui-sans-serif** (400, 500, 600): mọi chữ còn lại. Cỡ gốc 17px, line-height 1.6.
 
 Tiêu đề có letter-spacing âm: mặc định `-0.035em`, logo `-0.045em`.
 
@@ -59,7 +61,7 @@ Tiêu đề có letter-spacing âm: mặc định `-0.035em`, logo `-0.045em`.
 
 ### Nạp font
 
-Font được self-host trong thư mục `fonts/` cạnh `LandingPage.css`. Vite đóng gói chúng vào `/assets/`.
+Bricolage Grotesque được self-host trong thư mục `src/lib/brand/fonts/`. Vite đóng gói vào `/assets/`. Chữ thường dùng font hệ thống `ui-sans-serif, system-ui, sans-serif`, không tải thêm font.
 
 - Chỉ có hai bộ ký tự: latin và tiếng Việt.
 - Không thêm link Google Fonts. `scripts/check-seo.mjs` sẽ fail nếu HTML của `/` chứa `fonts.googleapis.com`.
@@ -93,7 +95,7 @@ Bo góc:
 
 | Thành phần | Class hoặc file | Ghi chú |
 | --- | --- | --- |
-| Logo | `LumipicLogo.tsx` | Hai tấm ảnh nghiêng thành trái tim. Biểu tượng dùng `currentColor`, tức màu nhấn. Cỡ 40px ở header, 30px ở footer. |
+| Logo | `src/components/ui/lumipic-logo.tsx` | Hai tấm ảnh nghiêng thành trái tim. Biểu tượng dùng `currentColor`, tức màu nhấn. Cỡ 40px ở header, 30px ở footer. |
 | CTA chính | `.lp-cta` | Nền màu nhấn |
 | CTA phụ | `.lp-cta-ghost` | Nền trắng, có viền |
 | Nút header | `.lp-nav-link`, `.lp-nav-cta` | CTA header dùng nền mực |

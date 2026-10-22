@@ -1,0 +1,15 @@
+@import "@/lib/brand/typography.css";
+
+.auth-screen {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.auth-screen h1 {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -.035em;
+}
+@media (max-width: 639px) {
+  .auth-screen .lumipic-logo { font-size: 22px; }
+  .auth-screen .lumipic-logo svg { width: 32px; height: 32px; }
+}

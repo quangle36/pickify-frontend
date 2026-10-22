@@ -1,3 +1,4 @@
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
 import { InfinitePhotoLoader } from "@/features/photo/components/InfinitePhotoLoader";
 import { FC, useState, useEffect, useRef } from "react";
 import type { Photo } from "@/features/photo/types/photo.types";
@@ -123,10 +124,7 @@ export const GuestAlbumView: FC<GuestAlbumViewProps> = ({
     >
       <header className="border-b border-border bg-card px-4 py-3 md:px-6 md:py-4">
         <div className="mx-auto flex max-w-[1392px] items-center justify-between gap-3">
-          <span className="flex items-center gap-2 text-sm font-semibold">
-            <Heart className="h-5 w-5 text-primary" />
-            Lumipic
-          </span>
+          <LumipicLogo />
           <Button
             variant="ghost"
             size="icon"

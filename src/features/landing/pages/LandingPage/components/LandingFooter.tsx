@@ -1,11 +1,11 @@
 import { FC } from "react";
-import { LumipicLogo } from "./LumipicLogo";
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
 
 export const LandingFooter: FC = () => {
   return (
     <footer className="lp-footer">
       <div className="lp-wrap lp-footer-inner">
-        <LumipicLogo size={30} />
+        <LumipicLogo className="lp-logo" size={30} />
         <nav aria-label="Chân trang">
           <a href="/huong-dan/gui-anh-google-drive">Hướng dẫn</a>
           <a href="/dashboard">Demo</a>

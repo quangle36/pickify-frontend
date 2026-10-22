@@ -1,5 +1,6 @@
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
 import { RelatedGuides } from "../../components/RelatedGuides";
-import { ArrowLeft, ArrowRight, Heart } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { guideSteps } from "./guide";
 import { GuideStep } from "./GuideStep";
@@ -11,7 +12,7 @@ export default function DriveSelectionGuidePage() {
     <header className="sticky top-0 z-30 border-b border-neutral-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4 px-6 sm:px-8">
         <a href="/" className="flex items-center gap-2.5 text-xl font-medium tracking-tight" aria-label="Lumipic — về trang chủ">
-          <span className="grid size-8 place-items-center rounded-full bg-neutral-900 text-white"><Heart className="size-4 fill-current" aria-hidden="true" /></span>Lumipic
+          <LumipicLogo />
         </a>
         <Button asChild className="rounded-full bg-neutral-900 px-5 text-white shadow-none hover:bg-neutral-700"><a href="/dashboard">Tạo album <ArrowRight className="ml-2 size-4" aria-hidden="true" /></a></Button>
       </div>
