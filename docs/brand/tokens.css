@@ -1,0 +1,44 @@
+/* Extracted Lumipic brand. Opt in on a wrapper; no global theme override. */
+:where(.lumipic-brand) {
+  --lumipic-bg: #fff;
+  --lumipic-soft: #fff4f6;
+  --lumipic-card: #fff;
+  --lumipic-ink: #1a1420;
+  --lumipic-muted: #5a5160;
+  --lumipic-line: #eee7ec;
+  --lumipic-accent: #d61f5b;
+  --lumipic-accent-hover: #b8184d;
+  --lumipic-on-accent: #fff;
+  --lumipic-accent-soft: #ffe8ee;
+  --lumipic-accent-text: #9c1240;
+  --lumipic-hero-accent: #ff7fa3;
+  --lumipic-band: #1a1420;
+  --lumipic-band-ink: #fff;
+  --lumipic-band-muted: #c9c0cc;
+  --lumipic-device: #15161a;
+  --lumipic-font-body: ui-sans-serif, system-ui, sans-serif;
+  --lumipic-font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --lumipic-radius-input: 14px;
+  --lumipic-radius-icon: 12px;
+  --lumipic-radius-card: 22px;
+  --lumipic-radius-step: 24px;
+  --lumipic-radius-panel: 32px;
+  --lumipic-radius-pill: 999px;
+  --lumipic-shadow-card: 0 10px 30px rgb(0 0 0 / .06);
+  --lumipic-shadow-float: 0 18px 40px rgb(13 21 48 / .12);
+  --lumipic-shadow-phone: 0 30px 70px rgb(13 21 48 / .22);
+  --lumipic-motion-fast: 150ms;
+  --lumipic-motion-standard: 350ms;
+  --lumipic-motion-panel: 500ms;
+  --lumipic-motion-ease: ease;
+  --lumipic-motion-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --lumipic-content-max: 1280px;
+  --lumipic-gutter: clamp(20px, 5vw, 48px);
+  font-family: var(--lumipic-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.lumipic-brand .lumipic-display { font-family: var(--lumipic-font-display); }
+@media (prefers-reduced-motion: reduce) {
+  .lumipic-brand { --lumipic-motion-fast: 0ms; --lumipic-motion-standard: 0ms; --lumipic-motion-panel: 0ms; }
+}

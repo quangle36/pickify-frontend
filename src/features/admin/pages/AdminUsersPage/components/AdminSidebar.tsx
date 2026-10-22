@@ -1,4 +1,5 @@
-import { Heart, HardDrive, LayoutDashboard, Users, ShieldCheck, LogOut } from 'lucide-react';
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
+import { HardDrive, LayoutDashboard, Users, ShieldCheck, LogOut } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import type { PhotographerProfile } from '@/features/photographer/types/album.types';
@@ -14,7 +15,7 @@ export function AdminSidebar({ profile, total, active, onNavigate, onLogout }: {
     { id: 'dung-luong', label: 'Dung lượng', icon: HardDrive },
   ];
   return <>
-    <Link to="/" className="admin-brand"><span className="admin-brand-logo"><Heart fill="currentColor" /></span>Lumipic <small>ADMIN</small></Link>
+    <Link to="/" className="admin-brand"><LumipicLogo /> <small>ADMIN</small></Link>
     <nav className="admin-side-nav" aria-label="Điều hướng quản trị">
       <p className="admin-nav-label">Quản trị</p>
       {items.map(item => <a key={item.id} href={`#${item.id}`} className={`admin-nav-item ${active === item.id ? 'selected' : ''}`} aria-current={active === item.id ? 'location' : undefined} onClick={() => onNavigate(item.id)}>

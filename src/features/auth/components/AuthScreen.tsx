@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { getPageSeo } from "@/app/seo";
-import { ArrowLeft, ArrowRight, Heart, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { errorMessage } from "@/api/errors";
 import {
   useAuthConfigQuery,
   useOwnerQuery,
 } from "@/features/auth/queries/auth.queries";
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
+import "./AuthScreen.css";
 import { GoogleMark } from "./GoogleMark";
 import { EmailAuthForm } from "./EmailAuthForm";
 import { useEmailAuthMutation } from "../queries/auth.mutations";
@@ -102,7 +104,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7f4ef] text-stone-900">
+    <main className="auth-screen relative min-h-screen overflow-hidden bg-[#f7f4ef] text-stone-900">
       <div className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(#a8a29e_0.7px,transparent_0.7px)] [background-size:18px_18px]" />
       <div className="pointer-events-none absolute -left-44 -top-44 h-[34rem] w-[34rem] rounded-full bg-rose-200/50 blur-3xl" />
 
@@ -113,12 +115,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             aria-label="Lumipic — về trang chủ"
             className="group flex items-center gap-2.5"
           >
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-stone-900 text-white shadow-lg shadow-stone-900/15 transition-all duration-200 group-hover:-rotate-6">
-              <Heart className="h-[18px] w-[18px] fill-white" />
-            </span>
-            <span className="text-xl font-extrabold tracking-[-0.04em]">
-              Lumipic
-            </span>
+            <LumipicLogo />
           </a>
           <a
             href="/"

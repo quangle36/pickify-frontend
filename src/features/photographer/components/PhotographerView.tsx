@@ -1,3 +1,4 @@
+import "./dashboardBrand.css";
 import type { AppController } from "@/app/hooks/useAppController";
 import PhotographerDashboardPage from "@/features/photographer/pages/PhotographerDashboardPage";
 import AlbumDetailPage from "@/features/photographer/pages/AlbumDetailPage";
@@ -31,7 +32,7 @@ export function PhotographerView({
     );
   }
   return (
-    <>
+    <div className={isDetailView ? "contents" : "lumipic-dashboard flex flex-1 flex-col"}>
       <PhotographerNavbar profile={profile} onLogout={actions.logout} />
       {!profile.canCreateAlbums && <div className="mx-auto mt-5 w-full max-w-7xl px-4 sm:px-8"><Alert><AlertDescription>
         {profile.emailVerified ? 'Tài khoản đang chờ quản trị viên cấp quyền tạo album. Bạn vẫn có thể quản lý album hiện có.' : 'Xác minh email bằng Google, sau đó chờ quản trị viên cấp quyền tạo album.'}
@@ -69,6 +70,6 @@ export function PhotographerView({
         selectionEnabled={false}
         commentsBasePath={album ? `/albums/${album.id}` : undefined}
       />
-    </>
+    </div>
   );
 }

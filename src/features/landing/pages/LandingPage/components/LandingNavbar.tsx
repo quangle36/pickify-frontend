@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LumipicLogo } from "./LumipicLogo";
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
 
 interface LandingNavbarProps {
   onLogout: () => void;
@@ -43,7 +43,7 @@ export function LandingNavbar({
     <header className="lp-header">
       <div className="lp-wrap lp-header-inner">
         <a href="/" aria-label="Lumipic — về trang chủ" className="shrink-0">
-          <LumipicLogo />
+          <LumipicLogo className="lp-logo" />
         </a>
 
         <nav

@@ -1,5 +1,6 @@
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
 import { FC, useId, useState, FormEvent } from 'react';
-import { Eye, EyeOff, Heart } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { errorMessage } from '@/api/errors';
 import { useGuestVerificationMutation } from '@/features/guest/queries/guest.mutations';
 import type { Album } from '@/features/photographer/types/album.types';
@@ -49,10 +50,7 @@ export const GuestPasscodeModal: FC<GuestPasscodeModalProps> = ({
     >
       <div className="w-full max-w-[360px] md:max-w-[400px]">
         <div className="mb-8 flex items-center gap-2 text-lg font-extrabold md:mb-10">
-          <span className="grid size-7 place-items-center rounded-full bg-neutral-900 text-white">
-            <Heart className="size-[18px] fill-current" aria-hidden="true" />
-          </span>
-          <span>Lumipic</span>
+          <LumipicLogo />
         </div>
 
         <div className="mb-8">

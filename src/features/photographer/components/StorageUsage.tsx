@@ -25,7 +25,7 @@ export function StorageUsage({ profile }: { profile: Pick<PhotographerProfile,
       </div>
       <Progress value={percent} aria-valuenow={percent}
         className="h-1.5" indicatorColor="bg-stone-900" aria-label="Dung lượng lưu trữ đã dùng" />
-      {remaining === 0 && <p>Đã hết dung lượng. Hãy xoá album không còn dùng và chờ dọn xong.</p>}
+      {remaining === 0 && <p>Đã hết dung lượng. Hãy xoá album không còn dùng để giải phóng dung lượng.</p>}
     </div>
   );
 }

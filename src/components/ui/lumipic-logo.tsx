@@ -1,7 +1,9 @@
 /** Two photo cards tilted into a heart, beside the "lumipic" wordmark. */
-export function LumipicLogo({ size = 40 }: { size?: number }) {
+import "@/lib/brand/logo.css";
+
+export function LumipicLogo({ size = 40, className = "" }: { size?: number; className?: string }) {
   return (
-    <span className="lp-logo">
+    <span className={`lumipic-logo ${className}`}>
       <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
         <g transform="translate(32 53) scale(1.22)">
           <path d="M-20 0 V-22 A10 10 0 0 1 0 -22 V0 Z" transform="rotate(45)" fill="currentColor" opacity="0.5" />

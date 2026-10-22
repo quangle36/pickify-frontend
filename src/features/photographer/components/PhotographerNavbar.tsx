@@ -1,8 +1,8 @@
 import { FC } from "react";
+import { LumipicLogo } from "@/components/ui/lumipic-logo";
 import { Link } from "@tanstack/react-router";
 import type { PhotographerProfile } from "@/features/photographer/types/album.types";
 import {
-  Heart,
   LogOut,
   ChevronDown,
   ShieldCheck,
@@ -26,7 +26,7 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
   onLogout,
 }) => {
   return (
-    <header className="sticky top-0 z-30 border-b border-stone-200 bg-white">
+    <header className="photographer-navbar sticky top-0 z-30 border-b border-stone-200 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
         {/* Left: Brand Logo & Landing Link */}
         <div className="flex items-center gap-3">
@@ -35,12 +35,7 @@ export const PhotographerNavbar: FC<PhotographerNavbarProps> = ({
             className="flex items-center gap-2.5 group focus:outline-hidden"
             title="Quay về Trang chủ Landing Page"
           >
-            <div className="w-8 h-8 rounded-full bg-neutral-900 grid place-items-center text-white">
-              <Heart className="w-4 h-4 fill-white" />
-            </div>
-            <span className="text-left text-base font-semibold leading-tight text-stone-900">
-              Lumipic
-            </span>
+            <LumipicLogo />
           </Link>
 
 

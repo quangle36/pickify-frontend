@@ -1,0 +1,18 @@
+@import "./typography.css";
+
+.lumipic-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -.045em;
+  color: #1a1420;
+}
+.lumipic-logo svg { flex: none; color: #d61f5b; }
+@media (max-width: 639px) {
+  .lumipic-logo:not(.lp-logo) { font-size: 22px; }
+  .lumipic-logo:not(.lp-logo) svg { width: 32px; height: 32px; }
+}
